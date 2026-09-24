@@ -1,7 +1,9 @@
 {
   "name": "Visitor Counter",
   "short_name": "Visitors",
+  "id": "./Visitor%20Counter/",
   "start_url": "./Visitor%20Counter/index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
@@ -10,7 +12,13 @@
       "src": "./Icons/Visitor.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./Icons/Visitor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
