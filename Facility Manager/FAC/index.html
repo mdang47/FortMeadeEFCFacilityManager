@@ -1,35 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Eagle Fitness Center</title>
+  <title>707 FSS | Fitness Assessment Cell</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
       background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    /* HEADER */
+    .header {
+      width: 100%;
       text-align: center;
+      padding: 65px 30px 40px;
+    }
+
+    .unit {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 6px;
+      color: #5f6873;
+      margin-bottom: 10px;
     }
 
     h1 {
-      margin-top: 80px;
+      margin: 0;
       font-size: 48px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #1f2937;
     }
 
-    p {
-      font-size: 22px;
-      color: #555;
+    /* MAIN CONTENT AREA */
+    .dashboard {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .header {
+        padding-top: 45px;
+      }
+
+      .unit {
+        font-size: 18px;
+        letter-spacing: 4px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Eagle Fitness Center</h1>
-  <p>FAC Operations Portal</p>
+  <header class="header">
+    <div class="unit">707 FSS</div>
+    <h1>FITNESS ASSESSMENT CELL</h1>
+  </header>
+
+  <main class="dashboard">
+
+    <!-- We will add the FAC dashboard buttons here -->
+
+  </main>
 
 </body>
+
 </html>
