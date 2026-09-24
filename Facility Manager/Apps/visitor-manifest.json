@@ -1,0 +1,16 @@
+{
+  "name": "Visitor Counter",
+  "short_name": "Visitors",
+  "start_url": "./Visitor%20Counter/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "./Icons/Visitor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
