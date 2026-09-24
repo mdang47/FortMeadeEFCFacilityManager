@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,80 +11,463 @@
       box-sizing: border-box;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
-      height: 100%;
+      min-height: 100%;
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      color: #1f2937;
+      background: #f3f5f7;
+      color: #17212b;
+      padding: 30px;
     }
 
-    /* HEADER */
+    /* =========================
+       HEADER
+       ========================= */
+
     .header {
-      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto 28px;
       text-align: center;
-      padding: 65px 30px 40px;
+    }
+
+    .date-time {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      font-size: 18px;
+      font-weight: 600;
+      color: #68737e;
+
+      margin-bottom: 30px;
     }
 
     .unit {
-      font-size: 24px;
-      font-weight: 600;
+      font-size: 22px;
+      font-weight: 700;
       letter-spacing: 6px;
-      color: #5f6873;
-      margin-bottom: 10px;
+      color: #68737e;
+      margin-bottom: 8px;
     }
 
     h1 {
       margin: 0;
-      font-size: 48px;
+
+      font-size: clamp(34px, 4vw, 58px);
       font-weight: 800;
       letter-spacing: 2px;
-      color: #1f2937;
     }
 
-    /* MAIN CONTENT AREA */
+    /* =========================
+       MAIN LAYOUT
+       ========================= */
+
     .dashboard {
-      width: 90%;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
+
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 22px;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 700px) {
-      .header {
-        padding-top: 45px;
+    .panel {
+      background: #ffffff;
+
+      border-radius: 20px;
+      padding: 28px;
+
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .panel-title {
+      margin: 0 0 25px;
+
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    /* =========================
+       FAC INFORMATION
+       ========================= */
+
+    .info-section {
+      margin-bottom: 27px;
+    }
+
+    .info-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #7a858f;
+
+      margin-bottom: 7px;
+    }
+
+    .info-primary {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .info-secondary {
+      font-size: 17px;
+      color: #606b75;
+      margin-top: 2px;
+    }
+
+    .email {
+      font-size: 19px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .poc-list {
+      font-size: 19px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    /* =========================
+       QUICK ACCESS
+       ========================= */
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .quick-card {
+      min-height: 230px;
+
+      border: 2px solid #e5e9ed;
+      border-radius: 18px;
+
+      padding: 22px 15px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      background: #fafbfc;
+    }
+
+    .quick-icon {
+      font-size: 44px;
+      margin-bottom: 16px;
+    }
+
+    .quick-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .coming-soon {
+      margin-top: 10px;
+
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+
+      color: #8a949e;
+    }
+
+    /* =========================
+       FOOTER
+       ========================= */
+
+    .footer {
+      max-width: 1400px;
+      margin: 22px auto 0;
+
+      text-align: center;
+
+      font-size: 13px;
+      color: #89939c;
+    }
+
+    /* =========================
+       TABLET
+       ========================= */
+
+    @media (max-width: 900px) {
+
+      body {
+        padding: 20px;
+      }
+
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-card {
+        min-height: 180px;
+      }
+
+    }
+
+    /* =========================
+       SMALL TABLET / PHONE
+       ========================= */
+
+    @media (max-width: 650px) {
+
+      .date-time {
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 22px;
       }
 
       .unit {
-        font-size: 18px;
-        letter-spacing: 4px;
+        font-size: 17px;
       }
 
       h1 {
-        font-size: 32px;
+        font-size: 31px;
       }
+
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-card {
+        min-height: 140px;
+      }
+
     }
+
   </style>
 </head>
 
+
 <body>
 
+  <!-- =========================
+       HEADER
+       ========================= -->
+
   <header class="header">
-    <div class="unit">707 FSS</div>
-    <h1>FITNESS ASSESSMENT CELL</h1>
+
+    <div class="date-time">
+      <div id="currentDate"></div>
+      <div id="currentTime"></div>
+    </div>
+
+    <div class="unit">
+      707 FSS
+    </div>
+
+    <h1>
+      FITNESS ASSESSMENT CELL
+    </h1>
+
   </header>
+
+
+  <!-- =========================
+       DASHBOARD
+       ========================= -->
 
   <main class="dashboard">
 
-    <!-- We will add the FAC dashboard buttons here -->
+
+    <!-- FAC INFORMATION -->
+
+    <section class="panel">
+
+      <h2 class="panel-title">
+        FAC INFORMATION
+      </h2>
+
+
+      <div class="info-section">
+
+        <div class="info-label">
+          BCA TIMES
+        </div>
+
+        <div class="info-primary">
+          1200–1500
+        </div>
+
+        <div class="info-secondary">
+          Monday–Friday
+        </div>
+
+      </div>
+
+
+      <div class="info-section">
+
+        <div class="info-label">
+          FAC EMAIL
+        </div>
+
+        <div class="email">
+          707fss.fac@us.af.mil
+        </div>
+
+      </div>
+
+
+      <div class="info-section">
+
+        <div class="info-label">
+          POINTS OF CONTACT
+        </div>
+
+        <div class="poc-list">
+          SrA Tiskalas<br>
+          SrA Howell<br>
+          A1C Cortez
+        </div>
+
+      </div>
+
+
+      <!-- FAC PHONE CAN BE ADDED HERE LATER -->
+
+    </section>
+
+
+
+    <!-- QUICK ACCESS -->
+
+    <section class="panel">
+
+      <h2 class="panel-title">
+        QUICK ACCESS
+      </h2>
+
+
+      <div class="quick-grid">
+
+
+        <!-- PFRA COUNTER -->
+
+        <div class="quick-card">
+
+          <div class="quick-icon">
+            🏃
+          </div>
+
+          <div class="quick-title">
+            PFRA COUNTER
+          </div>
+
+          <div class="coming-soon">
+            COMING SOON
+          </div>
+
+        </div>
+
+
+
+        <!-- PFRA SCORING -->
+
+        <div class="quick-card">
+
+          <div class="quick-icon">
+            📊
+          </div>
+
+          <div class="quick-title">
+            PFRA SCORING
+          </div>
+
+          <div class="coming-soon">
+            COMING SOON
+          </div>
+
+        </div>
+
+
+
+        <!-- RESOURCES -->
+
+        <div class="quick-card">
+
+          <div class="quick-icon">
+            📚
+          </div>
+
+          <div class="quick-title">
+            RESOURCES
+          </div>
+
+          <div class="coming-soon">
+            COMING SOON
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
 
   </main>
 
-</body>
 
+  <footer class="footer">
+    707 FSS • FITNESS ASSESSMENT CELL
+  </footer>
+
+
+
+  <!-- =========================
+       DATE + CLOCK
+       ========================= -->
+
+  <script>
+
+    function updateDateTime() {
+
+      const now = new Date();
+
+
+      /* DATE */
+
+      document.getElementById("currentDate").textContent =
+        now.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        }).toUpperCase();
+
+
+      /* TIME */
+
+      document.getElementById("currentTime").textContent =
+        now.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+
+    }
+
+
+    updateDateTime();
+
+    setInterval(updateDateTime, 1000);
+
+  </script>
+
+</body>
 </html>
