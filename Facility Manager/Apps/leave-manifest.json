@@ -3,7 +3,7 @@
   "short_name": "Leave",
   "id": "./Leave%20Tracker/",
   "start_url": "./Leave%20Tracker/leave.html",
-  "scope": "./",
+  "scope": "./Leave Tracker/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
@@ -14,11 +14,5 @@
       "type": "image/png",
       "purpose": "any"
     },
-    {
-      "src": "./Icons/Leave.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
   ]
 }
