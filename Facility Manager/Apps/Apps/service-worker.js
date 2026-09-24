@@ -1,9 +1,20 @@
-const CACHE_NAME = "visitor-counter-v1";
+const CACHE_NAME = "facility-manager-v4";
 
 const FILES_TO_CACHE = [
+  // Visitor Counter
   "./Visitor Counter/index.html",
   "./visitor-manifest.json",
-  "./Icons/Visitor.png"
+  "./Icons/Visitor.png",
+
+  // Inventory
+  "./Inventory/inventory.html",
+  "./inventory-manifest.json",
+  "./Icons/Inventory.png",
+
+  // Leave Tracker
+  "./Leave Tracker/leave.html",
+  "./leave-manifest.json",
+  "./Icons/Leave.png"
 ];
 
 self.addEventListener("install", event => {
@@ -12,6 +23,7 @@ self.addEventListener("install", event => {
       return cache.addAll(FILES_TO_CACHE);
     })
   );
+
   self.skipWaiting();
 });
 

@@ -1,21 +1,21 @@
 {
-  "name": "Visitor Counter",
-  "short_name": "Visitors",
-  "id": "./Visitor%20Counter/",
-  "start_url": "./Visitor%20Counter/index.html",
+  "name": "Inventory",
+  "short_name": "Inventory",
+  "id": "./Inventory/",
+  "start_url": "./Inventory/inventory.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "./Icons/Visitor.png",
+      "src": "./Icons/Inventory.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./Icons/Visitor.png",
+      "src": "./Icons/Inventory.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

@@ -6,6 +6,9 @@
 
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="../inventory-manifest.json">
+<link rel="icon" type="image/png" sizes="512x512" href="../Icons/Inventory.png">
+<link rel="apple-touch-icon" href="../Icons/Inventory.png">
 
 <title>Inventory</title>
 
@@ -2713,9 +2716,18 @@ loadServerInventory()
     syncPending()
 );
 
-
 </script>
 
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("../service-worker.js")
+        .then(() => console.log("Service worker registered"))
+        .catch(error => console.error("Service worker registration failed:", error));
+    });
+  }
+</script>
 
 </body>
 </html>
