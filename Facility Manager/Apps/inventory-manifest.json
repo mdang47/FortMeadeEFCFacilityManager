@@ -3,7 +3,7 @@
   "short_name": "Inventory",
   "id": "./Inventory/",
   "start_url": "./Inventory/inventory.html",
-  "scope": "./",
+  "scope": "./Inventory/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
@@ -13,12 +13,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "./Icons/Inventory.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
