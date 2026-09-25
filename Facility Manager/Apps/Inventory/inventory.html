@@ -1278,9 +1278,65 @@ function displayInventory() {
     let visibleItems = 0;
 
 
-    inventory.forEach(
+/* =========================
+   SORT INVENTORY
+========================= */
 
-        item => {
+const sortOption =
+document.getElementById("sortInventory").value;
+
+const categoryOrder = [
+    "Safety",
+    "Cleaning",
+    "Office",
+    "Fitness Equipment",
+    "Facility",
+    "FAC",
+    "Other"
+];
+
+const sortedInventory = [...inventory];
+
+if (sortOption === "category") {
+
+    sortedInventory.sort((a, b) => {
+
+        const categoryDifference =
+        categoryOrder.indexOf(a.category) -
+        categoryOrder.indexOf(b.category);
+
+        if (categoryDifference !== 0) {
+            return categoryDifference;
+        }
+
+        return String(a.name).localeCompare(
+            String(b.name)
+        );
+
+    });
+
+}
+
+else if (sortOption === "low") {
+
+    sortedInventory.sort((a, b) =>
+        Number(a.quantity) - Number(b.quantity)
+    );
+
+}
+
+else if (sortOption === "high") {
+
+    sortedInventory.sort((a, b) =>
+        Number(b.quantity) - Number(a.quantity)
+    );
+
+}
+
+
+sortedInventory.forEach(
+
+    item => {
 
 
             if (
