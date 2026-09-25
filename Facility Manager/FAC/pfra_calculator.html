@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USAF PFRA Calculator | 707 FSS FAC</title>
+<style>
+:root{--navy:#0b1f33;--navy2:#163b61;--blue:#2a6f9b;--lt:#edf5fb;--line:#c7d5e2;--text:#172033;--muted:#64748b;--ok:#166534;--bad:#991b1b;--white:#fff;--gold:#d7b56d}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7fa;color:var(--text)}
+.app{max-width:980px;margin:0 auto;padding:18px}
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:24px;border-radius:18px 18px 0 0}
+.hero-inner{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:18px;align-items:center}
+.hero-copy h1{margin:0;font-size:clamp(24px,4vw,38px);line-height:1.1}
+.hero-sub{margin:9px 0 0;font-size:14px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#dceaf7}
+.hero-note{margin:8px 0 0;opacity:.92;font-size:14px;line-height:1.45}
+.hero-badge{display:inline-block;margin-top:14px;padding:8px 12px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.08);font-size:13px;font-weight:800;letter-spacing:.03em}
+.logo-card{background:transparent;border-radius:0;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:none}
+.logo-card img{max-width:100%;height:auto;display:block;
+  filter: brightness(0) saturate(100%) invert(91%) sepia(14%) saturate(462%) hue-rotate(181deg) brightness(103%) contrast(97%);
+  opacity:.98;
+}
+.tabs{display:flex;background:#fff;border:1px solid var(--line);border-top:0}.tab{flex:1;padding:15px;border:0;background:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.tab.active{background:var(--lt);color:var(--blue);box-shadow:inset 0 -3px 0 var(--blue)}
+.panel{background:#fff;border:1px solid var(--line);border-top:0;padding:20px;border-radius:0 0 18px 18px}.hidden{display:none}
+.section{margin:0 0 22px}.section h2{font-size:15px;letter-spacing:.08em;color:var(--blue);margin:0 0 12px;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+label{display:block;font-size:13px;font-weight:700;margin:0 0 6px;color:#334155}input,select{width:100%;min-height:46px;border:1px solid #b8c4d1;border-radius:10px;padding:10px 12px;font-size:16px;background:#fff}
+input:focus,select:focus{outline:3px solid #cfe5f5;border-color:var(--blue)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background:var(--blue);color:#fff;font-weight:800;font-size:17px;cursor:pointer}
+.results{margin-top:18px;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px}.scorebig{text-align:center;padding:10px 0 16px}
+.scorebig .num{font-size:48px;font-weight:900;color:var(--navy)}.rating{font-size:18px;font-weight:900}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.breakdown{display:grid;grid-template-columns:1fr auto;gap:9px;border-top:1px solid var(--line);padding-top:12px}.breakdown div:nth-child(even){font-weight:800}
+.solvebox{background:var(--lt);border-radius:14px;padding:16px;margin-top:18px}.solvebox .answer{font-size:30px;font-weight:900;color:var(--navy);margin:7px 0}
+.minimum-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.summary-tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.summary-tile .value{font-size:22px;font-weight:900;color:var(--navy);margin-top:4px}
+.minimum-group{margin-top:14px}.minimum-group h3{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.minimum-list{display:grid;gap:8px}.minimum-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px}
+.minimum-row .event{font-weight:800}.minimum-row .floor{font-size:11px;color:var(--muted);margin-top:3px}.minimum-row .result{text-align:right;font-weight:900;color:var(--navy);font-size:18px}
+.minimum-note{margin-top:12px;padding:11px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.45}
+.optional-card{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#f8fafc}
+.optional-card h3{margin:0 0 5px;font-size:15px;color:var(--navy)}
+.optional-card p{margin:0 0 13px;font-size:12px;color:var(--muted);line-height:1.45}
+.optional-tag{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+.locked{font-size:11px;color:var(--ok);font-weight:800;margin-top:5px;min-height:14px}.small{font-size:12px;color:var(--muted);line-height:1.45}.msg{min-height:20px;margin-top:10px;font-weight:700;color:var(--bad)}
+.disabled{opacity:.45}.footer{font-size:11px;color:var(--muted);text-align:center;margin-top:14px}
+@media(max-width:650px){.grid,.grid3,.minimum-summary{grid-template-columns:1fr 1fr}.minimum-row{grid-template-columns:1fr}.minimum-row .result{text-align:left}.app{padding:0}.hero{border-radius:0}.hero-inner{grid-template-columns:1fr}.logo-card{max-width:180px;margin:0 auto;padding-top:4px}.panel{border-radius:0}.tab{font-size:14px;padding:13px 8px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1>USAF PFRA Calculator</h1>
+        <div class="hero-sub">CAO 1 Mar 2026 • IAW DAFMAN 36-2905</div>
+                <div class="hero-badge">Brought to you by 707 FSS Fitness Assessment Cell</div>
+      </div>
+      <div class="logo-card">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAAtGVYSWZJSSoACAAAAAYAEgEDAAEAAAABAAAAGgEFAAEAAABWAAAAGwEFAAEAAABeAAAAKAEDAAEAAAACAAAAEwIDAAEAAAABAAAAaYcEAAEAAABmAAAAAAAAAGAAAAABAAAAYAAAAAEAAAAGAACQBwAEAAAAMDIxMAGRBwAEAAAAAQIDAACgBwAEAAAAMDEwMAGgAwABAAAA//8AAAKgBAABAAAA9AEAAAOgBAABAAAA9AEAAAAAAAAA4cNEAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFRWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczpBdHRyaWI9J2h0dHA6Ly9ucy5hdHRyaWJ1dGlvbi5jb20vYWRzLzEuMC8nPgogIDxBdHRyaWI6QWRzPgogICA8cmRmOlNlcT4KICAgIDxyZGY6bGkgcmRmOnBhcnNlVHlwZT0nUmVzb3VyY2UnPgogICAgIDxBdHRyaWI6Q3JlYXRlZD4yMDI2LTA5LTI1PC9BdHRyaWI6Q3JlYXRlZD4KICAgICA8QXR0cmliOkRhdGE+eyZxdW90O2RvYyZxdW90OzomcXVvdDtEQUhRT0JSNUJQRSZxdW90OywmcXVvdDt1c2VyJnF1b3Q7OiZxdW90O1VBQlg2LXlNejd3JnF1b3Q7LCZxdW90O2JyYW5kJnF1b3Q7OiZxdW90O0RyZWFtIFRlYW0mcXVvdDt9PC9BdHRyaWI6RGF0YT4KICAgICA8QXR0cmliOkV4dElkPjMyNDFmYTg0LWQ2NDMtNGJmMC05MWM5LWZiNzdiM2JjODYwZjwvQXR0cmliOkV4dElkPgogICAgIDxBdHRyaWI6RmJJZD41MjUyNjU5MTQxNzk1ODA8L0F0dHJpYjpGYklkPgogICAgIDxBdHRyaWI6VG91Y2hUeXBlPjI8L0F0dHJpYjpUb3VjaFR5cGU+CiAgICA8L3JkZjpsaT4KICAgPC9yZGY6U2VxPgogIDwvQXR0cmliOkFkcz4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6ZGM9J2h0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvJz4KICA8ZGM6dGl0bGU+CiAgIDxyZGY6QWx0PgogICAgPHJkZjpsaSB4bWw6bGFuZz0neC1kZWZhdWx0Jz5FRkMgQlJBTkRNQVJLIC0gRUZDIEJyYW5kbWFyazwvcmRmOmxpPgogICA8L3JkZjpBbHQ+CiAgPC9kYzp0aXRsZT4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6cGRmPSdodHRwOi8vbnMuYWRvYmUuY29tL3BkZi8xLjMvJz4KICA8cGRmOkF1dGhvcj5NIERhbmc8L3BkZjpBdXRob3I+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnhtcD0naHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyc+CiAgPHhtcDpDcmVhdG9yVG9vbD5DYW52YSBkb2M9REFIUU9CUjVCUEUgdXNlcj1VQUJYNi15TXo3dyBicmFuZD1EcmVhbSBUZWFtPC94bXA6Q3JlYXRvclRvb2w+CiA8L3JkZjpEZXNjcmlwdGlvbj4KPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KPD94cGFja2V0IGVuZD0ncic/Pis62qkAABcfSURBVHic7d19rCZXXcDx05bGlhebUgRTrAhNg9E2akxKfYlbq6JBXJGAIaaJBWNSUwMrUaw20Qv80aokrKZITUpS0oANiqWi0kRqVjDaiqGEhYBmBUGW8tJAKaUrlC3O4VKY3d57nznPc2bOOTOfT/L9B+29M+e5z/Pbuc/c84QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJ/rNrgdVvD9Z9UABwG72dx3v+pqKdnPXqSseK6BSPxPKv4ioreLg/YmQz2Vdxyo4r6V3R9djTn5w3lfBgam9/r7rVcpSCgNdqR0I+VzYdX8F57T0Dnc9YacH6MoKDk5acikMdKV0MORzbtfRCs5p6R39xmOxo8d1PVDBQUpLLYWBrqHlfH81Xg0eruCclt69Yfu3JHu6qYIDlZZaCgNdQ9rx/dU1nfGNr1f6nJZevG/h4hWP1dddUsHBSksthYGuVe36/uoa4hX+bRWc09KLNzbuX/FYncDNcVKZUhjo2qs9319dw8EKzkkhXLXqgTrZgQoOWlpiKQx07dag91cTXF3BOSmErRWP046eFNwcJ5UohYGunRr8/upAl1dwTtq+sXFtN1VwAtLSSmGg6+SS319dIW4c81AF57X0Nr6x0c1x0vSlMNB1csnvr+7BxjF1dFfIdGOjm+OkaUthoKvfVsjn/GDjmBo60nXOisdqMDfHSdOWwkDXI230/upJ4gA5UsE5Lb14Y+P5Kx6rJG6Ok6YthYGuWO6NY+6q4JyWXnyrI+eNjd90UwUnJy2lFAa6sr2/Grb/UWDjmPLFmxAvW/FYre3SCk5QWkopDPRll/X91bD9a/vS56TtPxMczSld76/gJKUllMJAX26531/dquCclPfGxl25OU6aphQG+jLL/f6qjWPq6PpVD1Qu8ea4r0xwQtLSS2GgL6/c76/uDzaOqaF470Kuj7cd5JYRTkLSiaUw0JdXzvdX41X+sQrOaenFGxvPWPFYZXfphgctaXUpDPRltRXyie+/31vBOS29+PG2OW9sHCzeHPc/CQcqKb0UBvpyyvn+avxIVRvHlC/3x9sm8xF60rilMNCXUc73V+PfrB+u4JyWXryxMefH267FzXHSuKUw0OdfzvdX48Yxd1RwTktv1I1jUr0tlF8Qaa6lMNDnXe73V20cU7748bajbhyT6udC+UWR5loKA32+5X5/9boKzknbe7pUxc1x0nilMNDnWe73V20MVkcHVz1QpWyF8osjzbEUBvr8GmPjmOMVnNfSi293TLpxTIqnBTfHSWOUwkCfV7nfX43/MLBxTPlyfrztaNwcJ+UvhYE+r3K+vxp/ZX9/Bee09OKNjbk+3nZUbo6T8pfCQJ9POd9fjTfTHa3gnJZe8Y1jUrg5TspfCgN9HuV8f9XGMXUUt9UtvnFMqq1QfuGkOZXCQG+/nO+vnhFsHFND8b6FnB9vO5mnBTfHSTlLYaC3Xc73V+MV/m0VnNPSizc27l/xWFXNzXFSvlIY6O2W+/3VgxWck0K4atUDVbvnhfKLKM2lFAZ6m+V+f9WHZtXR1orHqQmnBzfHSblKYaC3V+73Vy+v4Jy0fWPjbGyF8gsqzaEUz6/geDW83O+vxo1jHqrgvJZeExvHpHha18Oh/MJKrZfi9yo4Xg0v5/urNo6po/jxtk1sHJPq9lB+caXWS2Ggt9PWzg/hWuKfp32o6/Mq2nu7nrjisWqWm+OkzUthoLfRrN5fZRnizXGfDeWfPFLLpXhOBcc7tE91fTJzRxvoLWFm76+yHL8fyj+Baur4CJV+YV6nVef0QAWPVS2laOnzFGb7q0mAdZwWyr8wr9MsbxqpgIEO0CgDnT4DfTnibz+/WGFXj3nSMGcGOn0G+jJshfKP305tjXfKMH8GOn0G+vxthfKP3U5dN+I5wyIY6PQZ6PNW6x7trx3zpGEpDHT6DPT5OhDKP2aGOYzIQKfPQJ8nwxwWwECnz0Cfn1qH+RvGPGlYIgOdPgN9Xl4Syj9Ouw3zU0c8b1gkA50+A30+4jCvcSdIwxxGYqDTZ6DPg2EOC2Sg02egt6/WYf5XwTCHURno9Bnobat5mPuEOBiZgU6fgd6uFwTDHBbNQKfPQG9THOYPhfKPiWEOBRno9Bno7THMga8z0Okz0NtS6zB/RzDMYXIGOn0GejviY1XrMD9jxPMGdmGg02egtyE+TsdC+cfAMIeKGOj0Gej1M8yBHRno9Bnodat1mL87GOZQnIFOn4Fer1O6nt51fmU9I2y/jgCFGej0Gej1+kzXn5U+CKBeBjp9Bnqd/iNsn3PcCc7PPrAjA50+A70+fx1OPO9byx4OUCsDnT4DvS5/FB593vEq/aySBwXUyUCnz0Cvxy+H3c/97QWPC6iUgU5fSwP9D7te0Vi/MPBxeNaKc3+467yBXwtYCAOdvpYGemsdDsN+bp8y8OsdGvC1gAUx0Okz0MfpaNe5A9b/8WH76nvo13WVDnyTgU6fgZ6/e7suHLD28bl4PPFrHxrwdYGFMNDpM9DzFrdpvXjAusdd4L645ve4YMDXBxbAQKfPQM9XvNreP3Dd/3eD7/Oegd8DmDkDnT4DPV9XDVzzR3aB26SLBn4vYMYMdPoM9DxtDVzvN2X6fncP/H7AjBno9Bnom3f9wLW+JvP3dZUOC2eg02egb9ZtXacOWOdfGuF7f3DA9wVmzECnz0Bfv7u6zhiwxj8w4jHsG/D9oWkv6/ot7djLQ/kXwnUy0MdhoK9X3AXunAHr+x0jH8eRAccATbsllH/CK28pA/1JYftvdeP+2Jfu0Q93nZnwdefIQE9v6C5w8WcrZRe4dds34FigWZeG8k965e2Rgf59Xc/v+u2uP+96R9d7uz7add+aX/sTXXd0Hez6ta4f6fqesAwGelr3h+G7wD000TF9dMDxQLPiLkwfCOWf/MrXv3Y9UOD7/mPXS8L2r07nyEAfXtwF7rIBaxpff74w8bG9cMBxQbMOhPIvAJpX7wvbV/BzYqAPK2UXuI8VOL57Bh4bNCnesPKlUP6FQPMrvod6RZgHA31YBwau57sKHqOrdGbtplD+hUDz7ZNdPx3aZqCv7rqBa/nGwsfpKp1ZuySUfzHQ/Is36bXKQN+7mweu4+9WcKyxFw88XmhSfN+z9JNMdRY/teqGrr/t+q8Nv9YzQ5sM9N2Lf/nwmAFr+PMVHOsjfW7A8UKzrgzln2Sqt3jn8q+HbY/tel7X363xdW4NbTLQdy7uAjdk74MLKzjWkxv6fj80J75IuzlOq3pdOPEF/Ie6Xh/S/lTuKaE9Bvqji7uvDdkF7pwKjnWn7htw7NCs+GvV0k8y1V98IfzVsO3sru/u+tGuOwf+988N7THQT+zervMHrFvcw32KXeDWzVU6s/WDofwTTPPv3aG9bTgN9G8Vd4G7eMCaxV3gvlLB8e6Vq3RmbehVlrRp/97146ENBvp2cZvWobvAfb6C4x3SKwecDzTpilD+CaZl9Yaux4W6GejbXT5wvY5UcKxDOzbwnKA58ea4+P5Y6SeZltVHun4s1MtAD+HqgWtVche4dbt24LlBc+KnaZV+gmmZ/Wmo86Nalz7QDw5cp9dVcKzr5Cqd2fr+UPedqZp3Hw7D7qCe0pIH+m1dpw5Yo5dXcKyb9JoB5whNOhTKP8G03OKd1D8b6rHUgR53gTtjwPo8u4Jj3bQvd50+4FyhOS8K5Z9gUhwUNVjiQD8chu0C970VHGuubhxwvtCcuDezm+NUQ88K5S1toMe71M8dsC5nV3CsOYt/lucqnVmKH4dY+gkm/Xcob0kDfegucN/WdbyC483dGwecOzQnbunp5jjV0FYoaykDPd7tPZdd4Nbtq11nDVgDaM7tofwTTHowlP1ztiUM9Pjr5v0D16OVXeDWrdVPBYQ9xY/JLP3kkmIvCOUsYaAP3QXuAxUc69jFtxJcpTM78ea4j4XyTzDVW/zo1HgTVdwh7K1he3ORV3dd3/Wmrn/oen+G71Py74TnPtC3Bq7D71RwrFP11oFrAk3ZCuWfXKqn+D7r33Rd2fVdYbjHd/1U1zVdd63xfd+c8L1ym/NAvz5hHc6r4HinKl6lPzlhbaAJ8ea4+P5a6SeYyhavwF8c8n2Qynd2/UbY/nvnId//lkzfdx1zHehDd4HrO1TBcU/VOxPXBprwtlD+yaUyxV+XPzeMK24gs+oGzNeOfAx7meNAj78lGbIL3MmWdJX+tW+cL8zKHF/QtHdfCtu/Vp/ST3a9b5fjuWLiY+mb289//K3IORusxzsqOIepOrTBOkGVTglujltS/xTS3h/P7Y93OKanFDyeOQ30o2HYLnB7iXeAz3FTmd1ylc7sxM9DLv3E0vi9KtThZeFbx/TPhY+lpYH+xJHW4GS3TnhOpfuXTGsG1Yi/onNz3Lx7cajLX4bt4/qVwsdhoD/a0q7SL8qzbFCPeKdx6SeWxukXQ32e3nVn6YMIBvpu3jLiedTW3ZnWDKpxaSj/xFL+Xhbq9YzSBxAM9N08Nizrt3au0pmVeHPcErZ+XFJ/EVjFQN/djRmPvfZcpTM7B0L5J5by9K7AEAb67uLnhy/pKn3Ip9FBM+LNcfFvlEs/sbRZ8XOvS/4pWEsM9L0t6Sr9PzOtGVTjplD+iaXNevbJDyq7MtD3Fq/Sv7zm8bbYvjzLBnW4JJR/Umn9bnj0Q8oeDPTVXpNwjK13JNOaQTV226JTdRd3/Mv1AStLYaAPc2yP45pbz8m0ZlCFeMf7qTMtfg586ReMdfr2Xc6HzRjow1y7x3HNrY9nWjNgZKeF8i8Y6/SEMRYDAz3Bkq7SX5hpzYARGej0GejDXRPKr8FU3ZNpzYARGej0Gehp7gvl12GqXKVD5Qx0+gz0NEvafOrTmdYMGImBTp+Bnm5JV+kvzbRmwAgMdPoM9HRLukq/L9OaASMw0Okz0Nfz2VB+PabqQKY1AzIz0Okz0NcTbxgrvR5T5SodKmWg02egry/+aVfpNZmqV2RaMyAjA50+A319S7pKfyDTmgEZGej0GeibWdJV+rWZ1gzIxECnz0DfzJKu0o9lWjMgEwOdPgN9c/EjR0uvzVS5SoeKGOj0Geib2xfKr81Uxav00/IsG7ApA50+Az2PJV2lvz7TmgEbMtDpM9Dz2BfKr89UPdR1ep5lAzZhoNNnoOfzwVB+jabqxkxrBmzAQKfPQM/nolB+jaYqXqU/Ns+yAesy0Okz0PO6O5Rfp6l6c6Y1A9ZkoNNnoOe1pKv0r3adlWfZgHUY6PQZ6Pm9J5Rfq6m6NdOaAWsw0Okz0PO7IJRfq6k6HlylQzEGOn0G+jgOhfLrNVVvz7NkQCoDnT4DfRznhfLrNVUPdz05z7IBKQx0+gz08RwK5ddsqt6ZZ8mAFAY6fQb6eOJVenyPufS6TdV5eZYNGMpAp89AH1e8C7z0uk3VoTxLBgxloNNnoI8r3gG+pKv0C/IsGzCEgU6fgT6+JV2l35lpzYABDHT6DPTxLe0q/aI8ywasYqDTZ6BP402h/PpN1d2Z1gxYwUCnz0CfRvz88PgJZaXXcKpcpcMEDHT6DPTpxM8QL72GU/X+TGsG7MFAp89An87SrtL35Vk2YDcGOn0G+rSWdJX+oUxrBuzCQKfPQJ/e/4XyazlF93UdVbO9MlA9A50+A31614byazl2X6jgGLR+N3edGqiegU6fgV7GsVB+PcfqgQqOQet3R9djAk0w0Okz0MuY61X6nP+hsoQOB6+1TTHQ6TPQy5nb8FvSHfxzLL5vfm6gKQY6fQZ6OdeE8muaqyVtbTvH7u26MNAcA50+A72seCd46XXNkYHebvE3RRcHmmSg02egl3UglF/XTVvKn+HNsfgPsf2BZhno9Bno5bV8le7P09ruqkDTDHT6DPTyXhrKr+063V/BMWj9tgLNM9DpM9Dr8OlQfn1TureCY9D6xY1jmAEDnT4DvQ4vDOXXd2ifq+AYtH42jpkRA50+A70e94Tya7wq75m33V3Ba+msGOj0Gej1qP0q/cEKjkHrd6TrnMCsGOj0Geh1+UQov847ZRe4tov3PJwfmB0DnT4DvS7PCeXX+eSOBxvHtFz8awQbx0zgzlD+wW4lA30cBnp94q9GS691P1fn7RYfu8sCk3hRKP+Aa36lMNDrsy+UX+tH8lGobXd5YDLxTwc+HMo/6JpXKQz0OtVwle5vzdtuKzC5K0P5B17zKoWBXqd9oexat7bRjU7s+kARZwYbNShvKQz0et0dyqyzYd52t3WdGijmulD+h0DzKYWBXq+LwvRr/NkC31P5ihvHnBEo6qnBnaTKVwoDvW5TXqXbBa7tDgcbx1TjplD+B0LzKIWBXreprtK/NNH30Tgd7To3UI1ndj0cyv9gqP1SGOj1+7cw7rr67WDbxY1jLgxU5/ZQ/odD7ZfCQK/feWG8NY07wBno7WbjmIq19OKqekvR0s/cUgd6dCiMs6ZfHOnravziP8ZsHFOxU4KNZrR5KQz0NoxxlX7fCF9T03UgUL0rQvkfFLVdCgO9HYdCvrX8VMavpek7GGhC3A621o9QVBulMNDbEa/Sc3zqmdeXtrs52DimKVeH8j80arcUBnpbbg2breE9G/73KtsdYfuij4ac3fVgKP/DozZLYaC35ayw/lW6Yd52ceMYHyPdqBtC+R8gtVkKA70961ylf36N/0b1ZOOYxsWNZvx9qNYphYHenniV/tUwfN38aVrbxY+xtXHMDNwSyv8wqb1SGOhtemMYtmbxoiDHjXQq07GuiwOzcEko/wOl9kphoLfp9LD6N3hxK+ljK/5/VG/xH2L7A7NyZyj/g6W2SmGgt+vGsPd6fW7F/111d1Vgdl4Uyv9gqa1SGOjt2usq/TO7/O9qo63ALMW/ObQdrFJKYaC37fXh0ev08R3+N7XTzYFZuzKU/yFTO6Uw0Nt2WjjxffKPhHKPjzbPxjELcGbwfpiGl8JAb98fhO31Mczb7q5g45jFuC6U/4FTG6Uw0OfhPaH846P1O9J1zqMeVWbrqcFGMxpWCgMdoAAbzWhIKQx0gALijkFxs4jSL6yquxQGOkAht4fyL6yquxQGOkAhLb0Aq0wpWvp5MtCBWTkl2GhGe5fCQAcoyEYz2qsUBjpAQXGjmU+E8i+wqrMUBjpAYVeH8i+wqrMUBjpAYWd3PRjKv8iqvlIY6AAVuCGUf5FVfaW4oOvVjXRm4rkBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQz/8DKt+v3ibWHXIAAAAASUVORK5CYII=" alt="707 FSS Fitness Assessment Cell logo">
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="calc" type="button">PFRA Calculator</button>
+    <button class="tab" data-tab="solve" type="button">Minimum to Pass</button>
+  </div>
+
+  <main class="panel">
+    <section id="calcPanel">
+      <div class="section">
+        <h2>Member Information</h2>
+        <div class="grid">
+          <div><label for="age">Age</label><input id="age" type="number" min="18" max="100" value="26"></div>
+          <div><label for="sex">Gender</label><select id="sex"><option value="M">Male</option><option value="F" selected>Female</option></select></div>
+          <div><label for="height">Height (in)</label><input id="height" type="number" min="1" step=".1" placeholder="e.g. 64"></div>
+          <div><label for="waist">Waist Circumference (in)</label><input id="waist" type="number" min="1" step=".1" placeholder="e.g. 29.5"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Strength</h2>
+        <div class="grid">
+          <div><label for="strengthEvent">Event</label><select id="strengthEvent"><option>Pushup</option><option>Hand Release Pushup</option></select></div>
+          <div><label for="strengthResult">Repetitions</label><input id="strengthResult" type="number" min="0" step="1"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Core</h2>
+        <div class="grid">
+          <div><label for="coreEvent">Event</label><select id="coreEvent"><option>Situp</option><option>Cross-Leg Reverse Crunch</option><option>Forearm Plank</option></select></div>
+          <div id="coreRepsWrap"><label for="coreResult">Repetitions</label><input id="coreResult" type="number" min="0" step="1"></div>
+          <div id="plankWrap" class="hidden"><label>Plank Time</label><div class="pair"><input id="plankMin" type="number" min="0" step="1" placeholder="Min"><input id="plankSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Cardio</h2>
+        <div class="grid">
+          <div><label for="cardioEvent">Event</label><select id="cardioEvent"><option>2 Mile Run</option><option>HAMR</option></select></div>
+          <div id="runWrap"><label>2-Mile Time</label><div class="pair"><input id="runMin" type="number" min="0" step="1" placeholder="Min"><input id="runSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div></div>
+          <div id="hamrWrap" class="hidden"><label for="hamr">HAMR Shuttles</label><input id="hamr" type="number" min="0" step="1"></div>
+        </div>
+      </div>
+
+      <button class="primary" id="calculate" type="button">Calculate Score</button>
+      <div class="msg" id="calcMsg" aria-live="polite"></div>
+
+      <div class="results hidden" id="calcResults" aria-live="polite">
+        <div class="scorebig"><div class="small">TOTAL SCORE</div><div class="num" id="totalScore">0</div><div class="rating" id="rating"></div></div>
+        <div class="breakdown">
+          <div>WHtR</div><div id="wScore">—</div>
+          <div>Strength</div><div id="sScore">—</div>
+          <div>Core</div><div id="cScore">—</div>
+          <div>Cardio</div><div id="aScore">—</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="solvePanel" class="hidden">
+      <div class="section">
+        <h2>Minimums to Reach Your Target</h2>
+        <div class="grid">
+          <div><label for="solveAge">Age</label><input id="solveAge" type="number" min="18" max="100" value="26"></div>
+          <div><label for="solveSex">Gender</label><select id="solveSex"><option value="M">Male</option><option value="F" selected>Female</option></select></div>
+          <div><label for="solveHeight">Height (in)</label><input id="solveHeight" type="number" min="1" step=".1" placeholder="e.g. 64"></div>
+          <div><label for="solveWaist">Waist Circumference (in)</label><input id="solveWaist" type="number" min="1" step=".1" placeholder="e.g. 29.5"></div>
+          <div><label for="target">Target Score</label><input id="target" type="number" min="75" max="100" step=".5" value="75"></div>
+          <div>
+            <label>Calculated WHtR</label>
+            <div style="min-height:46px;border:1px solid #b8c4d1;border-radius:10px;padding:11px 12px;background:#f8fafc;font-size:16px;font-weight:800" id="solveWhtrDisplay">—</div>
+          </div>
+        </div>
+        <p class="small" style="margin:10px 0 0">Enter height and waist circumference. The calculator will calculate WHtR and its point value automatically. Any component results below are optional — enter only the results you already know.</p>
+
+        <div class="optional-card">
+          <div class="optional-tag">Optional known results</div>
+          <h3>Already know one or more component results?</h3>
+          <p>Enter them here. Leave any component blank and the calculator will determine what you need in that category to reach your target score.</p>
+
+          <div class="grid">
+            <div>
+              <label for="knownStrengthEvent">Strength Event</label>
+              <select id="knownStrengthEvent">
+                <option>Pushup</option>
+                <option>Hand Release Pushup</option>
+              </select>
+            </div>
+            <div>
+              <label for="knownStrengthResult">Strength Reps <span class="small">(optional)</span></label>
+              <input id="knownStrengthResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+              <div class="locked" id="knownStrengthPts"></div>
+            </div>
+
+            <div>
+              <label for="knownCoreEvent">Core Event</label>
+              <select id="knownCoreEvent">
+                <option>Situp</option>
+                <option>Cross-Leg Reverse Crunch</option>
+                <option>Forearm Plank</option>
+              </select>
+            </div>
+            <div id="knownCoreRepsWrap">
+              <label for="knownCoreResult">Core Reps <span class="small">(optional)</span></label>
+              <input id="knownCoreResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+              <div class="locked" id="knownCorePts"></div>
+            </div>
+            <div id="knownPlankWrap" class="hidden">
+              <label>Plank Time <span class="small">(optional)</span></label>
+              <div class="pair"><input id="knownPlankMin" type="number" min="0" step="1" placeholder="Min"><input id="knownPlankSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
+              <div class="locked" id="knownPlankPts"></div>
+            </div>
+
+            <div>
+              <label for="knownCardioEvent">Cardio Event</label>
+              <select id="knownCardioEvent">
+                <option>2 Mile Run</option>
+                <option>HAMR</option>
+              </select>
+            </div>
+            <div id="knownRunWrap">
+              <label>2-Mile Time <span class="small">(optional)</span></label>
+              <div class="pair"><input id="knownRunMin" type="number" min="0" step="1" placeholder="Min"><input id="knownRunSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
+              <div class="locked" id="knownRunPts"></div>
+            </div>
+            <div id="knownHamrWrap" class="hidden">
+              <label for="knownHamr">HAMR Shuttles <span class="small">(optional)</span></label>
+              <input id="knownHamr" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+              <div class="locked" id="knownHamrPts"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary" id="solveBtn" type="button">Calculate Minimums</button>
+      <div class="msg" id="solveMsg" aria-live="polite"></div>
+
+      <div class="solvebox hidden" id="solveResult" aria-live="polite">
+        <div class="minimum-summary">
+          <div class="summary-tile"><div class="small">WHtR / POINTS</div><div class="value" id="minWhtrPts">—</div></div>
+          <div class="summary-tile"><div class="small">CARDIO TARGET</div><div class="value" id="minCardioPts">—</div></div>
+          <div class="summary-tile"><div class="small">STRENGTH TARGET</div><div class="value" id="minStrengthPts">—</div></div>
+          <div class="summary-tile"><div class="small">CORE TARGET</div><div class="value" id="minCorePts">—</div></div>
+        </div>
+
+        <div class="minimum-group">
+          <h3>Strength</h3>
+          <div class="minimum-list">
+            <div class="minimum-row"><div><div class="event">Push-Ups</div><div class="floor" id="floorPushup">Official floor: —</div></div><div class="result" id="minPushup">—</div></div>
+            <div class="minimum-row"><div><div class="event">Hand-Release Push-Ups</div><div class="floor" id="floorHrpu">Official floor: —</div></div><div class="result" id="minHrpu">—</div></div>
+          </div>
+        </div>
+
+        <div class="minimum-group">
+          <h3>Core</h3>
+          <div class="minimum-list">
+            <div class="minimum-row"><div><div class="event">Sit-Ups</div><div class="floor" id="floorSitup">Official floor: —</div></div><div class="result" id="minSitup">—</div></div>
+            <div class="minimum-row"><div><div class="event">Cross-Leg Reverse Crunch</div><div class="floor" id="floorClrc">Official floor: —</div></div><div class="result" id="minClrc">—</div></div>
+            <div class="minimum-row"><div><div class="event">Forearm Plank</div><div class="floor" id="floorPlank">Official floor: —</div></div><div class="result" id="minPlank">—</div></div>
+          </div>
+        </div>
+
+        <div class="minimum-group">
+          <h3>Cardio</h3>
+          <div class="minimum-list">
+            <div class="minimum-row"><div><div class="event">2-Mile Run</div><div class="floor" id="floorRun">Official floor: —</div></div><div class="result" id="minRun">—</div></div>
+            <div class="minimum-row"><div><div class="event">20m HAMR</div><div class="floor" id="floorHamr">Official floor: —</div></div><div class="result" id="minHamr">—</div></div>
+          </div>
+        </div>
+
+        <div class="minimum-note" id="minimumNote"></div>
+      </div>
+    </section>
+
+    <div class="footer">USAF PFRA Calculator • CAO 1 Mar 2026 • IAW DAFMAN 36-2905 • 707 FSS Fitness Assessment Cell</div>
+  </main>
+</div>
+
+<script>
+const DB={"Pushup_Lookup":{"points":[2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0],"data":{"U25_M":[30.0,31.0,33.0,34.0,36.0,37.0,39.0,40.0,42.0,43.0,45.0,46.0,48.0,49.0,51.0,52.0,54.0,55.0,57.0,58.0,60.0,61.0,63.0,64.0,66.0,67.0],"U25_F":[15.0,16.0,18.0,19.0,21.0,22.0,23.0,25.0,26.0,28.0,29.0,30.0,32.0,33.0,35.0,36.0,37.0,39.0,40.0,42.0,43.0,44.0,46.0,47.0,49.0,50.0],"25_29_M":[28.0,29.0,31.0,32.0,34.0,35.0,36.0,38.0,39.0,41.0,42.0,43.0,45.0,46.0,48.0,49.0,50.0,52.0,53.0,55.0,56.0,57.0,59.0,60.0,62.0,63.0],"25_29_F":[14.0,15.0,17.0,18.0,19.0,21.0,22.0,23.0,25.0,26.0,27.0,29.0,30.0,31.0,32.0,34.0,35.0,36.0,38.0,39.0,40.0,42.0,43.0,44.0,46.0,47.0],"30_34_M":[26.0,26.0,29.0,31.0,32.0,33.0,35.0,36.0,37.0,39.0,40.0,41.0,43.0,44.0,45.0,47.0,48.0,49.0,51.0,52.0,53.0,55.0,56.0,57.0,59.0,60.0],"30_34_F":[12.0,14.0,15.0,16.0,17.0,19.0,20.0,21.0,22.0,24.0,25.0,26.0,27.0,29.0,30.0,31.0,32.0,34.0,35.0,36.0,37.0,39.0,40.0,41.0,42.0,44.0],"35_39_M":[23.0,24.0,26.0,27.0,28.0,30.0,31.0,32.0,34.0,35.0,36.0,38.0,39.0,40.0,41.0,43.0,44.0,45.0,47.0,48.0,49.0,51.0,52.0,53.0,55.0,56.0],"35_39_F":[11.0,12.0,13.0,15.0,16.0,17.0,18.0,20.0,21.0,22.0,23.0,25.0,26.0,27.0,28.0,30.0,31.0,32.0,33.0,35.0,36.0,37.0,38.0,40.0,41.0,42.0],"40_44_M":[21.0,22.0,23.0,24.0,26.0,27.0,28.0,30.0,31.0,32.0,33.0,35.0,36.0,37.0,39.0,40.0,41.0,42.0,44.0,45.0,46.0,48.0,49.0,50.0,51.0,52.0],"40_44_F":[10.0,11.0,12.0,13.0,14.0,15.0,17.0,18.0,19.0,20.0,21.0,23.0,24.0,25.0,26.0,27.0,29.0,30.0,31.0,32.0,33.0,35.0,36.0,37.0,38.0,39.0],"45_49_M":[19.0,21.0,22.0,23.0,24.0,25.0,26.0,28.0,29.0,30.0,31.0,32.0,33.0,35.0,36.0,37.0,38.0,39.0,40.0,42.0,43.0,44.0,45.0,46.0,47.0,49.0],"45_49_F":[8.0,9.0,10.0,11.0,12.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,32.0,33.0,34.0,35.0,36.0],"50_54_M":[17.0,18.0,19.0,20.0,21.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,41.0,42.0,43.0,44.0,45.0],"50_54_F":[7.0,8.0,9.0,10.0,11.0,12.0,13.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0],"55_59_M":[14.0,15.0,16.0,17.0,18.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,38.0,39.0,40.0,41.0,42.0],"55_59_F":[5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0],"60_PLUS_M":[12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0],"60_PLUS_F":[3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0]}},"HRPU_Lookup":{"points":[2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0],"data":{"U25_M":[27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0],"U25_F":[17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0],"25_29_M":[25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0],"25_29_F":[15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0],"30_34_M":[23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0],"30_34_F":[13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0],"35_39_M":[21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0],"35_39_F":[11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0],"40_44_M":[19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0],"40_44_F":[9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0],"45_49_M":[17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0],"45_49_F":[7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0],"50_54_M":[15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0],"50_54_F":[5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0],"55_59_M":[13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0],"55_59_F":[3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0],"60_PLUS_M":[11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0],"60_PLUS_F":[1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0]}},"Situp_Lookup":{"points":[2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0],"data":{"U25_M":[33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0],"U25_F":[29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0],"25_29_M":[31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0],"25_29_F":[25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0],"30_34_M":[29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0],"30_34_F":[20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0],"35_39_M":[27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0],"35_39_F":[18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0],"40_44_M":[25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0],"40_44_F":[16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0],"45_49_M":[23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0],"45_49_F":[10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0],"50_54_M":[21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0],"50_54_F":[9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0],"55_59_M":[19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0],"55_59_F":[7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0],"60_PLUS_M":[17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0],"60_PLUS_F":[6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0]}},"CLRC_Lookup":{"points":[2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0],"data":{"U25_M":[35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0],"U25_F":[33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0],"25_29_M":[33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0],"25_29_F":[31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0],"30_34_M":[31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0],"30_34_F":[29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0],"35_39_M":[29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0],"35_39_F":[27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0],"40_44_M":[27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0],"40_44_F":[25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0],"45_49_M":[25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0],"45_49_F":[23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0],"50_54_M":[23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0],"50_54_F":[21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0],"55_59_M":[21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0],"55_59_F":[19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0],"60_PLUS_M":[19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0],"60_PLUS_F":[17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0]}},"Plank_Lookup":{"points":[2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0],"data":{"U25_M":[95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0,210.0,215.0,220.0],"U25_F":[90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0,210.0,215.0],"25_29_M":[90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0,210.0,215.0],"25_29_F":[85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0,210.0],"30_34_M":[85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0,210.0],"30_34_F":[80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0],"35_39_M":[80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0,205.0],"35_39_F":[75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0],"40_44_M":[75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0,200.0],"40_44_F":[70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0],"45_49_M":[70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0,195.0],"45_49_F":[65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0],"50_54_M":[65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0,190.0],"50_54_F":[60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0],"55_59_M":[60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,185.0],"55_59_F":[55.0,60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0],"60_PLUS_M":[55.0,60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0],"60_PLUS_F":[50.0,55.0,60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0,105.0,110.0,115.0,120.0,125.0,130.0,135.0,140.0,145.0,150.0,155.0,160.0,165.0,170.0,175.0]}},"HAMR_Lookup":{"points":[35.0,35.5,36.0,36.5,37.0,37.5,38.0,38.5,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,49.5,50.0],"data":{"U25_M":[42.0,44.0,46.0,47.0,49.0,51.0,52.0,54.0,56.0,58.0,60.0,63.0,65.0,67.0,70.0,72.0,75.0,78.0,81.0,84.0,87.0],"U25_F":[21.0,23.0,24.0,26.0,28.0,29.0,31.0,33.0,35.0,37.0,39.0,41.0,44.0,46.0,49.0,52.0,55.0,58.0,61.0,65.0,68.0],"25_29_M":[42.0,43.0,45.0,46.0,48.0,50.0,52.0,53.0,55.0,57.0,59.0,62.0,64.0,66.0,69.0,71.0,74.0,76.0,79.0,82.0,85.0],"25_29_F":[20.0,22.0,23.0,25.0,26.0,28.0,30.0,32.0,34.0,36.0,38.0,40.0,42.0,44.0,47.0,50.0,52.0,55.0,58.0,62.0,65.0],"30_34_M":[38.0,39.0,41.0,43.0,44.0,46.0,48.0,50.0,52.0,54.0,56.0,59.0,61.0,63.0,66.0,69.0,72.0,75.0,78.0,81.0,84.0],"30_34_F":[19.0,20.0,22.0,23.0,25.0,26.0,28.0,30.0,32.0,34.0,36.0,38.0,40.0,43.0,45.0,48.0,51.0,53.0,57.0,60.0,63.0],"35_39_M":[36.0,37.0,39.0,40.0,42.0,44.0,46.0,48.0,50.0,52.0,54.0,56.0,59.0,61.0,64.0,66.0,69.0,72.0,75.0,79.0,82.0],"35_39_F":[18.0,20.0,21.0,23.0,24.0,26.0,28.0,29.0,31.0,33.0,35.0,37.0,40.0,42.0,45.0,47.0,50.0,53.0,56.0,60.0,63.0],"40_44_M":[32.0,34.0,36.0,37.0,39.0,41.0,43.0,45.0,47.0,49.0,51.0,53.0,56.0,58.0,61.0,64.0,67.0,70.0,73.0,77.0,81.0],"40_44_F":[17.0,19.0,20.0,21.0,23.0,24.0,26.0,28.0,30.0,31.0,33.0,35.0,38.0,40.0,42.0,45.0,47.0,50.0,53.0,56.0,59.0],"45_49_M":[31.0,32.0,34.0,36.0,37.0,39.0,41.0,43.0,45.0,47.0,49.0,51.0,53.0,56.0,58.0,61.0,64.0,67.0,70.0,73.0,77.0],"45_49_F":[16.0,18.0,19.0,20.0,22.0,23.0,25.0,27.0,29.0,30.0,32.0,34.0,37.0,39.0,41.0,44.0,46.0,49.0,52.0,55.0,58.0],"50_54_M":[30.0,31.0,32.0,34.0,35.0,37.0,39.0,40.0,42.0,44.0,46.0,48.0,50.0,53.0,55.0,57.0,60.0,62.0,65.0,68.0,71.0],"50_54_F":[14.0,16.0,17.0,18.0,20.0,21.0,23.0,25.0,26.0,28.0,30.0,32.0,35.0,37.0,39.0,42.0,44.0,47.0,50.0,53.0,57.0],"55_59_M":[27.0,28.0,30.0,31.0,33.0,34.0,36.0,38.0,40.0,41.0,43.0,45.0,48.0,50.0,52.0,55.0,57.0,60.0,63.0,66.0,69.0],"55_59_F":[13.0,14.0,15.0,17.0,18.0,20.0,21.0,23.0,25.0,26.0,28.0,30.0,32.0,34.0,37.0,39.0,42.0,44.0,47.0,50.0,53.0],"60_PLUS_M":[26.0,27.0,28.0,30.0,31.0,33.0,34.0,36.0,38.0,39.0,41.0,43.0,45.0,47.0,49.0,52.0,54.0,56.0,59.0,62.0,65.0],"60_PLUS_F":[11.0,12.0,13.0,14.0,17.0,18.0,19.0,20.0,22.0,24.0,26.0,27.0,29.0,32.0,34.0,36.0,38.0,41.0,44.0,47.0,50.0]}},"Run_Compat":{"points":[50.0,49.5,49.0,48.0,47.0,46.0,45.0,44.0,43.0,42.0,41.0,40.0,39.0,38.5,38.0,37.5,37.0,36.5,36.0,35.5,35.0],"data":{"U25_M":[0.0,806.0,825.0,844.0,863.0,882.0,901.0,920.0,939.0,958.0,977.0,996.0,1015.0,1034.0,1053.0,1072.0,1091.0,1110.0,1129.0,1148.0,1177.0],"U25_F":[0.0,931.0,961.0,990.0,1020.0,1050.0,1079.0,1109.0,1139.0,1168.0,1198.0,1228.0,1257.0,1287.0,1316.0,1346.0,1376.0,1405.0,1435.0,1465.0,1494.0],"25_29_M":[0.0,816.0,835.0,854.0,873.0,892.0,911.0,930.0,949.0,968.0,987.0,1006.0,1025.0,1044.0,1063.0,1082.0,1101.0,1120.0,1139.0,1158.0,1177.0],"25_29_F":[0.0,956.0,985.0,1015.0,1044.0,1073.0,1102.0,1132.0,1161.0,1190.0,1219.0,1249.0,1278.0,1307.0,1336.0,1366.0,1395.0,1424.0,1453.0,1483.0,1512.0],"30_34_M":[0.0,823.0,844.0,865.0,886.0,907.0,929.0,950.0,971.0,992.0,1013.0,1034.0,1055.0,1076.0,1097.0,1118.0,1140.0,1161.0,1182.0,1203.0,1224.0],"30_34_F":[0.0,971.0,1001.0,1032.0,1062.0,1092.0,1122.0,1153.0,1183.0,1213.0,1243.0,1274.0,1304.0,1334.0,1364.0,1395.0,1425.0,1455.0,1485.0,1516.0,1546.0],"35_39_M":[0.0,837.0,859.0,881.0,903.0,925.0,947.0,969.0,991.0,1013.0,1035.0,1057.0,1079.0,1101.0,1123.0,1145.0,1167.0,1189.0,1211.0,1233.0,1255.0],"35_39_F":[0.0,973.0,1004.0,1035.0,1066.0,1097.0,1128.0,1158.0,1189.0,1220.0,1251.0,1282.0,1313.0,1344.0,1375.0,1406.0,1437.0,1467.0,1498.0,1529.0,1560.0],"40_44_M":[0.0,846.0,870.0,894.0,918.0,942.0,966.0,990.0,1014.0,1038.0,1062.0,1086.0,1109.0,1133.0,1157.0,1181.0,1205.0,1229.0,1253.0,1277.0,1301.0],"40_44_F":[0.0,1006.0,1036.0,1067.0,1097.0,1127.0,1158.0,1188.0,1218.0,1249.0,1279.0,1310.0,1340.0,1370.0,1401.0,1431.0,1461.0,1492.0,1522.0,1552.0,1583.0],"45_49_M":[0.0,871.0,895.0,919.0,943.0,966.0,990.0,1014.0,1038.0,1062.0,1086.0,1110.0,1133.0,1157.0,1181.0,1205.0,1229.0,1253.0,1276.0,1300.0,1324.0],"45_49_F":[0.0,1016.0,1047.0,1078.0,1109.0,1140.0,1171.0,1202.0,1233.0,1264.0,1295.0,1326.0,1357.0,1388.0,1419.0,1450.0,1481.0,1512.0,1543.0,1574.0,1605.0],"50_54_M":[0.0,910.0,933.0,956.0,979.0,1002.0,1025.0,1048.0,1071.0,1094.0,1117.0,1141.0,1164.0,1187.0,1210.0,1233.0,1256.0,1279.0,1302.0,1325.0,1348.0],"50_54_F":[0.0,1031.0,1064.0,1097.0,1129.0,1162.0,1195.0,1228.0,1260.0,1293.0,1326.0,1359.0,1391.0,1424.0,1457.0,1490.0,1522.0,1555.0,1588.0,1621.0,1653.0],"55_59_M":[0.0,929.0,953.0,978.0,1002.0,1027.0,1051.0,1075.0,1100.0,1124.0,1149.0,1173.0,1197.0,1222.0,1246.0,1271.0,1295.0,1319.0,1344.0,1368.0,1393.0],"55_59_F":[0.0,1064.0,1097.0,1130.0,1163.0,1195.0,1228.0,1261.0,1294.0,1327.0,1360.0,1393.0,1425.0,1458.0,1491.0,1524.0,1557.0,1590.0,1622.0,1655.0,1688.0],"60_PLUS_M":[0.0,1019.0,1040.0,1061.0,1082.0,1103.0,1125.0,1146.0,1167.0,1188.0,1209.0,1230.0,1251.0,1272.0,1293.0,1314.0,1336.0,1348.0,1357.0,1399.0,1420.0],"60_PLUS_F":[0.0,1101.0,1135.0,1169.0,1203.0,1237.0,1271.0,1305.0,1339.0,1373.0,1407.0,1441.0,1475.0,1509.0,1543.0,1577.0,1611.0,1645.0,1679.0,1713.0,1747.0]},"cutoff":{"U25_M":1185.0,"U25_F":1523.0,"25_29_M":1195.0,"25_29_F":1540.0,"30_34_M":1244.0,"30_34_F":1575.0,"35_39_M":1276.0,"35_39_F":1590.0,"40_44_M":1324.0,"40_44_F":1612.0,"45_49_M":1347.0,"45_49_F":1635.0,"50_54_M":1370.0,"50_54_F":1685.0,"55_59_M":1416.0,"55_59_F":1720.0,"60_PLUS_M":1440.0,"60_PLUS_F":1780.0}},"WHtR":[[0.0,20.0],[0.5,19.0],[0.51,18.0],[0.52,17.0],[0.53,16.0],[0.54,15.0],[0.55,12.5],[0.56,10.0],[0.57,7.5],[0.58,5.0],[0.59,2.5],[0.6,0.0]]};
+
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:null};
+function key(age,sex){let a=age<25?"U25":age<30?"25_29":age<35?"30_34":age<40?"35_39":age<45?"40_44":age<50?"45_49":age<55?"50_54":age<60?"55_59":"60_PLUS";return a+"_"+sex.toUpperCase()}
+function lookupFloor(x,thresholds,points){let ans=0;for(let i=0;i<thresholds.length;i++){if(thresholds[i]!==null && x>=thresholds[i]) ans=points[i];}return ans}
+function nearestScore(x,thresholds,points){let bi=0,bd=Infinity;thresholds.forEach((v,i)=>{if(v===null)return;const d=Math.abs(v-x);if(d<bd){bd=d;bi=i}});return points[bi]||0}
+function whtrScore(r){if(r<.5)return 20;if(r>=.6)return 0;let ans=0;for(const [min,p] of DB.WHtR){if(r>=min)ans=p}return ans}
+function tableName(event){return {"Pushup":"Pushup_Lookup","Hand Release Pushup":"HRPU_Lookup","Situp":"Situp_Lookup","Cross-Leg Reverse Crunch":"CLRC_Lookup","Forearm Plank":"Plank_Lookup"}[event]}
+function strengthScore(event,reps,k){const t=DB[tableName(event)];return lookupFloor(reps,t.data[k],t.points)}
+function coreScore(event,val,k){const t=DB[tableName(event)];return lookupFloor(val,t.data[k],t.points)}
+function cardioScore(event,val,k){if(event==="HAMR"){const t=DB.HAMR_Lookup;return lookupFloor(val,t.data[k],t.points)}const t=DB.Run_Compat;if(val>t.cutoff[k])return 0;return lookupFloor(val,t.data[k],t.points)}
+function fmt(n){return Number(n).toFixed(1).replace(/\.0$/,"")}
+function rating(total){return total>=90?"Excellent":total>=75?"Pass":"Fail"}
+
+function toggleCore(prefix=""){const ev=$(prefix+"coreEvent").value;$(prefix+"coreRepsWrap").classList.toggle("hidden",ev==="Forearm Plank");$(prefix+"plankWrap").classList.toggle("hidden",ev!=="Forearm Plank")}
+function toggleCardio(prefix=""){const ev=$(prefix+"cardioEvent").value;$(prefix+"runWrap").classList.toggle("hidden",ev==="HAMR");$(prefix+"hamrWrap").classList.toggle("hidden",ev!=="HAMR")}
+$("coreEvent").addEventListener("change",()=>toggleCore(""));
+$("cardioEvent").addEventListener("change",()=>toggleCardio(""));
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+ $("calcPanel").classList.toggle("hidden",b.dataset.tab!=="calc");$("solvePanel").classList.toggle("hidden",b.dataset.tab!=="solve");
+}));
+
+$("calculate").addEventListener("click",()=>{
+ $("calcMsg").textContent="";$("calcResults").classList.add("hidden");
+ const age=num("age"),height=num("height"),waist=num("waist"),sr=num("strengthResult");
+ if(age===null||height===null||waist===null||sr===null||height<=0||waist<=0){$("calcMsg").textContent="Enter age, height, waist, and strength result.";return}
+ const k=key(age,$("sex").value), ratio=waist/height;
+ const ce=$("coreEvent").value, cv=ce==="Forearm Plank"?(num("plankMin")??0)*60+(num("plankSec")??0):num("coreResult");
+ const ae=$("cardioEvent").value, av=ae==="HAMR"?num("hamr"):(num("runMin")??0)*60+(num("runSec")??0);
+ if(cv===null||av===null){$("calcMsg").textContent="Enter your core and cardio result.";return}
+ const ws=whtrScore(ratio),ss=strengthScore($("strengthEvent").value,sr,k),cs=coreScore(ce,cv,k),as=cardioScore(ae,av,k),total=ws+ss+cs+as;
+ $("wScore").textContent=fmt(ws)+" pts";$("sScore").textContent=fmt(ss)+" pts";$("cScore").textContent=fmt(cs)+" pts";$("aScore").textContent=fmt(as)+" pts";
+ const floorsMet=ss>=2.5&&cs>=2.5&&as>=35;
+ const rt=!floorsMet||total<75?"Fail":total>=90?"Excellent":"Pass";
+ $("totalScore").textContent=fmt(total);$("rating").textContent=rt;$("rating").className="rating "+(rt==="Fail"?"bad":"ok");
+ if(!floorsMet) $("calcMsg").textContent="Total points alone are not enough: each strength/core event must meet its 2.5-point minimum and cardio must meet its 35-point minimum.";
+ $("calcResults").classList.remove("hidden");
+});
+
+
+function scoreTierAtOrAbove(points, required){
+ const eligible=points.filter(p=>p>=required);
+ return eligible.length?Math.min(...eligible):null;
+}
+function thresholdForPoints(tableName,k,required){
+ const t=DB[tableName], tier=scoreTierAtOrAbove(t.points,required);
+ if(tier===null)return null;
+ const i=t.points.indexOf(tier), v=t.data[k][i];
+ return {value:v,points:tier};
+}
+function runForPoints(k,required){
+ const t=DB.Run_Compat;
+ const eligible=t.points.map((p,i)=>({p,i})).filter(x=>x.p>=required);
+ if(!eligible.length)return null;
+ const chosen=eligible[eligible.length-1];
+ const i=chosen.i;
+ let seconds;
+ if(i===t.points.length-1) seconds=t.cutoff[k];
+ else seconds=Math.max(0,t.data[k][i+1]-1);
+ return {value:seconds,points:chosen.p};
+}
+function mmss(seconds){
+ seconds=Math.round(seconds);
+ return Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");
+}
+function balancedTargets(bodyPts,target){
+ const floors={cardio:35,strength:2.5,core:2.5};
+ const maxes={cardio:50,strength:15,core:15};
+ const weights={cardio:50,strength:15,core:15};
+ const needed=target-bodyPts;
+ const floorTotal=floors.cardio+floors.strength+floors.core;
+ const maxTotal=maxes.cardio+maxes.strength+maxes.core;
+ if(needed>maxTotal+1e-9)return null;
+ if(needed<=floorTotal)return {...floors};
+ let lo=0,hi=2;
+ for(let n=0;n<80;n++){
+   const a=(lo+hi)/2;
+   const sum=Object.keys(weights).reduce((s,k)=>s+Math.min(maxes[k],Math.max(floors[k],a*weights[k])),0);
+   if(sum<needed)lo=a;else hi=a;
+ }
+ const a=hi;
+ return {
+   cardio:Math.min(maxes.cardio,Math.max(floors.cardio,a*weights.cardio)),
+   strength:Math.min(maxes.strength,Math.max(floors.strength,a*weights.strength)),
+   core:Math.min(maxes.core,Math.max(floors.core,a*weights.core))
+ };
+}
+function officialFloor(tableName,k){
+ const t=DB[tableName];
+ return {value:t.data[k][0],points:t.points[0]};
+}
+function officialRunFloor(k){
+ return {value:DB.Run_Compat.cutoff[k],points:35};
+}
+
+
+function updateSolveWhtr(){
+ const h=num("solveHeight"),w=num("solveWaist");
+ if(h===null||w===null||h<=0||w<=0){
+   $("solveWhtrDisplay").textContent="—";
+   return;
+ }
+ const r=w/h;
+ $("solveWhtrDisplay").textContent=r.toFixed(2)+"  •  "+fmt(whtrScore(r))+" pts";
+}
+$("solveHeight").addEventListener("input",updateSolveWhtr);
+$("solveWaist").addEventListener("input",updateSolveWhtr);
+
+
+function toggleKnownCore(){
+ const ev=$("knownCoreEvent").value;
+ $("knownCoreRepsWrap").classList.toggle("hidden",ev==="Forearm Plank");
+ $("knownPlankWrap").classList.toggle("hidden",ev!=="Forearm Plank");
+ updateKnownPointPreview();
+}
+function toggleKnownCardio(){
+ const ev=$("knownCardioEvent").value;
+ $("knownRunWrap").classList.toggle("hidden",ev==="HAMR");
+ $("knownHamrWrap").classList.toggle("hidden",ev!=="HAMR");
+ updateKnownPointPreview();
+}
+function knownInputs(){
+ const age=num("solveAge");
+ if(age===null)return null;
+ const k=key(age,$("solveSex").value);
+
+ let strength=null, core=null, cardio=null;
+
+ const sr=num("knownStrengthResult");
+ if(sr!==null){
+   strength={points:strengthScore($("knownStrengthEvent").value,sr,k),event:$("knownStrengthEvent").value,value:sr};
+ }
+
+ const cev=$("knownCoreEvent").value;
+ if(cev==="Forearm Plank"){
+   const pm=num("knownPlankMin"), ps=num("knownPlankSec");
+   if(pm!==null || ps!==null){
+     const sec=(pm??0)*60+(ps??0);
+     core={points:coreScore(cev,sec,k),event:cev,value:sec};
+   }
+ } else {
+   const cr=num("knownCoreResult");
+   if(cr!==null) core={points:coreScore(cev,cr,k),event:cev,value:cr};
+ }
+
+ const aev=$("knownCardioEvent").value;
+ if(aev==="HAMR"){
+   const hv=num("knownHamr");
+   if(hv!==null) cardio={points:cardioScore(aev,hv,k),event:aev,value:hv};
+ } else {
+   const rm=num("knownRunMin"), rs=num("knownRunSec");
+   if(rm!==null || rs!==null){
+     const sec=(rm??0)*60+(rs??0);
+     cardio={points:cardioScore(aev,sec,k),event:aev,value:sec};
+   }
+ }
+ return {strength,core,cardio,k};
+}
+function updateKnownPointPreview(){
+ const known=knownInputs();
+ ["knownStrengthPts","knownCorePts","knownPlankPts","knownRunPts","knownHamrPts"].forEach(id=>$(id).textContent="");
+ if(!known)return;
+ if(known.strength) $("knownStrengthPts").textContent="Locked at "+fmt(known.strength.points)+" pts";
+ if(known.core){
+   const id=known.core.event==="Forearm Plank"?"knownPlankPts":"knownCorePts";
+   $(id).textContent="Locked at "+fmt(known.core.points)+" pts";
+ }
+ if(known.cardio){
+   const id=known.cardio.event==="HAMR"?"knownHamrPts":"knownRunPts";
+   $(id).textContent="Locked at "+fmt(known.cardio.points)+" pts";
+ }
+}
+["solveAge","solveSex","knownStrengthEvent","knownStrengthResult","knownCoreEvent","knownCoreResult","knownPlankMin","knownPlankSec","knownCardioEvent","knownRunMin","knownRunSec","knownHamr"].forEach(id=>{
+ const el=$(id); if(el) el.addEventListener("input",updateKnownPointPreview);
+});
+$("knownCoreEvent").addEventListener("change",toggleKnownCore);
+$("knownCardioEvent").addEventListener("change",toggleKnownCardio);
+$("knownStrengthEvent").addEventListener("change",updateKnownPointPreview);
+toggleKnownCore(); toggleKnownCardio();
+
+$("solveBtn").addEventListener("click",()=>{
+ $("solveMsg").textContent="";
+ $("solveResult").classList.add("hidden");
+ const age=num("solveAge"),height=num("solveHeight"),waist=num("solveWaist"),target=num("target");
+ if(age===null||age<18||height===null||height<=0||waist===null||waist<=0||target===null){
+   $("solveMsg").textContent="Enter age, height, waist circumference, and target score.";
+   return;
+ }
+ if(target<75||target>100){
+   $("solveMsg").textContent="Target score must be between 75 and 100.";
+   return;
+ }
+ const ratio=waist/height;
+ if(ratio<0.30||ratio>0.80){
+   $("solveMsg").textContent="The calculated WHtR looks unusual. Check the height and waist entries.";
+   return;
+ }
+
+ const k=key(age,$("solveSex").value);
+ const body=whtrScore(ratio);
+ const known=knownInputs()||{strength:null,core:null,cardio:null,k};
+ const locked={
+   strength:known.strength?known.strength.points:null,
+   core:known.core?known.core.points:null,
+   cardio:known.cardio?known.cardio.points:null
+ };
+ const floors={cardio:35,strength:2.5,core:2.5};
+ const maxes={cardio:50,strength:15,core:15};
+ const weights={cardio:50,strength:15,core:15};
+ const categories=["cardio","strength","core"];
+
+ // Known results still have to meet component minimums.
+ for(const c of categories){
+   if(locked[c]!==null && locked[c]<floors[c]){
+     $("solveMsg").textContent="The entered "+c+" result is below the official component minimum, so the assessment cannot pass with that result.";
+     return;
+   }
+ }
+
+ const lockedTotal=categories.reduce((s,c)=>s+(locked[c]??0),0);
+ const unknown=categories.filter(c=>locked[c]===null);
+ const needFromUnknown=target-body-lockedTotal;
+
+ if(unknown.length===0){
+   const total=body+lockedTotal;
+   if(total<target){
+     $("solveMsg").textContent="With all three component results locked, the projected total is "+fmt(total)+". Increase one of the entered results to reach "+fmt(target)+".";
+     return;
+   }
+ }
+
+ const targetPts={};
+ for(const c of categories) if(locked[c]!==null) targetPts[c]=locked[c];
+
+ if(unknown.length){
+   const floorUnknown=unknown.reduce((s,c)=>s+floors[c],0);
+   const maxUnknown=unknown.reduce((s,c)=>s+maxes[c],0);
+   if(needFromUnknown>maxUnknown+1e-9){
+     $("solveMsg").textContent="That target cannot be reached with the component results you entered.";
+     return;
+   }
+
+   if(needFromUnknown<=floorUnknown){
+     unknown.forEach(c=>targetPts[c]=floors[c]);
+   } else if(unknown.length===1){
+     const c=unknown[0];
+     targetPts[c]=Math.max(floors[c],Math.min(maxes[c],needFromUnknown));
+   } else {
+     let lo=0,hi=2;
+     for(let n=0;n<80;n++){
+       const a=(lo+hi)/2;
+       const sum=unknown.reduce((s,c)=>s+Math.min(maxes[c],Math.max(floors[c],a*weights[c])),0);
+       if(sum<needFromUnknown)lo=a; else hi=a;
+     }
+     const a=hi;
+     unknown.forEach(c=>targetPts[c]=Math.min(maxes[c],Math.max(floors[c],a*weights[c])));
+   }
+ }
+
+ // Convert any unknown categories to actual chart thresholds.
+ const push=thresholdForPoints("Pushup_Lookup",k,targetPts.strength);
+ const hrpu=thresholdForPoints("HRPU_Lookup",k,targetPts.strength);
+ const sit=thresholdForPoints("Situp_Lookup",k,targetPts.core);
+ const clrc=thresholdForPoints("CLRC_Lookup",k,targetPts.core);
+ const plank=thresholdForPoints("Plank_Lookup",k,targetPts.core);
+ const hamr=thresholdForPoints("HAMR_Lookup",k,targetPts.cardio);
+ const run=runForPoints(k,targetPts.cardio);
+
+ const strengthPts=locked.strength!==null?locked.strength:push.points;
+ const corePts=locked.core!==null?locked.core:sit.points;
+ const cardioPts=locked.cardio!==null?locked.cardio:run.points;
+ const projected=body+strengthPts+corePts+cardioPts;
+
+ $("minWhtrPts").textContent=ratio.toFixed(2)+" / "+fmt(body)+" pts";
+ $("minStrengthPts").textContent=fmt(strengthPts)+(locked.strength!==null?" ✓":"");
+ $("minCorePts").textContent=fmt(corePts)+(locked.core!==null?" ✓":"");
+ $("minCardioPts").textContent=fmt(cardioPts)+(locked.cardio!==null?" ✓":"");
+
+ if(locked.strength!==null){
+   const txt=known.strength.event==="Pushup"?Math.round(known.strength.value)+" reps entered":"—";
+   $("minPushup").textContent=known.strength.event==="Pushup"?txt:"Locked in HRPU";
+   $("minHrpu").textContent=known.strength.event==="Hand Release Pushup"?Math.round(known.strength.value)+" reps entered":"Locked in Push-Ups";
+ } else {
+   $("minPushup").textContent=Math.round(push.value)+" reps";
+   $("minHrpu").textContent=Math.round(hrpu.value)+" reps";
+ }
+
+ if(locked.core!==null){
+   $("minSitup").textContent=known.core.event==="Situp"?Math.round(known.core.value)+" reps entered":"Locked in "+known.core.event;
+   $("minClrc").textContent=known.core.event==="Cross-Leg Reverse Crunch"?Math.round(known.core.value)+" reps entered":"Locked in "+known.core.event;
+   $("minPlank").textContent=known.core.event==="Forearm Plank"?mmss(known.core.value)+" entered":"Locked in "+known.core.event;
+ } else {
+   $("minSitup").textContent=Math.round(sit.value)+" reps";
+   $("minClrc").textContent=Math.round(clrc.value)+" reps";
+   $("minPlank").textContent=mmss(plank.value)+" or longer";
+ }
+
+ if(locked.cardio!==null){
+   $("minRun").textContent=known.cardio.event==="2 Mile Run"?mmss(known.cardio.value)+" entered":"Locked in HAMR";
+   $("minHamr").textContent=known.cardio.event==="HAMR"?Math.round(known.cardio.value)+" shuttles entered":"Locked in 2-Mile Run";
+ } else {
+   $("minHamr").textContent=Math.round(hamr.value)+" shuttles";
+   $("minRun").textContent=mmss(run.value)+" or faster";
+ }
+
+ const fPush=officialFloor("Pushup_Lookup",k);
+ const fHrpu=officialFloor("HRPU_Lookup",k);
+ const fSit=officialFloor("Situp_Lookup",k);
+ const fClrc=officialFloor("CLRC_Lookup",k);
+ const fPlank=officialFloor("Plank_Lookup",k);
+ const fHamr=officialFloor("HAMR_Lookup",k);
+ const fRun=officialRunFloor(k);
+
+ $("floorPushup").textContent="Official floor: "+Math.round(fPush.value)+" reps ("+fmt(fPush.points)+" pts)";
+ $("floorHrpu").textContent="Official floor: "+Math.round(fHrpu.value)+" reps ("+fmt(fHrpu.points)+" pts)";
+ $("floorSitup").textContent="Official floor: "+Math.round(fSit.value)+" reps ("+fmt(fSit.points)+" pts)";
+ $("floorClrc").textContent="Official floor: "+Math.round(fClrc.value)+" reps ("+fmt(fClrc.points)+" pts)";
+ $("floorPlank").textContent="Official floor: "+mmss(fPlank.value)+" ("+fmt(fPlank.points)+" pts)";
+ $("floorHamr").textContent="Official floor: "+Math.round(fHamr.value)+" shuttles ("+fmt(fHamr.points)+" pts)";
+ $("floorRun").textContent="Official floor: "+mmss(fRun.value)+" ("+fmt(fRun.points)+" pts)";
+
+ const lockedNames=categories.filter(c=>locked[c]!==null);
+ $("minimumNote").textContent=
+   (lockedNames.length
+     ? "Entered results are locked and counted at their actual point values. "
+     : "No optional results were entered. ") +
+   "Blank categories are calculated from the official event minimums and the additional points needed to reach "+fmt(target)+
+   ". Because the scoring charts use fixed point steps, the projected total is "+fmt(projected)+".";
+ $("solveResult").classList.remove("hidden");
+});
+toggleCore("");toggleCardio("");
+</script>
+</body>
+</html>
