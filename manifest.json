@@ -1,0 +1,24 @@
+{
+  "name": "Eagle Fitness Center Tools",
+  "short_name": "EFC Tools",
+  "description": "Eagle Fitness Center tools for the 707 FSS Fitness Assessment Cell and Facility Management.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#001522",
+  "icons": [
+    {
+      "src": "./Facility%20Manager/Apps/Icons/EFC%20Brandmark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Facility%20Manager/Apps/Icons/EFC%20Brandmark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
