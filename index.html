@@ -2,202 +2,427 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Eagle Fitness Center Tools</title>
+
   <style>
     :root {
-      --navy:#0b1f33;
-      --navy2:#163b61;
-      --blue:#2a6f9b;
-      --light:#edf5fb;
-      --line:#c7d5e2;
-      --text:#172033;
-      --muted:#64748b;
-      --white:#ffffff;
+      --navy: #0b1f33;
+      --navy2: #163b61;
+      --blue: #2a6f9b;
+      --light: #edf5fb;
+      --line: #c7d5e2;
+      --text: #172033;
+      --muted: #64748b;
+      --white: #ffffff;
     }
-    * { box-sizing:border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      margin:0;
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background:#f4f7fa;
-      color:var(--text);
+      background: #f4f7fa;
+      color: var(--text);
     }
+
     .wrap {
       max-width: 1100px;
       margin: 0 auto;
       padding: 24px;
     }
+
     .hero {
-      background: linear-gradient(135deg, var(--navy), var(--navy2));
-      color: #fff;
+      background: linear-gradient(
+        135deg,
+        var(--navy),
+        var(--navy2)
+      );
+
+      color: white;
+
       border-radius: 22px;
+
       padding: 30px;
+
       display: grid;
-      grid-template-columns: minmax(0,1fr) 210px;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        210px;
+
       gap: 24px;
+
       align-items: center;
     }
+
     .hero h1 {
       margin: 0;
-      font-size: clamp(30px, 5vw, 48px);
+
+      font-size: clamp(
+        30px,
+        5vw,
+        48px
+      );
+
       line-height: 1.05;
     }
+
     .hero .sub {
       margin: 12px 0 0;
+
       color: #dceaf7;
+
       font-size: 17px;
+
       font-weight: 700;
     }
+
     .hero .location {
       margin: 6px 0 0;
+
       color: #dceaf7;
+
       font-size: 15px;
     }
+
     .logo {
-      display:flex;
-      justify-content:center;
-      align-items:center;
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
     }
+
     .logo img {
       width: 100%;
+
       max-width: 180px;
+
       height: auto;
+
       display: block;
     }
+
     .section-title {
       margin: 30px 0 14px;
+
       font-size: 14px;
+
       letter-spacing: .09em;
+
       text-transform: uppercase;
+
       color: var(--blue);
+
       font-weight: 800;
     }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
       gap: 16px;
     }
+
     .card {
       display: block;
+
       text-decoration: none;
+
       color: inherit;
-      background: #fff;
+
+      background: white;
+
       border: 1px solid var(--line);
+
       border-radius: 16px;
+
       padding: 20px;
-      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+
+      transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
     }
+
     .card:hover {
       transform: translateY(-2px);
+
       border-color: #9fb9cf;
-      box-shadow: 0 10px 24px rgba(15,38,59,.08);
+
+      box-shadow:
+        0 10px 24px
+        rgba(15, 38, 59, .08);
     }
+
     .card h2 {
       margin: 0 0 7px;
+
       font-size: 20px;
+
       color: var(--navy);
     }
+
     .card p {
       margin: 0;
+
       color: var(--muted);
+
       line-height: 1.45;
+
       font-size: 14px;
     }
+
     .tag {
       display: inline-block;
+
       margin-top: 14px;
+
       padding: 6px 9px;
+
       border-radius: 999px;
+
       background: var(--light);
+
       color: var(--blue);
+
       font-size: 11px;
+
       font-weight: 800;
+
       letter-spacing: .05em;
+
       text-transform: uppercase;
     }
+
     footer {
       text-align: center;
+
       color: var(--muted);
+
       font-size: 12px;
+
       margin: 24px 0 6px;
     }
 
     @media (max-width: 700px) {
-      .wrap { padding: 0; }
+
+      .wrap {
+        padding: 0;
+      }
+
       .hero {
         border-radius: 0;
+
         grid-template-columns: 1fr;
+
         padding: 24px 20px;
       }
+
       .logo {
         max-width: 180px;
+
         margin: 0 auto;
       }
+
       .grid {
         grid-template-columns: 1fr;
+
         padding: 0 16px;
       }
+
       .section-title {
         padding: 0 16px;
       }
+
       footer {
-        padding: 0 16px 18px;
+        padding:
+          0 16px
+          18px;
       }
     }
   </style>
 </head>
+
 <body>
+
   <div class="wrap">
+
     <header class="hero">
+
       <div>
-        <h1>Eagle Fitness Center Tools</h1>
-        <div class="sub">Brought to you by 707 FSS Fitness Assessment Cell</div>
-        <div class="location">Fort George G. Meade, Maryland</div>
+
+        <h1>
+          Eagle Fitness Center Tools
+        </h1>
+
+        <div class="sub">
+          Brought to you by
+          707 FSS Fitness Assessment Cell
+        </div>
+
+        <div class="location">
+          Fort George G. Meade, Maryland
+        </div>
+
       </div>
+
       <div class="logo">
-        <img src="data:image/png;base64,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" alt="Eagle Fitness Center logo">
+
+        <img
+          src="./Facility%20Manager/Apps/Icons/Eagle%20Logo.png"
+          alt="Eagle Fitness Center logo"
+        >
+
       </div>
+
     </header>
 
-    <div class="section-title">FAC</div>
-    <div class="grid">
-      <a class="card" href="./Facility%20Manager/FAC/">
-        <h2>FAC Portal</h2>
-        <p>Fitness Assessment Cell information, resources, and quick-access tools.</p>
-        <span class="tag">Open FAC</span>
-      </a>
 
-      <a class="card" href="./Facility%20Manager/FAC/pfra.html">
-        <h2>PFRA Calculator</h2>
-        <p>Calculate PFRA scores and find minimum performance needed for a target score.</p>
-        <span class="tag">Open Calculator</span>
-      </a>
+    <!-- FAC -->
+
+    <div class="section-title">
+      FAC
     </div>
 
-    <div class="section-title">Facility Management</div>
     <div class="grid">
-      <a class="card" href="./Inventory/inventory.html">
-        <h2>Inventory</h2>
-        <p>Track inventory quantities, low-stock items, and sorting views.</p>
-        <span class="tag">Open Inventory</span>
+
+      <a
+        class="card"
+        href="./Facility%20Manager/FAC/"
+      >
+
+        <h2>
+          FAC Portal
+        </h2>
+
+        <p>
+          Fitness Assessment Cell information,
+          resources, and quick-access tools.
+        </p>
+
+        <span class="tag">
+          Open FAC
+        </span>
+
       </a>
 
-      <a class="card" href="./Visitor%20Counter/">
-        <h2>Visitor Counter</h2>
-        <p>Offline-friendly headcount and visitor tracking tool.</p>
-        <span class="tag">Open Counter</span>
+
+      <a
+        class="card"
+        href="./Facility%20Manager/FAC/pfra_calculator.html"
+      >
+
+        <h2>
+          PFRA Calculator
+        </h2>
+
+        <p>
+          Calculate PFRA scores and determine
+          minimum performance needed to reach
+          a target score.
+        </p>
+
+        <span class="tag">
+          Open Calculator
+        </span>
+
       </a>
 
-      <a class="card" href="./Leave%20Tracker/Leave.html">
-        <h2>Leave Tracker</h2>
-        <p>View and manage leave information from the web app.</p>
-        <span class="tag">Open Tracker</span>
-      </a>
     </div>
+
+
+    <!-- FACILITY MANAGEMENT -->
+
+    <div class="section-title">
+      Facility Management
+    </div>
+
+    <div class="grid">
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/Apps/Inventory/inventory.html"
+      >
+
+        <h2>
+          Inventory
+        </h2>
+
+        <p>
+          Track inventory quantities,
+          low-stock items, and supply levels.
+        </p>
+
+        <span class="tag">
+          Open Inventory
+        </span>
+
+      </a>
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/Apps/Visitor%20counter/"
+      >
+
+        <h2>
+          Visitor Counter
+        </h2>
+
+        <p>
+          Quick headcount and visitor
+          tracking tool.
+        </p>
+
+        <span class="tag">
+          Open Counter
+        </span>
+
+      </a>
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/Apps/Leave%20Tracker/Leave.html"
+      >
+
+        <h2>
+          Leave Tracker
+        </h2>
+
+        <p>
+          View and manage leave information
+          from the web app.
+        </p>
+
+        <span class="tag">
+          Open Tracker
+        </span>
+
+      </a>
+
+
+    </div>
+
 
     <footer>
-      Eagle Fitness Center Tools • 707 FSS Fitness Assessment Cell
+      Eagle Fitness Center Tools
+      •
+      707 FSS Fitness Assessment Cell
     </footer>
+
   </div>
+
 </body>
 </html>
