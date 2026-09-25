@@ -32,7 +32,7 @@ const CORE_FILES = [
   "./Facility%20Manager/Apps/Leave%20Tracker/Leave.html",
 
   // Visitor Counter
-
+  "./Facility%20Manager/Apps/Visitor%20Counter/index.html",
 ];
 
 
