@@ -636,7 +636,34 @@ oninput="displayInventory()">
 
 </div>
 
+<div class="search-container">
 
+    <select id="sortInventory"
+            onchange="displayInventory()"
+            style="
+                width: 100%;
+                padding: 13px;
+                border: 1px solid #ccc;
+                border-radius: 12px;
+                font-size: 16px;
+                background: white;
+            ">
+
+        <option value="category">
+            Sort: Category + A–Z
+        </option>
+
+        <option value="low">
+            Sort: Quantity Low → High
+        </option>
+
+        <option value="high">
+            Sort: Quantity High → Low
+        </option>
+
+    </select>
+
+</div>
 
 <!-- CATEGORY TABS -->
 
