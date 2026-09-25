@@ -286,7 +286,16 @@
   const dodError = document.getElementById("dodError");
   const dateInput = document.getElementById("formDate");
 
+// -------------------------
+// START A NEW FORM
+// -------------------------
 
+sessionStorage.removeItem("fitnessAccessMember");
+sessionStorage.removeItem("fitnessAccessAcknowledgments");
+sessionStorage.removeItem("fitnessAccessSignature");
+sessionStorage.removeItem("fitnessAccessCertified");
+sessionStorage.removeItem("fitnessAccessSubmissionId");
+  
   // -------------------------
   // SET TODAY'S DATE
   // -------------------------
