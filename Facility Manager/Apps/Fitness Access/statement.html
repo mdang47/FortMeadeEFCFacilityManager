@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Statement of Understanding | Eagle Fitness Center</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  color: #1d252c;
+}
+
+.page {
+  max-width: 900px;
+  margin: auto;
+  padding: 30px 20px 60px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header h2 {
+  margin: 6px 0;
+  font-size: 19px;
+}
+
+.step {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #69737d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.member-summary {
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.member-summary strong {
+  margin-right: 6px;
+}
+
+.intro {
+  line-height: 1.6;
+}
+
+.card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.07);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #e4e8ec;
+}
+
+.statement {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 15px;
+  align-items: start;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.statement:last-child {
+  border-bottom: none;
+}
+
+.statement-text {
+  line-height: 1.55;
+}
+
+.initial-btn {
+  width: 82px;
+  min-height: 42px;
+  border: 2px solid #69737d;
+  background: white;
+  color: #344054;
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.initial-btn.acknowledged {
+  background: #ecfdf3;
+  border-color: #079455;
+  color: #067647;
+}
+
+.progress-card {
+  position: sticky;
+  bottom: 10px;
+  background: #1d252c;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-top: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.2);
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.progress-text {
+  font-weight: 700;
+}
+
+.continue-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 13px 24px;
+  background: white;
+  color: #1d252c;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.continue-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 20px 12px 50px;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+
+  .statement {
+    grid-template-columns: 72px 1fr;
+    gap: 10px;
+  }
+
+  .initial-btn {
+    width: 68px;
+    font-size: 12px;
+  }
+
+  .progress-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .continue-btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <h1>EAGLE FITNESS CENTER</h1>
+    <h2>Fitness Access</h2>
+
+    <div class="step">
+      Step 2 · Statement of Understanding
+    </div>
+  </div>
+
+
+  <div class="member-summary">
+    <strong id="memberName"></strong>
+    <span id="memberDetails"></span>
+  </div>
+
+
+  <div class="card intro">
+    Fitness Access is defined as unstaffed hours of operation.
+    Access to the Eagle Fitness Center (EFC) during Fitness Access
+    is a privilege that carries greater responsibility. Failure to
+    comply with the following rules &amp; conditions may result in
+    suspension or termination of access.
+  </div>
+
+
+  <!-- SECTION I -->
+
+  <div class="card">
+
+    <div class="section-title">
+      Section I – Rules of Use
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule1">INITIAL</button>
+      <div class="statement-text">
+        I must register my Common Access Card (CAC), sign this
+        Statement of Understanding &amp; Assumption of Risk Form, &amp;
+        receive a program briefing by EFC Staff prior to participating.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule2">INITIAL</button>
+      <div class="statement-text">
+        I understand there is no EFC staff during Fitness Access hours,
+        &amp; surveillance cameras will monitor activity.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule3">INITIAL</button>
+      <div class="statement-text">
+        I understand that only authorized patrons may access EFC during
+        unstaffed hours, and I will not allow any customers to access
+        the facility under my account. This includes holding or propping
+        open doors to allow access. I acknowledge that video surveillance
+        cameras monitor this activity.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule4">INITIAL</button>
+      <div class="statement-text">
+        I will ensure doors close securely after entering &amp; exiting the facility.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule5">INITIAL</button>
+      <div class="statement-text">
+        I understand the risk of exercising alone and the buddy concept is highly encouraged.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule6">INITIAL</button>
+      <div class="statement-text">
+        I will assess risks &amp; only use EFC equipment as it is intended to be used.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule7">INITIAL</button>
+      <div class="statement-text">
+        I will not remove safety devices from equipment &amp; I will use safety collars on barbells
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule8">INITIAL</button>
+      <div class="statement-text">
+        I will re-rack weights after use.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule9">INITIAL</button>
+      <div class="statement-text">
+        I will wear appropriate work out attire. Shoes &amp; shirts must be worn at all times.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule10">INITIAL</button>
+      <div class="statement-text">
+        I will not record videos or take photos in the facility.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule11">INITIAL</button>
+      <div class="statement-text">
+        I will only play music through personal earphones/buds
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule12">INITIAL</button>
+      <div class="statement-text">
+        I understand restricted areas will be locked or marked as off-limits.
+        e.g., saunas &amp; customer service desk.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule13">INITIAL</button>
+      <div class="statement-text">
+        In case of emergencies, I will use the phone at the Front Desk
+        to contact NSA police, first responders, and/or EFC staff.
+      </div>
+    </div>
+
+    <div class="statement">
+      <button class="initial-btn" data-id="rule14">INITIAL</button>
+      <div class="statement-text">
+        I understand the US Government, US Air Force, EFC, &amp; associated
+        personnel are not responsible for my personal property &amp; I may
+        be liable for any damage I cause to government property.
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- SECTION II -->
+
+  <div class="card">
+
+    <div class="section-title">
+      Section II – Violations &amp; Disciplinary Actions
+    </div>
+
+    <div class="statement">
+
+      <button class="initial-btn" data-id="section2">
+        INITIAL
+      </button>
+
+      <div class="statement-text">
+        1st Violation: Verbal warning from EFC
+        <br><br>
+
+        2nd Violation: Suspension (30 days), &amp; retraining before regaining access
+        <br><br>
+
+        3rd Violation: Suspension (90 days), written request from leadership
+        to re-instate, &amp; retraining
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SECTION III -->
+
+  <div class="card">
+
+    <div class="section-title">
+      Section III – Assumption of Risk &amp; Waiver of Claims
+    </div>
+
+    <div class="statement">
+
+      <button class="initial-btn" data-id="section3">
+        INITIAL
+      </button>
+
+      <div class="statement-text">
+        I assume all risks of injury and waive all rights to pursue monetary
+        damages or any other relief of any kind because of injury or other loss
+        occurring at or near the Eagle Health and Fitness Center. In the event
+        I am injured while at the EFC, I will hold harmless the United States
+        Government, the United States Air Force, EFC, any administrative
+        subdivision or agency thereof, and the respective personnel and employees
+        thereof from all claims of any sort for damages or for other relief.
+        I understand and agree that the EFC will be unsupervised and that no
+        personnel assigned to the Fitness Center or other employee will be on site
+        to help me use the equipment or exercise in the manner that I choose to
+        exercise. I acknowledge there is possible danger connected with any
+        physical activity (including the dangers of physical injury and death)
+        and knowingly and voluntarily waive my right to make legal or equitable
+        claims of any sort against the United States Government, the United States
+        Air Force, EFC administrative subdivision or agency thereof and the
+        respective personnel and employees thereof. This assumption of risk and
+        waiver of liability applies to my family members, successors, heirs and assigns.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SECTION IV -->
+
+  <div class="card">
+
+    <div class="section-title">
+      Section IV – Preexisting Medical Conditions
+    </div>
+
+    <div class="statement">
+
+      <button class="initial-btn" data-id="section4">
+        INITIAL
+      </button>
+
+      <div class="statement-text">
+        I represent that I am in good physical health and have no symptoms,
+        medical conditions, impairments, or diseases that might be aggravated,
+        worsened, or induced by my intended use of the EFC. If I have any health
+        or medical concerns now or after I register, I will immediately discontinue
+        my use of the EFC until I am cleared for physical activity by a physician.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SECTION V -->
+
+  <div class="card">
+
+    <div class="section-title">
+      Section V – Orientation &amp; Safety
+    </div>
+
+    <div class="statement">
+
+      <button class="initial-btn" data-id="section5a">
+        INITIAL
+      </button>
+
+      <div class="statement-text">
+        I am familiar with safe operation of fitness equipment. If not,
+        I will complete an orientation before after-hours use.
+      </div>
+
+    </div>
+
+
+    <div class="statement">
+
+      <button class="initial-btn" data-id="section5b">
+        INITIAL
+      </button>
+
+      <div class="statement-text">
+        I received instructions on emergency procedures, phone usage,
+        Automatic External Defibrillator &amp; first aid kit.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="progress-card">
+
+    <div class="progress-row">
+
+      <div class="progress-text">
+        <span id="completedCount">0</span> of 19 acknowledged
+      </div>
+
+      <button
+        type="button"
+        class="continue-btn"
+        id="continueButton"
+        disabled>
+        Continue to Signature →
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const REQUIRED_IDS = [
+  "rule1",
+  "rule2",
+  "rule3",
+  "rule4",
+  "rule5",
+  "rule6",
+  "rule7",
+  "rule8",
+  "rule9",
+  "rule10",
+  "rule11",
+  "rule12",
+  "rule13",
+  "rule14",
+  "section2",
+  "section3",
+  "section4",
+  "section5a",
+  "section5b"
+];
+
+
+/* LOAD MEMBER */
+
+let member;
+
+try {
+  member = JSON.parse(
+    sessionStorage.getItem("fitnessAccessMember")
+  );
+}
+catch (error) {
+  member = null;
+}
+
+
+if (
+  !member ||
+  !member.rank ||
+  !member.fullName ||
+  !member.dodId ||
+  !member.initials
+) {
+
+  alert(
+    "Member information was not found. Please start the form again."
+  );
+
+  window.location.href =
+    "fitness-access.html";
+}
+
+
+/* MEMBER SUMMARY */
+
+document.getElementById("memberName").textContent =
+  member.fullName;
+
+document.getElementById("memberDetails").textContent =
+  " · " + member.rank +
+  " · Initials: " + member.initials;
+
+
+/* LOAD EXISTING ACKNOWLEDGMENTS */
+
+let acknowledgments = {};
+
+try {
+
+  acknowledgments =
+    JSON.parse(
+      sessionStorage.getItem(
+        "fitnessAccessAcknowledgments"
+      )
+    ) || {};
+
+}
+catch (error) {
+
+  acknowledgments = {};
+
+}
+
+
+/* BUTTON EVENTS */
+
+const buttons =
+  document.querySelectorAll(".initial-btn");
+
+
+buttons.forEach(button => {
+
+  const id =
+    button.dataset.id;
+
+
+  if (acknowledgments[id]) {
+
+    button.classList.add(
+      "acknowledged"
+    );
+
+    button.textContent =
+      member.initials + " ✓";
+
+  }
+
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      if (acknowledgments[id]) {
+
+        delete acknowledgments[id];
+
+        button.classList.remove(
+          "acknowledged"
+        );
+
+        button.textContent =
+          "INITIAL";
+
+      }
+
+      else {
+
+        acknowledgments[id] = {
+          initials:
+            member.initials,
+
+          timestamp:
+            new Date().toISOString()
+        };
+
+        button.classList.add(
+          "acknowledged"
+        );
+
+        button.textContent =
+          member.initials + " ✓";
+
+      }
+
+
+      saveAcknowledgments();
+      updateProgress();
+
+    }
+  );
+
+});
+
+
+function saveAcknowledgments() {
+
+  sessionStorage.setItem(
+    "fitnessAccessAcknowledgments",
+    JSON.stringify(acknowledgments)
+  );
+
+}
+
+
+function updateProgress() {
+
+  const completed =
+    REQUIRED_IDS.filter(
+      id => acknowledgments[id]
+    ).length;
+
+
+  document.getElementById(
+    "completedCount"
+  ).textContent =
+    completed;
+
+
+  document.getElementById(
+    "continueButton"
+  ).disabled =
+    completed !== REQUIRED_IDS.length;
+
+}
+
+
+document.getElementById(
+  "continueButton"
+).addEventListener(
+  "click",
+  function() {
+
+    const complete =
+      REQUIRED_IDS.every(
+        id => acknowledgments[id]
+      );
+
+
+    if (!complete) {
+
+      alert(
+        "Please acknowledge all 19 statements before continuing."
+      );
+
+      return;
+
+    }
+
+
+    saveAcknowledgments();
+
+    window.location.href =
+      "signature.html";
+
+  }
+);
+
+
+updateProgress();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Review Fitness Access Form</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2933;
+    }
+
+    .page {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-top: 7px;
+      color: #667085;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+
+    .review-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 15px;
+      padding: 9px 0;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #475467;
+    }
+
+    .ack-complete {
+      padding: 14px;
+      background: #ecfdf3;
+      border: 1px solid #abefc6;
+      border-radius: 8px;
+      color: #067647;
+      font-weight: bold;
+    }
+
+    .certification {
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .signature-box {
+      border: 1px solid #d0d5dd;
+      border-radius: 8px;
+      min-height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .signature-box img {
+      display: block;
+      max-width: 100%;
+      max-height: 160px;
+    }
+
+    .privacy-note {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #667085;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #344054;
+    }
+
+    .primary {
+      flex: 1;
+      background: #1f2937;
+      color: white;
+    }
+
+    .primary:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .status {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .status.error {
+      display: block;
+      background: #fef3f2;
+      border: 1px solid #fecdca;
+      color: #b42318;
+    }
+
+    .status.success {
+      display: block;
+      background: #ecfdf3;
+      border: 1px solid #abefc6;
+      color: #067647;
+    }
+
+    .success-screen {
+      text-align: center;
+    }
+
+    .success-screen h2 {
+      border: 0;
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+
+    .submission-id {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      background: #f2f4f7;
+      font-family: monospace;
+      font-size: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding: 15px 12px 40px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .review-row {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="card" id="reviewCard">
+
+    <h1>Review Your Form</h1>
+
+    <div class="subtitle">
+      Eagle Fitness Center · Fitness Access
+    </div>
+
+    <p style="text-align:center; margin-top:20px;">
+      Please review your information before submitting your
+      Statement of Understanding & Assumption of Risk Form.
+    </p>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>Member Information</h2>
+
+    <div class="review-row">
+      <div class="label">Rank</div>
+      <div id="rank"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">Name</div>
+      <div id="name"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">DoD ID #</div>
+      <div id="dodId"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">Date</div>
+      <div id="date"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">Initials</div>
+      <div id="initials"></div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>Acknowledgments</h2>
+
+    <div class="ack-complete">
+      ✓ <span id="ackCount">0</span> of 19 required statements acknowledged
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>Certification & Signature</h2>
+
+    <div class="certification">
+      I certify that I have read, understand, &amp; agree to abide by all
+      rules &amp; terms of this Statement of Understanding/Assumption of
+      Risk Form.
+    </div>
+
+    <div class="signature-box">
+      <img id="signaturePreview" alt="Member signature">
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="privacy-note">
+      By selecting Submit Form, your completed form will be recorded
+      and a signed PDF will be generated for Eagle Fitness Center records.
+    </div>
+
+    <div class="buttons">
+
+      <button
+        class="secondary"
+        type="button"
+        onclick="editSignature()">
+        Edit Signature
+      </button>
+
+      <button
+        class="primary"
+        id="submitButton"
+        type="button"
+        onclick="submitForm()">
+        Submit Form
+      </button>
+
+    </div>
+
+    <div id="status" class="status"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /* =========================================
+     APPS SCRIPT API
+  ========================================= */
+
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec";
+
+
+  /* =========================================
+     REQUIRED ACKNOWLEDGMENTS
+  ========================================= */
+
+  const REQUIRED_ACKNOWLEDGMENTS = [
+    "rule1",
+    "rule2",
+    "rule3",
+    "rule4",
+    "rule5",
+    "rule6",
+    "rule7",
+    "rule8",
+    "rule9",
+    "rule10",
+    "rule11",
+    "rule12",
+    "rule13",
+    "rule14",
+    "section2",
+    "section3",
+    "section4",
+    "section5a",
+    "section5b"
+  ];
+
+
+  /* =========================================
+     LOAD STORED FORM DATA
+  ========================================= */
+
+  let member;
+  let acknowledgments;
+  let signature;
+  let certified;
+
+
+  try {
+
+    member =
+      JSON.parse(
+        sessionStorage.getItem(
+          "fitnessAccessMember"
+        )
+      );
+
+    acknowledgments =
+      JSON.parse(
+        sessionStorage.getItem(
+          "fitnessAccessAcknowledgments"
+        )
+      ) || {};
+
+    signature =
+      sessionStorage.getItem(
+        "fitnessAccessSignature"
+      );
+
+    certified =
+      sessionStorage.getItem(
+        "fitnessAccessCertified"
+      );
+
+  }
+  catch (error) {
+
+    showFatalError(
+      "Your saved form information could not be read. Please start the form again."
+    );
+
+  }
+
+
+  /* =========================================
+     VALIDATE FORM
+  ========================================= */
+
+  function formIsComplete() {
+
+    if (!member) {
+      return false;
+    }
+
+    if (
+      !member.rank ||
+      !member.fullName ||
+      !member.dodId ||
+      !member.initials
+    ) {
+      return false;
+    }
+
+    if (
+      !/^\d{10}$/.test(
+        String(member.dodId)
+      )
+    ) {
+      return false;
+    }
+
+    const allAcknowledged =
+      REQUIRED_ACKNOWLEDGMENTS.every(
+        id => acknowledgments[id]
+      );
+
+    if (!allAcknowledged) {
+      return false;
+    }
+
+    if (
+      !signature ||
+      !signature.startsWith(
+        "data:image/png;base64,"
+      )
+    ) {
+      return false;
+    }
+
+    if (certified !== "true") {
+      return false;
+    }
+
+    return true;
+
+  }
+
+
+  /* =========================================
+     DISPLAY REVIEW
+  ========================================= */
+
+  function displayReview() {
+
+    if (!formIsComplete()) {
+
+      showFatalError(
+        "This form is incomplete. Please return to the beginning and complete all required steps."
+      );
+
+      return;
+    }
+
+
+    document.getElementById("rank")
+      .textContent =
+        member.rank;
+
+
+    document.getElementById("name")
+      .textContent =
+        member.fullName;
+
+
+    document.getElementById("date")
+      .textContent =
+        member.date;
+
+
+    document.getElementById("initials")
+      .textContent =
+        member.initials;
+
+
+    const dod =
+      String(member.dodId);
+
+
+    document.getElementById("dodId")
+      .textContent =
+        "••••••" +
+        dod.slice(-4);
+
+
+    const completedCount =
+      REQUIRED_ACKNOWLEDGMENTS
+        .filter(
+          id => acknowledgments[id]
+        )
+        .length;
+
+
+    document.getElementById("ackCount")
+      .textContent =
+        completedCount;
+
+
+    document.getElementById(
+      "signaturePreview"
+    ).src =
+      signature;
+
+  }
+
+
+  /* =========================================
+     CLIENT SUBMISSION ID
+  ========================================= */
+
+  function getSubmissionId() {
+
+    let id =
+      sessionStorage.getItem(
+        "fitnessAccessSubmissionId"
+      );
+
+
+    if (!id) {
+
+      const date =
+        new Date();
+
+
+      const yyyy =
+        date.getFullYear();
+
+      const mm =
+        String(
+          date.getMonth() + 1
+        ).padStart(2, "0");
+
+      const dd =
+        String(
+          date.getDate()
+        ).padStart(2, "0");
+
+
+      let randomPart;
+
+
+      if (
+        window.crypto &&
+        crypto.randomUUID
+      ) {
+
+        randomPart =
+          crypto
+            .randomUUID()
+            .replace(/-/g, "")
+            .substring(0, 8)
+            .toUpperCase();
+
+      }
+      else {
+
+        randomPart =
+          Math.random()
+            .toString(36)
+            .substring(2, 10)
+            .toUpperCase();
+
+      }
+
+
+      id =
+        "FA-" +
+        yyyy +
+        mm +
+        dd +
+        "-" +
+        randomPart;
+
+
+      sessionStorage.setItem(
+        "fitnessAccessSubmissionId",
+        id
+      );
+
+    }
+
+
+    return id;
+
+  }
+
+
+  /* =========================================
+     SUBMIT FORM
+  ========================================= */
+
+  async function submitForm() {
+
+    if (!formIsComplete()) {
+
+      showStatus(
+        "Your form is incomplete and cannot be submitted.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const button =
+      document.getElementById(
+        "submitButton"
+      );
+
+
+    button.disabled = true;
+    button.textContent =
+      "Submitting…";
+
+
+    showStatus(
+      "Please wait while your signed form is being created.",
+      ""
+    );
+
+
+    const payload = {
+
+      action:
+        "submitFitnessAccess",
+
+      submissionId:
+        getSubmissionId(),
+
+      rank:
+        member.rank,
+
+      name:
+        member.fullName,
+
+      dodId:
+        String(member.dodId),
+
+      date:
+        member.date,
+
+      initials:
+        member.initials,
+
+      acknowledgments:
+        acknowledgments,
+
+      signature:
+        signature
+
+    };
+
+
+    try {
+
+      const response =
+        await fetch(
+          API_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+
+            body:
+              JSON.stringify(payload)
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "The server returned an error."
+        );
+
+      }
+
+
+      const result =
+        await response.json();
+
+
+      if (!result.success) {
+
+        throw new Error(
+          result.message ||
+          "The form could not be submitted."
+        );
+
+      }
+
+
+      submissionSuccess(
+        result.submissionId
+      );
+
+    }
+    catch (error) {
+
+      console.error(error);
+
+
+      showStatus(
+        "Your form could not be submitted. Please check your connection and try again. Your form has not been cleared.",
+        "error"
+      );
+
+
+      button.disabled = false;
+      button.textContent =
+        "Submit Form";
+
+    }
+
+  }
+
+
+  /* =========================================
+     SUCCESS
+  ========================================= */
+
+  function submissionSuccess(
+    submissionId
+  ) {
+
+    /*
+      Clear form data only AFTER
+      the server confirms success.
+    */
+
+    sessionStorage.removeItem(
+      "fitnessAccessMember"
+    );
+
+    sessionStorage.removeItem(
+      "fitnessAccessAcknowledgments"
+    );
+
+    sessionStorage.removeItem(
+      "fitnessAccessSignature"
+    );
+
+    sessionStorage.removeItem(
+      "fitnessAccessCertified"
+    );
+
+    sessionStorage.removeItem(
+      "fitnessAccessSubmissionId"
+    );
+
+
+    document.querySelector(
+      ".page"
+    ).innerHTML = `
+
+      <div class="card success-screen">
+
+        <h2>Form Submitted</h2>
+
+        <p>
+          Your Fitness Access Statement of Understanding
+          &amp; Assumption of Risk Form has been submitted successfully.
+        </p>
+
+        <p>
+          Submission Reference
+        </p>
+
+        <div class="submission-id">
+          ${escapeHTML(submissionId)}
+        </div>
+
+        <p style="
+          margin-top:25px;
+          color:#667085;
+          font-size:14px;
+        ">
+          You may now close this page.
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================================
+     EDIT SIGNATURE
+  ========================================= */
+
+  function editSignature() {
+
+    window.location.href =
+      "signature.html";
+
+  }
+
+
+  /* =========================================
+     STATUS MESSAGE
+  ========================================= */
+
+  function showStatus(
+    message,
+    type
+  ) {
+
+    const status =
+      document.getElementById(
+        "status"
+      );
+
+
+    status.textContent =
+      message;
+
+
+    status.className =
+      "status";
+
+
+    if (type) {
+
+      status.classList.add(
+        type
+      );
+
+    }
+    else {
+
+      status.style.display =
+        "block";
+
+      status.style.background =
+        "#f2f4f7";
+
+      status.style.color =
+        "#475467";
+
+    }
+
+  }
+
+
+  /* =========================================
+     FATAL ERROR
+  ========================================= */
+
+  function showFatalError(
+    message
+  ) {
+
+    document.body.innerHTML = `
+
+      <div
+        style="
+          max-width:600px;
+          margin:60px auto;
+          padding:25px;
+          font-family:Arial,sans-serif;
+        "
+      >
+
+        <h2>
+          Form Cannot Be Loaded
+        </h2>
+
+        <p>
+          ${escapeHTML(message)}
+        </p>
+
+        <button
+          onclick="
+            window.location.href='fitness-access.html'
+          "
+          style="
+            margin-top:15px;
+            padding:12px 18px;
+            cursor:pointer;
+          "
+        >
+          Start Over
+        </button>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================================
+     SAFE HTML OUTPUT
+  ========================================= */
+
+  function escapeHTML(
+    value
+  ) {
+
+    return String(
+      value || ""
+    )
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* =========================================
+     INITIALIZE PAGE
+  ========================================= */
+
+  displayReview();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Signature | Eagle Fitness Center</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  color: #1d252c;
+}
+
+.page {
+  max-width: 760px;
+  margin: auto;
+  padding: 40px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header h2 {
+  margin: 6px 0;
+  font-size: 19px;
+}
+
+.step {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #69737d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 30px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e4e8ec;
+  margin-bottom: 20px;
+}
+
+.review-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 15px;
+  padding: 8px 0;
+}
+
+.label {
+  font-weight: 700;
+  color: #475467;
+}
+
+.certification {
+  line-height: 1.65;
+  margin-bottom: 25px;
+}
+
+.signature-label {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.signature-instructions {
+  font-size: 13px;
+  color: #69737d;
+  margin-bottom: 10px;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  height: 220px;
+  border: 2px solid #98a2b3;
+  border-radius: 10px;
+  background: white;
+  overflow: hidden;
+  touch-action: none;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.signature-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.clear-btn {
+  border: none;
+  background: #e5e7eb;
+  color: #344054;
+  padding: 10px 16px;
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.error {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 7px;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+button {
+  font-size: 15px;
+}
+
+.back-btn {
+  border: none;
+  background: #e5e7eb;
+  color: #344054;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.continue-btn {
+  flex: 1;
+  border: none;
+  background: #1d252c;
+  color: white;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+
+  .page {
+    padding: 20px 12px;
+  }
+
+  .card {
+    padding: 22px 18px;
+  }
+
+  .review-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .buttons {
+    flex-direction: column;
+  }
+
+  .canvas-wrapper {
+    height: 190px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="header">
+
+    <h1>EAGLE FITNESS CENTER</h1>
+
+    <h2>Fitness Access</h2>
+
+    <div class="step">
+      Step 3 · Certification &amp; Signature
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+      Member Information
+    </div>
+
+    <div class="review-row">
+      <div class="label">Rank</div>
+      <div id="rank"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">Name</div>
+      <div id="name"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">DoD ID #</div>
+      <div id="dodId"></div>
+    </div>
+
+    <div class="review-row">
+      <div class="label">Date</div>
+      <div id="date"></div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+      Certification
+    </div>
+
+    <div class="certification">
+      I certify that I have read, understand, &amp; agree to abide by all
+      rules &amp; terms of this Statement of Understanding/Assumption of
+      Risk Form.
+    </div>
+
+
+    <div class="signature-label">
+      Signature
+    </div>
+
+    <div class="signature-instructions">
+      Sign inside the box below using your finger, stylus, or mouse.
+    </div>
+
+
+    <div class="canvas-wrapper">
+      <canvas id="signatureCanvas"></canvas>
+    </div>
+
+
+    <div class="signature-actions">
+
+      <button
+        type="button"
+        class="clear-btn"
+        id="clearButton">
+        Clear Signature
+      </button>
+
+    </div>
+
+
+    <div
+      class="error"
+      id="signatureError">
+      Please provide your signature before continuing.
+    </div>
+
+
+    <div class="buttons">
+
+      <button
+        type="button"
+        class="back-btn"
+        onclick="goBack()">
+        ← Back
+      </button>
+
+      <button
+        type="button"
+        class="continue-btn"
+        id="continueButton">
+        Review Form →
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const REQUIRED_IDS = [
+  "rule1",
+  "rule2",
+  "rule3",
+  "rule4",
+  "rule5",
+  "rule6",
+  "rule7",
+  "rule8",
+  "rule9",
+  "rule10",
+  "rule11",
+  "rule12",
+  "rule13",
+  "rule14",
+  "section2",
+  "section3",
+  "section4",
+  "section5a",
+  "section5b"
+];
+
+
+/* =========================================
+   LOAD MEMBER + ACKNOWLEDGMENTS
+========================================= */
+
+let member;
+
+let acknowledgments;
+
+
+try {
+
+  member =
+    JSON.parse(
+      sessionStorage.getItem(
+        "fitnessAccessMember"
+      )
+    );
+
+
+  acknowledgments =
+    JSON.parse(
+      sessionStorage.getItem(
+        "fitnessAccessAcknowledgments"
+      )
+    ) || {};
+
+}
+catch (error) {
+
+  member = null;
+  acknowledgments = {};
+
+}
+
+
+const acknowledgmentsComplete =
+  REQUIRED_IDS.every(
+    id => acknowledgments[id]
+  );
+
+
+if (
+  !member ||
+  !member.rank ||
+  !member.fullName ||
+  !member.dodId ||
+  !member.initials ||
+  !acknowledgmentsComplete
+) {
+
+  alert(
+    "Your form is incomplete. Please complete the Statement of Understanding first."
+  );
+
+  window.location.href =
+    "fitness-access.html";
+
+}
+
+
+/* =========================================
+   MEMBER DISPLAY
+========================================= */
+
+document.getElementById("rank")
+  .textContent =
+    member.rank;
+
+
+document.getElementById("name")
+  .textContent =
+    member.fullName;
+
+
+document.getElementById("date")
+  .textContent =
+    member.date;
+
+
+const dod =
+  String(member.dodId);
+
+
+document.getElementById("dodId")
+  .textContent =
+    "••••••" +
+    dod.slice(-4);
+
+
+/* =========================================
+   SIGNATURE CANVAS
+========================================= */
+
+const canvas =
+  document.getElementById(
+    "signatureCanvas"
+  );
+
+
+const ctx =
+  canvas.getContext("2d");
+
+
+let drawing = false;
+
+let hasSignature = false;
+
+
+/*
+  Resize the internal canvas to match
+  its visible size and account for
+  high-DPI/Retina displays.
+*/
+
+function resizeCanvas() {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+
+  const ratio =
+    Math.max(
+      window.devicePixelRatio || 1,
+      1
+    );
+
+
+  canvas.width =
+    Math.round(
+      rect.width * ratio
+    );
+
+
+  canvas.height =
+    Math.round(
+      rect.height * ratio
+    );
+
+
+  ctx.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
+
+
+  ctx.lineWidth = 2;
+
+  ctx.lineCap =
+    "round";
+
+  ctx.lineJoin =
+    "round";
+
+  ctx.strokeStyle =
+    "#111827";
+
+}
+
+
+/*
+  Restore a signature if the member
+  came back from the Review page.
+*/
+
+function restoreSignature() {
+
+  const savedSignature =
+    sessionStorage.getItem(
+      "fitnessAccessSignature"
+    );
+
+
+  if (
+    !savedSignature ||
+    !savedSignature.startsWith(
+      "data:image/png;base64,"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const image =
+    new Image();
+
+
+  image.onload =
+    function() {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      ctx.clearRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+
+      ctx.drawImage(
+        image,
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+
+      hasSignature = true;
+
+    };
+
+
+  image.src =
+    savedSignature;
+
+}
+
+
+/* =========================================
+   POINTER POSITION
+========================================= */
+
+function getPoint(event) {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+
+  return {
+
+    x:
+      event.clientX -
+      rect.left,
+
+    y:
+      event.clientY -
+      rect.top
+
+  };
+
+}
+
+
+/* =========================================
+   DRAW
+========================================= */
+
+canvas.addEventListener(
+  "pointerdown",
+  function(event) {
+
+    event.preventDefault();
+
+
+    drawing = true;
+
+    hasSignature = true;
+
+
+    canvas.setPointerCapture(
+      event.pointerId
+    );
+
+
+    const point =
+      getPoint(event);
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      point.x,
+      point.y
+    );
+
+  }
+);
+
+
+canvas.addEventListener(
+  "pointermove",
+  function(event) {
+
+    if (!drawing) {
+      return;
+    }
+
+
+    event.preventDefault();
+
+
+    const point =
+      getPoint(event);
+
+
+    ctx.lineTo(
+      point.x,
+      point.y
+    );
+
+
+    ctx.stroke();
+
+  }
+);
+
+
+function stopDrawing(event) {
+
+  if (!drawing) {
+    return;
+  }
+
+
+  drawing = false;
+
+
+  if (
+    event &&
+    canvas.hasPointerCapture(
+      event.pointerId
+    )
+  ) {
+
+    canvas.releasePointerCapture(
+      event.pointerId
+    );
+
+  }
+
+}
+
+
+canvas.addEventListener(
+  "pointerup",
+  stopDrawing
+);
+
+
+canvas.addEventListener(
+  "pointercancel",
+  stopDrawing
+);
+
+
+canvas.addEventListener(
+  "pointerleave",
+  function(event) {
+
+    if (
+      event.pointerType === "mouse"
+    ) {
+
+      stopDrawing(event);
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   CLEAR
+========================================= */
+
+document.getElementById(
+  "clearButton"
+).addEventListener(
+  "click",
+  function() {
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+
+    ctx.clearRect(
+      0,
+      0,
+      rect.width,
+      rect.height
+    );
+
+
+    hasSignature = false;
+
+
+    sessionStorage.removeItem(
+      "fitnessAccessSignature"
+    );
+
+
+    sessionStorage.removeItem(
+      "fitnessAccessCertified"
+    );
+
+
+    document.getElementById(
+      "signatureError"
+    ).style.display =
+      "none";
+
+  }
+);
+
+
+/* =========================================
+   REVIEW FORM
+========================================= */
+
+document.getElementById(
+  "continueButton"
+).addEventListener(
+  "click",
+  function() {
+
+    if (!hasSignature) {
+
+      document.getElementById(
+        "signatureError"
+      ).style.display =
+        "block";
+
+      return;
+
+    }
+
+
+    const signatureData =
+      canvas.toDataURL(
+        "image/png"
+      );
+
+
+    sessionStorage.setItem(
+      "fitnessAccessSignature",
+      signatureData
+    );
+
+
+    /*
+      Reaching this point means the member
+      has signed beneath the certification
+      statement shown immediately above.
+    */
+
+    sessionStorage.setItem(
+      "fitnessAccessCertified",
+      "true"
+    );
+
+
+    window.location.href =
+      "review.html";
+
+  }
+);
+
+
+/* =========================================
+   BACK
+========================================= */
+
+function goBack() {
+
+  window.location.href =
+    "statement.html";
+
+}
+
+
+/* =========================================
+   INITIALIZE CANVAS
+========================================= */
+
+resizeCanvas();
+
+restoreSignature();
+
+</script>
+
+</body>
+</html>

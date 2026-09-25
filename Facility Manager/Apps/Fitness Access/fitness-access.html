@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Fitness Access | Eagle Fitness Center</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1d252c;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+
+    .header h2 {
+      margin: 6px 0 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e4e8ec;
+    }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .required {
+      color: #b42318;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #b8c0c8;
+      border-radius: 8px;
+      font-size: 17px;
+      background: white;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #44515c;
+      box-shadow: 0 0 0 3px rgba(68,81,92,.12);
+    }
+
+    input[readonly] {
+      background: #f3f5f7;
+      color: #555;
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #69737d;
+    }
+
+    .error {
+      color: #b42318;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1d252c;
+      color: white;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    button:disabled {
+      background: #aeb5bb;
+      cursor: not-allowed;
+    }
+
+    .step {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #69737d;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding: 20px 12px;
+      }
+
+      .card {
+        padding: 22px 18px;
+      }
+
+      .header h1 {
+        font-size: 23px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="form-container">
+
+    <div class="header">
+      <h1>EAGLE FITNESS CENTER</h1>
+      <h2>Fitness Access</h2>
+    </div>
+
+    <div class="card">
+
+      <div class="step">
+        Step 1
+      </div>
+
+      <div class="section-title">
+        Member Information
+      </div>
+
+      <form id="memberForm">
+
+        <!-- RANK -->
+        <div class="field">
+          <label for="rank">
+            Rank <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="rank"
+            name="rank"
+            autocomplete="off"
+            required
+          >
+        </div>
+
+
+        <!-- NAME -->
+        <div class="field">
+          <label for="fullName">
+            Full Name <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            autocomplete="name"
+            placeholder="First Last"
+            required
+          >
+
+          <div class="hint">
+            Your first and last initials will be used when acknowledging each statement.
+          </div>
+        </div>
+
+
+        <!-- DOD ID -->
+        <div class="field">
+          <label for="dodId">
+            DoD ID # <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="dodId"
+            name="dodId"
+            inputmode="numeric"
+            maxlength="10"
+            autocomplete="off"
+            required
+          >
+
+          <div class="hint">
+            Enter your 10-digit DoD ID number.
+          </div>
+
+          <div class="error" id="dodError">
+            DoD ID must contain exactly 10 digits.
+          </div>
+        </div>
+
+
+        <!-- DATE -->
+        <div class="field">
+          <label for="formDate">
+            Date
+          </label>
+
+          <input
+            type="text"
+            id="formDate"
+            name="formDate"
+            readonly
+          >
+        </div>
+
+
+        <div class="button-row">
+          <button type="submit">
+            Continue →
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const form = document.getElementById("memberForm");
+  const dodInput = document.getElementById("dodId");
+  const dodError = document.getElementById("dodError");
+  const dateInput = document.getElementById("formDate");
+
+
+  // -------------------------
+  // SET TODAY'S DATE
+  // -------------------------
+
+  const today = new Date();
+
+  dateInput.value = today.toLocaleDateString(
+    "en-US",
+    {
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    }
+  );
+
+
+  // -------------------------
+  // DOD ID - NUMBERS ONLY
+  // -------------------------
+
+  dodInput.addEventListener("input", function () {
+
+    this.value = this.value
+      .replace(/\D/g, "")
+      .slice(0, 10);
+
+    dodError.style.display = "none";
+
+  });
+
+
+  // -------------------------
+  // CREATE INITIALS
+  // -------------------------
+
+  function getInitials(name) {
+
+    const parts = name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    if (parts.length === 0) {
+      return "";
+    }
+
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
+
+    const firstInitial =
+      parts[0][0].toUpperCase();
+
+    const lastInitial =
+      parts[parts.length - 1][0].toUpperCase();
+
+    return firstInitial + lastInitial;
+
+  }
+
+
+  // -------------------------
+  // CONTINUE
+  // -------------------------
+
+  form.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const rank =
+      document.getElementById("rank").value.trim();
+
+    const fullName =
+      document.getElementById("fullName").value.trim();
+
+    const dodId =
+      dodInput.value.trim();
+
+
+    // Validate DoD ID
+    if (!/^\d{10}$/.test(dodId)) {
+
+      dodError.style.display = "block";
+      dodInput.focus();
+
+      return;
+
+    }
+
+
+    const memberData = {
+
+      rank: rank,
+
+      fullName: fullName,
+
+      dodId: dodId,
+
+      date: dateInput.value,
+
+      initials: getInitials(fullName)
+
+    };
+
+
+    /*
+      TEMPORARY
+
+      This only keeps the information while
+      the member completes the form.
+
+      It is NOT our permanent database.
+    */
+
+    sessionStorage.setItem(
+      "fitnessAccessMember",
+      JSON.stringify(memberData)
+    );
+
+
+    /*
+      NEXT STEP:
+      Send member to the Statement of Understanding.
+    */
+
+    window.location.href = "statement.html";
+
+  });
+
+</script>
+
+</body>
+</html>
