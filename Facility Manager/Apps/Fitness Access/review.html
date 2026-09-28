@@ -659,7 +659,8 @@
 
     };
 
-
+// Save a local pending copy before attempting upload.
+await savePendingFitnessSubmission(payload);
     try {
 
       const response =
