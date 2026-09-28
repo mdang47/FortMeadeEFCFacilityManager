@@ -713,23 +713,19 @@ submissionSuccess(
   result.submissionId
 );
 
-    }
-    catch (error) {
+catch (error) {
 
-      console.error(error);
+  console.error(error);
 
+  showStatus(
+    "Your form could not be submitted. Please check your connection and try again. Your form has not been cleared.",
+    "error"
+  );
 
-      showStatus(
-        "Your form could not be submitted. Please check your connection and try again. Your form has not been cleared.",
-        "error"
-      );
+  button.disabled = false;
+  button.textContent = "Submit Form";
 
-
-      button.disabled = false;
-      button.textContent =
-        "Submit Form";
-
-    }
+}
 
   }
 
@@ -802,7 +798,75 @@ submissionSuccess(
     `;
 
   }
+/* =========================================
+   OFFLINE SUBMISSION SAVED
+========================================= */
 
+function offlineSubmissionSaved(submissionId) {
+
+  // The completed form is already safely stored
+  // in IndexedDB and will be retried later.
+
+  sessionStorage.removeItem(
+    "fitnessAccessMember"
+  );
+
+  sessionStorage.removeItem(
+    "fitnessAccessAcknowledgments"
+  );
+
+  sessionStorage.removeItem(
+    "fitnessAccessSignature"
+  );
+
+  sessionStorage.removeItem(
+    "fitnessAccessCertified"
+  );
+
+  sessionStorage.removeItem(
+    "fitnessAccessSubmissionId"
+  );
+
+
+  document.querySelector(
+    ".page"
+  ).innerHTML = `
+
+    <div class="card success-screen">
+
+      <h2>Form Saved</h2>
+
+      <p>
+        Your completed Fitness Access form has been saved
+        on this device and is waiting to sync.
+      </p>
+
+      <p>
+        It will be submitted automatically when an
+        internet connection is available.
+      </p>
+
+      <p>
+        Submission Reference
+      </p>
+
+      <div class="submission-id">
+        ${escapeHTML(submissionId)}
+      </div>
+
+      <p style="
+        margin-top:25px;
+        color:#667085;
+        font-size:14px;
+      ">
+        You may now close this page.
+      </p>
+
+    </div>
+
+  `;
+
+}
 
   /* =========================================
      EDIT SIGNATURE
