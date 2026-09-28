@@ -927,7 +927,70 @@ submissionSuccess(
       .replace(/'/g, "&#039;");
 
   }
+/* =========================================
+   SYNC PENDING SUBMISSIONS
+========================================= */
 
+async function syncPendingFitnessSubmissions() {
+
+  const pendingSubmissions =
+    await getPendingFitnessSubmissions();
+
+  if (!pendingSubmissions.length) {
+    return;
+  }
+
+  for (const pending of pendingSubmissions) {
+
+    try {
+
+      const response = await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "text/plain;charset=utf-8"
+          },
+
+          body: JSON.stringify(pending)
+        }
+      );
+
+      if (!response.ok) {
+        continue;
+      }
+
+      const result =
+        await response.json();
+
+      if (!result.success) {
+        continue;
+      }
+
+      await deletePendingFitnessSubmission(
+        pending.submissionId
+      );
+
+      console.log(
+        "Pending Fitness Access submission synced:",
+        pending.submissionId
+      );
+
+    }
+    catch (error) {
+
+      console.log(
+        "Pending Fitness Access submission still waiting to sync:",
+        pending.submissionId
+      );
+
+    }
+
+  }
+
+}
 
   /* =========================================
      INITIALIZE PAGE
