@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v3";
+const CACHE_NAME = "efc-tools-v4";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -24,6 +24,7 @@ const CORE_FILES = [
   "./Facility%20Manager/Apps/Fitness%20Access/review.html",
   "./Facility%20Manager/Apps/Fitness%20Access/signature.html",
   "./Facility%20Manager/Apps/Fitness%20Access/statement.html",
+  "./Facility%20Manager/Apps/Fitness%20Access/fitness-access-db.js",
 
   // Inventory
   "./Facility%20Manager/Apps/Inventory/inventory.html",
