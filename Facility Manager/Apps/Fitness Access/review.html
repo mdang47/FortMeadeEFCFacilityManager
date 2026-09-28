@@ -703,9 +703,15 @@ await savePendingFitnessSubmission(payload);
       }
 
 
-      submissionSuccess(
-        result.submissionId
-      );
+// Google confirmed receipt.
+// The local safety copy is no longer needed.
+await deletePendingFitnessSubmission(
+  payload.submissionId
+);
+
+submissionSuccess(
+  result.submissionId
+);
 
     }
     catch (error) {
