@@ -2,26 +2,26 @@ const CACHE_NAME = "facility-manager-v5";
 
 const FILES_TO_CACHE = [
   // Visitor Counter
-  "./Visitor Counter/index.html",
-  "./visitor-manifest.json",
-  "./Icons/Visitor.png",
+  "./Facility Manager/Apps/Visitor Counter/index.html",
+  "./Facility Manager/Apps/visitor-manifest.json",
+  "./Facility Manager/Apps/Icons/Visitor.png",
 
   // Inventory
-  "./Inventory/inventory.html",
-  "./inventory-manifest.json",
-  "./Icons/Inventory.png",
+  "./Facility Manager/Apps/Inventory/inventory.html",
+  "./Facility Manager/Apps/inventory-manifest.json",
+  "./Facility Manager/Apps/Icons/Inventory.png",
 
   // Leave Tracker
-  "./Leave Tracker/leave.html",
-  "./leave-manifest.json",
-  "./Icons/Leave.png"
+  "./Facility Manager/Apps/Leave Tracker/leave.html",
+  "./Facility Manager/Apps/leave-manifest.json",
+  "./Facility Manager/Apps/Icons/Leave.png",
 
   // Fitness Access
-  "./Fitness Access/fitness-access.html",
-  "./Fitness Access/statement.html",
-  "./Fitness Access/signature.html",
-  "./Fitness Access/review.html",
-  "./Fitness Access/fitness-access-db.js"
+  "./Facility Manager/Apps/Fitness Access/fitness-access.html",
+  "./Facility Manager/Apps/Fitness Access/statement.html",
+  "./Facility Manager/Apps/Fitness Access/signature.html",
+  "./Facility Manager/Apps/Fitness Access/review.html",
+  "./Facility Manager/Apps/Fitness Access/fitness-access-db.js"
 ];
 
 self.addEventListener("install", event => {
