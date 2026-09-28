@@ -996,7 +996,12 @@ async function syncPendingFitnessSubmissions() {
      INITIALIZE PAGE
   ========================================= */
 
-  displayReview();
+displayReview();
+
+// Automatically retry any submissions that were saved while offline.
+if (navigator.onLine) {
+  syncPendingFitnessSubmissions();
+}
 
 </script>
 
