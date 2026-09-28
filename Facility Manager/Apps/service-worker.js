@@ -1,4 +1,4 @@
-const CACHE_NAME = "facility-manager-v4";
+const CACHE_NAME = "facility-manager-v5";
 
 const FILES_TO_CACHE = [
   // Visitor Counter
@@ -15,6 +15,13 @@ const FILES_TO_CACHE = [
   "./Leave Tracker/leave.html",
   "./leave-manifest.json",
   "./Icons/Leave.png"
+
+  // Fitness Access
+  "./Fitness Access/fitness-access.html",
+  "./Fitness Access/statement.html",
+  "./Fitness Access/signature.html",
+  "./Fitness Access/review.html",
+  "./Fitness Access/fitness-access-db.js"
 ];
 
 self.addEventListener("install", event => {
