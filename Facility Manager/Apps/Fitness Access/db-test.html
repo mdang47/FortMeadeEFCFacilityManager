@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Access DB Test</title>
+</head>
+
+<body>
+
+<h1>Fitness Access DB Test</h1>
+
+<button id="testButton">Run Database Test</button>
+
+<pre id="result">Waiting for test...</pre>
+
+<script src="fitness-access-db.js"></script>
+
+<script>
+
+document.getElementById("testButton")
+  .addEventListener("click", async function () {
+
+    const output =
+      document.getElementById("result");
+
+    try {
+
+      output.textContent =
+        "Testing database...";
+
+      const testSubmission = {
+        submissionId: "TEST-OFFLINE-001",
+        rank: "TEST",
+        name: "John Smith",
+        dodId: "0123456789",
+        date: "September 28, 2026",
+        initials: "JS",
+        acknowledgments: {
+          test: true
+        },
+        signature: "TEST-SIGNATURE"
+      };
+
+      await savePendingFitnessSubmission(
+        testSubmission
+      );
+
+      const saved =
+        await getPendingFitnessSubmission(
+          "TEST-OFFLINE-001"
+        );
+
+      const count =
+        await countPendingFitnessSubmissions();
+
+      output.textContent =
+        "SUCCESS!\n\n" +
+        "Submission ID: " +
+        saved.submissionId +
+        "\n" +
+        "Name: " +
+        saved.name +
+        "\n" +
+        "Initials: " +
+        saved.initials +
+        "\n" +
+        "Pending submissions: " +
+        count;
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      output.textContent =
+        "DATABASE TEST FAILED\n\n" +
+        error.message;
+
+    }
+
+  });
+
+</script>
+
+</body>
+</html>
