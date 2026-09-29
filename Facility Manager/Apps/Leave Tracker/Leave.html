@@ -4,10 +4,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="manifest" href="../leave-manifest.json">
 <link rel="icon" type="image/png" sizes="512x512" href="../Icons/Leave.png">
 <link rel="apple-touch-icon" href="../Icons/Leave.png">
-<title>Leave Tracker</title>
+
+<title>Personnel Status Tracker</title>
 
 <style>
 
@@ -46,7 +48,9 @@ h1 {
 .offline { color: #c43d3d; }
 
 
-/* SUMMARY */
+/* =========================
+   SUMMARY
+========================= */
 
 .summary {
     max-width: 1000px;
@@ -75,7 +79,9 @@ h1 {
 }
 
 
-/* NEW REQUEST */
+/* =========================
+   BUTTONS
+========================= */
 
 .new-request {
     display: block;
@@ -92,8 +98,25 @@ h1 {
     cursor: pointer;
 }
 
+.sync-area {
+    max-width: 1000px;
+    margin: 15px auto;
+    text-align: center;
+}
 
-/* VIEW SWITCHER */
+.sync-button {
+    border: none;
+    background: #dbe8f6;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+/* =========================
+   VIEW SWITCHER
+========================= */
 
 .view-switcher {
     max-width: 1000px;
@@ -118,7 +141,9 @@ h1 {
 }
 
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
 
 .search-container {
     max-width: 1000px;
@@ -134,7 +159,9 @@ h1 {
 }
 
 
-/* FILTERS */
+/* =========================
+   FILTERS
+========================= */
 
 .tabs {
     max-width: 1000px;
@@ -164,7 +191,9 @@ h1 {
 }
 
 
-/* LIST */
+/* =========================
+   LIST
+========================= */
 
 .request-list {
     max-width: 1000px;
@@ -234,7 +263,9 @@ h1 {
 }
 
 
-/* ACTIONS */
+/* =========================
+   ACTIONS
+========================= */
 
 .actions {
     display: flex;
@@ -262,25 +293,9 @@ h1 {
 }
 
 
-/* SYNC BUTTON */
-
-.sync-area {
-    max-width: 1000px;
-    margin: 15px auto;
-    text-align: center;
-}
-
-.sync-button {
-    border: none;
-    background: #dbe8f6;
-    padding: 12px 22px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-
-/* CALENDAR */
+/* =========================
+   CALENDAR
+========================= */
 
 #calendarView {
     display: none;
@@ -410,7 +425,9 @@ h1 {
 .legend-cancelled { background: #ddd; }
 
 
-/* EMPTY */
+/* =========================
+   EMPTY
+========================= */
 
 .empty {
     background: white;
@@ -421,7 +438,9 @@ h1 {
 }
 
 
-/* MODALS */
+/* =========================
+   MODALS
+========================= */
 
 .modal {
     display: none;
@@ -504,7 +523,9 @@ h1 {
     cursor: pointer;
 }
 
-.close { background: #ddd; }
+.close {
+    background: #ddd;
+}
 
 .save {
     background: #333;
@@ -512,7 +533,9 @@ h1 {
 }
 
 
-/* DETAILS */
+/* =========================
+   DETAILS
+========================= */
 
 .detail-row {
     margin-bottom: 12px;
@@ -531,7 +554,9 @@ h1 {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 700px) {
 
@@ -580,7 +605,7 @@ h1 {
 
 <div class="header">
 
-<h1>Leave Request Tracker</h1>
+<h1>Personnel Status Tracker</h1>
 
 <div class="date" id="today"></div>
 
@@ -592,6 +617,8 @@ Loading...
 
 </div>
 
+
+<!-- SUMMARY -->
 
 <div class="summary">
 
@@ -612,7 +639,7 @@ Loading...
 
 <div class="summary-box">
 <div class="summary-number" id="totalCount">0</div>
-<div class="summary-label">Total Requests</div>
+<div class="summary-label">Total Entries</div>
 </div>
 
 </div>
@@ -621,7 +648,7 @@ Loading...
 <button
 class="new-request"
 onclick="openNewRequest()">
-+ New Leave Request
++ New Personnel Status
 </button>
 
 
@@ -635,6 +662,8 @@ onclick="syncEverything()">
 
 </div>
 
+
+<!-- VIEW SWITCHER -->
 
 <div class="view-switcher">
 
@@ -655,9 +684,9 @@ onclick="switchView('calendar')">
 </div>
 
 
+<!-- LIST VIEW -->
 
 <div id="listView">
-
 
 <div class="search-container">
 
@@ -713,9 +742,9 @@ id="requestList">
 </div>
 
 
+<!-- CALENDAR VIEW -->
 
 <div id="calendarView">
-
 
 <div class="calendar-header">
 
@@ -772,7 +801,6 @@ Cancelled
 </div>
 
 
-
 <!-- REQUEST FORM -->
 
 <div
@@ -782,7 +810,7 @@ id="requestModal">
 <div class="modal-content">
 
 <h2 id="formTitle">
-New Leave Request
+New Personnel Status
 </h2>
 
 
@@ -800,28 +828,34 @@ placeholder="Enter name">
 
 <div class="form-group">
 
-<label>Leave Type</label>
+<label>Type</label>
 
-<select id="leaveType">
+<select
+id="leaveType"
+onchange="updateFormFields()">
 
-<option>Annual Leave</option>
-<option>Medical</option>
-<option>Convalescent</option>
-<option>Emergency Leave</option>
-<option>PTDY</option>
-<option>SkillBridge</option>
-<option>Other</option>
+<option value="Leave">Leave</option>
+<option value="Appointment">Appointment</option>
+<option value="Day Pass">Day Pass</option>
+<option value="Unit Event">Unit Event</option>
+<option value="In Late">In Late</option>
+<option value="Indoc">Indoc</option>
+<option value="Other">Other</option>
 
 </select>
 
 </div>
 
 
+<!-- DATE FIELDS -->
+
 <div class="date-row">
 
 <div class="form-group">
 
-<label>Start Date</label>
+<label id="startDateLabel">
+Start Date
+</label>
 
 <input
 type="date"
@@ -831,9 +865,13 @@ onchange="calculateDays()">
 </div>
 
 
-<div class="form-group">
+<div
+class="form-group"
+id="endDateGroup">
 
-<label>End Date</label>
+<label id="endDateLabel">
+End Date
+</label>
 
 <input
 type="date"
@@ -845,20 +883,61 @@ onchange="calculateDays()">
 </div>
 
 
+<!-- TIME FIELDS -->
+
+<div
+class="date-row"
+id="timeFields"
+style="display:none;">
+
+<div class="form-group">
+
+<label id="startTimeLabel">
+Start Time
+</label>
+
+<input
+type="time"
+id="startTime">
+
+</div>
+
+
+<div
+class="form-group"
+id="endTimeGroup">
+
+<label id="endTimeLabel">
+End Time
+</label>
+
+<input
+type="time"
+id="endTime">
+
+</div>
+
+</div>
+
+
 <div
 class="calculated-days"
 id="daysDisplay">
+
 0 Days
+
 </div>
 
 
 <div class="form-group">
 
-<label>Notes</label>
+<label>
+Comments / Details
+</label>
 
 <textarea
 id="notes"
-placeholder="Optional notes"></textarea>
+placeholder="Add any relevant details or context..."></textarea>
 
 </div>
 
@@ -874,14 +953,13 @@ Cancel
 <button
 class="form-button save"
 onclick="saveRequest()">
-Save Request
+Save
 </button>
 
 </div>
 
 </div>
 </div>
-
 
 
 <!-- DETAILS -->
@@ -892,7 +970,7 @@ id="detailModal">
 
 <div class="modal-content">
 
-<h2>Leave Details</h2>
+<h2>Personnel Status Details</h2>
 
 <div id="detailContent"></div>
 
@@ -905,7 +983,6 @@ Close
 
 </div>
 </div>
-
 
 
 <script>
@@ -1143,7 +1220,7 @@ new Date()
 
 
 /* =========================================================
-   DATE HELPERS
+   DATE / TIME HELPERS
 ========================================================= */
 
 function parseLocalDate(dateString) {
@@ -1179,6 +1256,44 @@ function formatDate(dateString) {
             year: "numeric"
         }
 
+    );
+
+}
+
+
+function formatTime(timeString) {
+
+    if (!timeString) {
+        return "";
+    }
+
+    const parts =
+    timeString.split(":");
+
+    let hour =
+    Number(parts[0]);
+
+    const minute =
+    parts[1] || "00";
+
+    const suffix =
+    hour >= 12
+    ? "PM"
+    : "AM";
+
+    hour =
+    hour % 12;
+
+    if (hour === 0) {
+        hour = 12;
+    }
+
+    return (
+        hour +
+        ":" +
+        minute +
+        " " +
+        suffix
     );
 
 }
@@ -1259,6 +1374,27 @@ end
 
 function calculateDays() {
 
+    const type =
+    document
+    .getElementById(
+        "leaveType"
+    )
+    .value;
+
+
+    if (
+        type === "Appointment"
+        ||
+        type === "In Late"
+        ||
+        type === "Indoc"
+    ) {
+
+        return;
+
+    }
+
+
     const start =
     document
     .getElementById(
@@ -1291,6 +1427,198 @@ function calculateDays() {
         ? " Day"
         : " Days"
     );
+
+}
+
+
+
+/* =========================================================
+   DYNAMIC FORM
+========================================================= */
+
+function updateFormFields() {
+
+    const type =
+    document
+    .getElementById(
+        "leaveType"
+    )
+    .value;
+
+
+    const startDateLabel =
+    document
+    .getElementById(
+        "startDateLabel"
+    );
+
+
+    const endDateLabel =
+    document
+    .getElementById(
+        "endDateLabel"
+    );
+
+
+    const endDateGroup =
+    document
+    .getElementById(
+        "endDateGroup"
+    );
+
+
+    const timeFields =
+    document
+    .getElementById(
+        "timeFields"
+    );
+
+
+    const startTimeLabel =
+    document
+    .getElementById(
+        "startTimeLabel"
+    );
+
+
+    const endTimeGroup =
+    document
+    .getElementById(
+        "endTimeGroup"
+    );
+
+
+    const daysDisplay =
+    document
+    .getElementById(
+        "daysDisplay"
+    );
+
+
+    /* APPOINTMENT */
+
+    if (type === "Appointment") {
+
+        startDateLabel.textContent =
+        "Appointment Date";
+
+        endDateGroup.style.display =
+        "none";
+
+        timeFields.style.display =
+        "grid";
+
+        startTimeLabel.textContent =
+        "Appointment Time";
+
+        endTimeGroup.style.display =
+        "none";
+
+        daysDisplay.style.display =
+        "none";
+
+    }
+
+
+    /* IN LATE */
+
+    else if (type === "In Late") {
+
+        startDateLabel.textContent =
+        "Date";
+
+        endDateGroup.style.display =
+        "none";
+
+        timeFields.style.display =
+        "grid";
+
+        startTimeLabel.textContent =
+        "Expected Arrival Time";
+
+        endTimeGroup.style.display =
+        "none";
+
+        daysDisplay.style.display =
+        "none";
+
+    }
+
+
+    /* INDOC */
+
+    else if (type === "Indoc") {
+
+        startDateLabel.textContent =
+        "Day 1 Date";
+
+        endDateLabel.textContent =
+        "Day 2 Date";
+
+        endDateGroup.style.display =
+        "block";
+
+        timeFields.style.display =
+        "none";
+
+        daysDisplay.style.display =
+        "none";
+
+    }
+
+
+    /* OTHER */
+
+    else if (type === "Other") {
+
+        startDateLabel.textContent =
+        "Start Date";
+
+        endDateLabel.textContent =
+        "End Date";
+
+        endDateGroup.style.display =
+        "block";
+
+        timeFields.style.display =
+        "grid";
+
+        startTimeLabel.textContent =
+        "Start Time";
+
+        endTimeGroup.style.display =
+        "block";
+
+        daysDisplay.style.display =
+        "block";
+
+        calculateDays();
+
+    }
+
+
+    /* LEAVE / DAY PASS / UNIT EVENT */
+
+    else {
+
+        startDateLabel.textContent =
+        "Start Date";
+
+        endDateLabel.textContent =
+        "End Date";
+
+        endDateGroup.style.display =
+        "block";
+
+        timeFields.style.display =
+        "none";
+
+        daysDisplay.style.display =
+        "block";
+
+        calculateDays();
+
+    }
 
 }
 
@@ -1423,38 +1751,31 @@ function displayRequests() {
     request => {
 
         if (
-
             selectedStatus !== "All"
-
             &&
-
-            request.status !==
-            selectedStatus
-
+            request.status !== selectedStatus
         ) {
-
             return;
-
         }
 
 
         if (
-
             !String(request.name)
             .toLowerCase()
             .includes(search)
-
         ) {
-
             return;
-
         }
 
 
         visible++;
 
+
         const statusClass =
-        request.status
+        String(
+            request.status ||
+            "Pending"
+        )
         .toLowerCase();
 
 
@@ -1480,20 +1801,18 @@ function displayRequests() {
 
             <button
             class="action-button approve"
-            onclick="
-            changeStatus(
-            '${request.id}',
-            'Approved'
+            onclick="changeStatus(
+                '${request.id}',
+                'Approved'
             )">
             Approve
             </button>
 
             <button
             class="action-button deny"
-            onclick="
-            changeStatus(
-            '${request.id}',
-            'Denied'
+            onclick="changeStatus(
+                '${request.id}',
+                'Denied'
             )">
             Deny
             </button>
@@ -1507,9 +1826,8 @@ function displayRequests() {
 
         <button
         class="action-button edit"
-        onclick="
-        editRequest(
-        '${request.id}'
+        onclick="editRequest(
+            '${request.id}'
         )">
         Edit
         </button>
@@ -1526,11 +1844,10 @@ function displayRequests() {
 
             <button
             class="action-button cancel-request"
-            onclick="
-            cancelRequest(
-            '${request.id}'
+            onclick="cancelRequest(
+                '${request.id}'
             )">
-            Cancel Request
+            Cancel
             </button>
 
             `;
@@ -1542,14 +1859,134 @@ function displayRequests() {
 
         <button
         class="action-button delete"
-        onclick="
-        deleteRequest(
-        '${request.id}'
+        onclick="deleteRequest(
+            '${request.id}'
         )">
         Delete
         </button>
 
         `;
+
+
+        let dateDisplay = "";
+
+
+        /* APPOINTMENT / IN LATE */
+
+        if (
+            request.type === "Appointment"
+            ||
+            request.type === "In Late"
+        ) {
+
+            dateDisplay = `
+
+            ${formatDate(
+                request.start
+            )}
+
+            ${
+                request.startTime
+
+                ?
+
+                `<div class="days">
+
+                ${
+                    request.type ===
+                    "In Late"
+
+                    ? "Expected Arrival: "
+                    : "Time: "
+                }
+
+                ${formatTime(
+                    request.startTime
+                )}
+
+                </div>`
+
+                :
+
+                ""
+            }
+
+            `;
+
+        }
+
+
+        /* INDOC */
+
+        else if (
+            request.type === "Indoc"
+        ) {
+
+            dateDisplay = `
+
+            <strong>Day 1:</strong>
+            ${formatDate(
+                request.start
+            )}
+
+            <br><br>
+
+            <strong>Day 2:</strong>
+            ${formatDate(
+                request.end
+            )}
+
+            `;
+
+        }
+
+
+        /* DATE RANGE TYPES */
+
+        else {
+
+            dateDisplay = `
+
+            ${formatDate(
+                request.start
+            )}
+
+            &nbsp; → &nbsp;
+
+            ${formatDate(
+                request.end
+            )}
+
+
+            <div class="days">
+
+            ${request.days}
+
+            ${
+                Number(
+                    request.days
+                ) === 1
+                ? " Day"
+                : " Days"
+            }
+
+            ${
+                request.startTime
+                ? `<br>Start: ${formatTime(request.startTime)}`
+                : ""
+            }
+
+            ${
+                request.endTime
+                ? ` &nbsp; End: ${formatTime(request.endTime)}`
+                : ""
+            }
+
+            </div>
+
+            `;
+
+        }
 
 
         card.innerHTML = `
@@ -1559,11 +1996,15 @@ function displayRequests() {
             <div>
 
                 <div class="person-name">
-                ${escapeHtml(request.name)}
+                ${escapeHtml(
+                    request.name
+                )}
                 </div>
 
                 <div class="leave-type">
-                ${escapeHtml(request.type)}
+                ${escapeHtml(
+                    request.type
+                )}
                 </div>
 
             </div>
@@ -1574,33 +2015,17 @@ function displayRequests() {
             status
             status-${statusClass}
             ">
-            ${escapeHtml(request.status)}
+            ${escapeHtml(
+                request.status ||
+                "Pending"
+            )}
             </div>
 
         </div>
 
 
         <div class="leave-dates">
-
-        ${formatDate(request.start)}
-
-        &nbsp; → &nbsp;
-
-        ${formatDate(request.end)}
-
-
-        <div class="days">
-
-        ${request.days}
-
-        ${
-            Number(request.days) === 1
-            ? "Day"
-            : "Days"
-        }
-
-        </div>
-
+        ${dateDisplay}
         </div>
 
 
@@ -1611,9 +2036,13 @@ function displayRequests() {
 
             `<div class="notes">
 
-            <strong>Notes:</strong>
+            <strong>
+            Comments / Details:
+            </strong>
 
-            ${escapeHtml(request.notes)}
+            ${escapeHtml(
+                request.notes
+            )}
 
             </div>`
 
@@ -1641,7 +2070,9 @@ function displayRequests() {
         `;
 
 
-        list.appendChild(card);
+        list.appendChild(
+            card
+        );
 
     });
 
@@ -1651,7 +2082,7 @@ function displayRequests() {
         list.innerHTML = `
 
         <div class="empty">
-        No leave requests found.
+        No personnel status entries found.
         </div>
 
         `;
@@ -1839,7 +2270,9 @@ function renderCalendar() {
         );
 
         const dateString =
-        dateToString(date);
+        dateToString(
+            date
+        );
 
         const dayBox =
         document.createElement(
@@ -1865,7 +2298,6 @@ function renderCalendar() {
 
 
         if (
-
             date.getFullYear()
             === today.getFullYear()
 
@@ -1878,12 +2310,13 @@ function renderCalendar() {
 
             date.getDate()
             === today.getDate()
-
         ) {
 
             dayBox
             .classList
-            .add("today");
+            .add(
+                "today"
+            );
 
         }
 
@@ -1907,16 +2340,52 @@ function renderCalendar() {
         requests.forEach(
         request => {
 
+
+            let shouldDisplay =
+            false;
+
+
+            /*
+            INDOC ONLY APPEARS
+            ON DAY 1 AND DAY 2.
+            */
+
+
             if (
+                request.type ===
+                "Indoc"
+            ) {
 
-                dateString >=
-                request.start
+                shouldDisplay =
+                dateString === request.start
+                ||
+                dateString === request.end;
 
-                &&
+            }
 
-                dateString <=
-                request.end
 
+            else {
+
+                const requestEnd =
+                request.end ||
+                request.start;
+
+
+                shouldDisplay =
+
+                    dateString >=
+                    request.start
+
+                    &&
+
+                    dateString <=
+                    requestEnd;
+
+            }
+
+
+            if (
+                shouldDisplay
             ) {
 
                 const event =
@@ -1928,18 +2397,48 @@ function renderCalendar() {
 
                 "calendar-event event-" +
 
-                request.status
+                String(
+                    request.status ||
+                    "Pending"
+                )
                 .toLowerCase();
 
 
-                event.textContent =
-                request.name;
-
-
-                event.title =
+                let label =
                 request.name +
                 " - " +
                 request.type;
+
+
+                if (
+                    request.startTime
+                    &&
+                    (
+                        request.type ===
+                        "Appointment"
+
+                        ||
+
+                        request.type ===
+                        "In Late"
+                    )
+                ) {
+
+                    label +=
+                    " " +
+                    formatTime(
+                        request.startTime
+                    );
+
+                }
+
+
+                event.textContent =
+                label;
+
+
+                event.title =
+                label;
 
 
                 event.onclick =
@@ -2035,6 +2534,235 @@ function showDetails(id) {
     }
 
 
+    let dateDetails =
+    "";
+
+
+    /* APPOINTMENT / IN LATE */
+
+    if (
+        request.type ===
+        "Appointment"
+
+        ||
+
+        request.type ===
+        "In Late"
+    ) {
+
+        dateDetails = `
+
+        <div class="detail-row">
+
+        <div class="detail-label">
+        Date
+        </div>
+
+        <div class="detail-value">
+        ${formatDate(
+            request.start
+        )}
+        </div>
+
+        </div>
+
+
+        ${
+            request.startTime
+
+            ?
+
+            `<div class="detail-row">
+
+            <div class="detail-label">
+
+            ${
+                request.type ===
+                "In Late"
+
+                ? "Expected Arrival"
+                : "Appointment Time"
+            }
+
+            </div>
+
+            <div class="detail-value">
+
+            ${formatTime(
+                request.startTime
+            )}
+
+            </div>
+
+            </div>`
+
+            :
+
+            ""
+        }
+
+        `;
+
+    }
+
+
+    /* INDOC */
+
+    else if (
+        request.type ===
+        "Indoc"
+    ) {
+
+        dateDetails = `
+
+        <div class="detail-row">
+
+        <div class="detail-label">
+        Day 1
+        </div>
+
+        <div class="detail-value">
+
+        ${formatDate(
+            request.start
+        )}
+
+        </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+        <div class="detail-label">
+        Day 2
+        </div>
+
+        <div class="detail-value">
+
+        ${formatDate(
+            request.end
+        )}
+
+        </div>
+
+        </div>
+
+        `;
+
+    }
+
+
+    /* DATE RANGE */
+
+    else {
+
+        dateDetails = `
+
+        <div class="detail-row">
+
+        <div class="detail-label">
+        Dates
+        </div>
+
+        <div class="detail-value">
+
+        ${formatDate(
+            request.start
+        )}
+
+        →
+
+        ${formatDate(
+            request.end
+        )}
+
+        </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+        <div class="detail-label">
+        Duration
+        </div>
+
+        <div class="detail-value">
+
+        ${request.days}
+
+        ${
+            Number(
+                request.days
+            ) === 1
+            ? " Day"
+            : " Days"
+        }
+
+        </div>
+
+        </div>
+
+
+        ${
+            request.startTime
+
+            ?
+
+            `<div class="detail-row">
+
+            <div class="detail-label">
+            Start Time
+            </div>
+
+            <div class="detail-value">
+
+            ${formatTime(
+                request.startTime
+            )}
+
+            </div>
+
+            </div>`
+
+            :
+
+            ""
+        }
+
+
+        ${
+            request.endTime
+
+            ?
+
+            `<div class="detail-row">
+
+            <div class="detail-label">
+            End Time
+            </div>
+
+            <div class="detail-value">
+
+            ${formatTime(
+                request.endTime
+            )}
+
+            </div>
+
+            </div>`
+
+            :
+
+            ""
+        }
+
+        `;
+
+    }
+
+
     document
     .getElementById(
         "detailContent"
@@ -2049,36 +2777,10 @@ function showDetails(id) {
     </div>
 
     <div class="detail-value">
-    ${escapeHtml(request.name)}
-    </div>
 
-    </div>
-
-
-    <div class="detail-row">
-
-    <div class="detail-label">
-    Leave Type
-    </div>
-
-    <div class="detail-value">
-    ${escapeHtml(request.type)}
-    </div>
-
-    </div>
-
-
-    <div class="detail-row">
-
-    <div class="detail-label">
-    Dates
-    </div>
-
-    <div class="detail-value">
-
-    ${formatDate(request.start)}
-    →
-    ${formatDate(request.end)}
+    ${escapeHtml(
+        request.name
+    )}
 
     </div>
 
@@ -2088,22 +2790,21 @@ function showDetails(id) {
     <div class="detail-row">
 
     <div class="detail-label">
-    Duration
+    Type
     </div>
 
     <div class="detail-value">
 
-    ${request.days}
-
-    ${
-        Number(request.days) === 1
-        ? "Day"
-        : "Days"
-    }
+    ${escapeHtml(
+        request.type
+    )}
 
     </div>
 
     </div>
+
+
+    ${dateDetails}
 
 
     <div class="detail-row">
@@ -2113,7 +2814,12 @@ function showDetails(id) {
     </div>
 
     <div class="detail-value">
-    ${escapeHtml(request.status)}
+
+    ${escapeHtml(
+        request.status ||
+        "Pending"
+    )}
+
     </div>
 
     </div>
@@ -2127,11 +2833,15 @@ function showDetails(id) {
         `<div class="detail-row">
 
         <div class="detail-label">
-        Notes
+        Comments / Details
         </div>
 
         <div class="detail-value">
-        ${escapeHtml(request.notes)}
+
+        ${escapeHtml(
+            request.notes
+        )}
+
         </div>
 
         </div>`
@@ -2182,7 +2892,7 @@ function openNewRequest() {
         "formTitle"
     )
     .textContent =
-    "New Leave Request";
+    "New Personnel Status";
 
 
     document
@@ -2197,7 +2907,7 @@ function openNewRequest() {
         "leaveType"
     )
     .value =
-    "Annual Leave";
+    "Leave";
 
 
     document
@@ -2216,6 +2926,20 @@ function openNewRequest() {
 
     document
     .getElementById(
+        "startTime"
+    )
+    .value = "";
+
+
+    document
+    .getElementById(
+        "endTime"
+    )
+    .value = "";
+
+
+    document
+    .getElementById(
         "notes"
     )
     .value = "";
@@ -2227,6 +2951,9 @@ function openNewRequest() {
     )
     .textContent =
     "0 Days";
+
+
+    updateFormFields();
 
 
     document
@@ -2268,7 +2995,7 @@ function editRequest(id) {
         "formTitle"
     )
     .textContent =
-    "Edit Leave Request";
+    "Edit Personnel Status";
 
 
     document
@@ -2292,7 +3019,7 @@ function editRequest(id) {
         "startDate"
     )
     .value =
-    request.start;
+    request.start || "";
 
 
     document
@@ -2300,7 +3027,27 @@ function editRequest(id) {
         "endDate"
     )
     .value =
-    request.end;
+    request.end ||
+    request.start ||
+    "";
+
+
+    document
+    .getElementById(
+        "startTime"
+    )
+    .value =
+    request.startTime ||
+    "";
+
+
+    document
+    .getElementById(
+        "endTime"
+    )
+    .value =
+    request.endTime ||
+    "";
 
 
     document
@@ -2308,8 +3055,11 @@ function editRequest(id) {
         "notes"
     )
     .value =
-    request.notes || "";
+    request.notes ||
+    "";
 
+
+    updateFormFields();
 
     calculateDays();
 
@@ -2338,14 +3088,15 @@ function closeForm() {
     .style.display =
     "none";
 
-    editingId = null;
+    editingId =
+    null;
 
 }
 
 
 
 /* =========================================================
-   SAVE REQUEST
+   SAVE
 ========================================================= */
 
 function saveRequest() {
@@ -2375,10 +3126,26 @@ function saveRequest() {
     .value;
 
 
-    const end =
+    let end =
     document
     .getElementById(
         "endDate"
+    )
+    .value;
+
+
+    const startTime =
+    document
+    .getElementById(
+        "startTime"
+    )
+    .value;
+
+
+    const endTime =
+    document
+    .getElementById(
+        "endTime"
     )
     .value;
 
@@ -2392,14 +3159,15 @@ function saveRequest() {
     .trim();
 
 
+    /* BASIC */
+
     if (
         !name ||
-        !start ||
-        !end
+        !start
     ) {
 
         alert(
-            "Please enter a name, start date, and end date."
+            "Please enter a name and date."
         );
 
         return;
@@ -2407,14 +3175,116 @@ function saveRequest() {
     }
 
 
-    const days =
-    getDays(
-        start,
-        end
-    );
+    /* APPOINTMENT / IN LATE */
+
+    if (
+        type ===
+        "Appointment"
+
+        ||
+
+        type ===
+        "In Late"
+    ) {
+
+        end =
+        start;
 
 
-    if (days === 0) {
+        if (!startTime) {
+
+            alert(
+
+                type ===
+                "Appointment"
+
+                ? "Please enter the appointment time."
+
+                : "Please enter the expected arrival time."
+
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    /* INDOC */
+
+    else if (
+        type ===
+        "Indoc"
+    ) {
+
+        if (!end) {
+
+            alert(
+                "Please enter both Day 1 and Day 2 dates."
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    /* RANGE TYPES */
+
+    else {
+
+        if (!end) {
+
+            alert(
+                "Please enter an end date."
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    let days;
+
+
+    if (
+        type ===
+        "Indoc"
+    ) {
+
+        /*
+        Indoc is exactly two
+        separate attendance days.
+        */
+
+        days =
+        2;
+
+    }
+
+    else {
+
+        days =
+        getDays(
+            start,
+            end
+        );
+
+    }
+
+
+    if (
+        type !==
+        "Indoc"
+
+        &&
+
+        days === 0
+    ) {
 
         alert(
             "The end date cannot be before the start date."
@@ -2425,14 +3295,16 @@ function saveRequest() {
     }
 
 
-    /* NEW REQUEST */
+    /* NEW */
 
     if (!editingId) {
 
         const request = {
 
             id:
-            createId("LEAVE"),
+            createId(
+                "STATUS"
+            ),
 
             name:
             name,
@@ -2445,6 +3317,12 @@ function saveRequest() {
 
             end:
             end,
+
+            startTime:
+            startTime,
+
+            endTime:
+            endTime,
 
             days:
             days,
@@ -2483,7 +3361,7 @@ function saveRequest() {
     }
 
 
-    /* EDIT REQUEST */
+    /* EDIT */
 
     else {
 
@@ -2511,6 +3389,12 @@ function saveRequest() {
 
         request.end =
         end;
+
+        request.startTime =
+        startTime;
+
+        request.endTime =
+        endTime;
 
         request.days =
         days;
@@ -2609,7 +3493,7 @@ function cancelRequest(id) {
     const confirmed =
     confirm(
 
-        "Cancel the leave request for "
+        "Cancel this personnel status entry for "
         +
         request.name
         +
@@ -2670,21 +3554,9 @@ function deleteRequest(id) {
     const confirmed =
     confirm(
 
-        "Permanently delete this leave request?\n\n"
+        "Permanently delete this personnel status entry?\n\n"
         +
         request.name
-        +
-        "\n"
-        +
-        formatDate(
-            request.start
-        )
-        +
-        " - "
-        +
-        formatDate(
-            request.end
-        )
         +
         "\n\nThis cannot be undone."
 
@@ -2704,19 +3576,15 @@ function deleteRequest(id) {
     );
 
 
-    /*
-    If the request hasn't been
-    uploaded yet, remove its pending
-    ADD instead of sending a DELETE
-    for something Google doesn't have.
-    */
-
     const pendingAddIndex =
     pendingActions.findIndex(
 
         action =>
-        action.type === "add"
+        action.type ===
+        "add"
+
         &&
+
         String(
             action.request.id
         ) ===
@@ -2726,7 +3594,8 @@ function deleteRequest(id) {
 
 
     if (
-        pendingAddIndex !== -1
+        pendingAddIndex !==
+        -1
     ) {
 
         pendingActions =
@@ -2734,8 +3603,11 @@ function deleteRequest(id) {
 
             action =>
             !(
-                action.type === "add"
+                action.type ===
+                "add"
+
                 &&
+
                 String(
                     action.request.id
                 ) ===
@@ -2750,8 +3622,11 @@ function deleteRequest(id) {
 
             action =>
             !(
-                action.type === "update"
+                action.type ===
+                "update"
+
                 &&
+
                 String(
                     action.request.id
                 ) ===
@@ -2795,27 +3670,25 @@ function deleteRequest(id) {
    QUEUE UPDATE
 ========================================================= */
 
-function queueUpdate(request) {
-
-    /*
-    If this is a brand-new request
-    still waiting to upload, update
-    the pending ADD instead.
-
-    That way we don't try to UPDATE
-    a row that doesn't exist yet.
-    */
+function queueUpdate(
+request
+) {
 
     const pendingAdd =
     pendingActions.find(
 
         action =>
-        action.type === "add"
+        action.type ===
+        "add"
+
         &&
+
         String(
             action.request.id
         ) ===
-        String(request.id)
+        String(
+            request.id
+        )
 
     );
 
@@ -2832,21 +3705,21 @@ function queueUpdate(request) {
     }
 
 
-    /*
-    If an update is already waiting,
-    replace it with the newest version.
-    */
-
     const pendingUpdate =
     pendingActions.find(
 
         action =>
-        action.type === "update"
+        action.type ===
+        "update"
+
         &&
+
         String(
             action.request.id
         ) ===
-        String(request.id)
+        String(
+            request.id
+        )
 
     );
 
@@ -2945,7 +3818,7 @@ action
     else {
 
         throw new Error(
-            "Unknown leave action."
+            "Unknown personnel status action."
         );
 
     }
@@ -2999,7 +3872,7 @@ action
 
 
 /* =========================================================
-   SYNC PENDING
+   SYNC
 ========================================================= */
 
 async function syncPending() {
@@ -3010,7 +3883,8 @@ async function syncPending() {
 
 
     if (
-        pendingActions.length === 0
+        pendingActions.length ===
+        0
     ) {
 
         updateSyncStatus();
@@ -3046,10 +3920,14 @@ async function syncPending() {
 
                 const index =
                 pendingActions
-                .indexOf(action);
+                .indexOf(
+                    action
+                );
 
 
-                if (index !== -1) {
+                if (
+                    index !== -1
+                ) {
 
                     pendingActions
                     .splice(
@@ -3067,7 +3945,7 @@ async function syncPending() {
             catch (error) {
 
                 console.error(
-                    "Leave sync failed:",
+                    "Personnel status sync failed:",
                     error
                 );
 
@@ -3127,14 +4005,15 @@ async function loadServerRequests() {
 
             throw new Error(
                 data.message ||
-                "Unable to load leave."
+                "Unable to load personnel status entries."
             );
 
         }
 
 
         serverRequests =
-        data.requests || [];
+        data.requests ||
+        [];
 
 
         requests =
@@ -3159,7 +4038,7 @@ async function loadServerRequests() {
     catch (error) {
 
         console.error(
-            "Leave server unavailable:",
+            "Personnel status server unavailable:",
             error
         );
 
@@ -3168,7 +4047,8 @@ async function loadServerRequests() {
 
 
         if (
-            pendingActions.length > 0
+            pendingActions.length >
+            0
         ) {
 
             setStatus(
@@ -3216,8 +4096,13 @@ function applyPendingLocally() {
             requests.some(
 
                 request =>
-                String(request.id)
+
+                String(
+                    request.id
+                )
+
                 ===
+
                 String(
                     action.request.id
                 )
@@ -3245,8 +4130,13 @@ function applyPendingLocally() {
             requests.findIndex(
 
                 request =>
-                String(request.id)
+
+                String(
+                    request.id
+                )
+
                 ===
+
                 String(
                     action.request.id
                 )
@@ -3254,7 +4144,9 @@ function applyPendingLocally() {
             );
 
 
-            if (index !== -1) {
+            if (
+                index !== -1
+            ) {
 
                 requests[index] =
                 {
@@ -3275,9 +4167,16 @@ function applyPendingLocally() {
             requests.filter(
 
                 request =>
-                String(request.id)
+
+                String(
+                    request.id
+                )
+
                 !==
-                String(action.id)
+
+                String(
+                    action.id
+                )
 
             );
 
@@ -3310,7 +4209,7 @@ async function syncEverything() {
 
 
 /* =========================================================
-   REFRESH UI
+   REFRESH
 ========================================================= */
 
 function refreshViews() {
@@ -3330,7 +4229,8 @@ function refreshViews() {
 function escapeHtml(value) {
 
     return String(
-        value || ""
+        value ||
+        ""
     )
 
     .replaceAll(
@@ -3410,7 +4310,6 @@ loadServerRequests()
     () =>
     syncPending()
 );
-
 
 </script>
 
