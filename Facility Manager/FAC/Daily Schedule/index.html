@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FAC Daily Schedule</title>
+
+<style>
+
+:root {
+    --navy: #0b1f33;
+    --navy2: #163b61;
+    --blue: #2a6f9b;
+    --light: #edf5fb;
+    --white: #ffffff;
+    --line: #c7d5e2;
+    --text: #132333;
+    --muted: #647586;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fa;
+    color: var(--text);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    background: var(--navy);
+    color: white;
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.logo {
+    height: 70px;
+    width: auto;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.header-subtitle {
+    font-size: 15px;
+    opacity: 0.85;
+    margin-top: 3px;
+}
+
+.date-display {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar {
+    padding: 14px 24px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    background: white;
+    border-bottom: 1px solid var(--line);
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: var(--navy2);
+    color: white;
+}
+
+.secondary-btn {
+    background: #e4ebf1;
+    color: var(--text);
+}
+
+.danger-btn {
+    background: #c44141;
+    color: white;
+}
+
+/* =========================
+   DISPLAY MODE
+========================= */
+
+.display-container {
+    padding: 22px 30px 40px;
+}
+
+.schedule-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.schedule-title h2 {
+    margin: 0;
+    font-size: 30px;
+    color: var(--navy);
+}
+
+.schedule-title p {
+    margin: 5px 0 0;
+    color: var(--muted);
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.schedule-table th {
+    background: var(--navy2);
+    color: white;
+    padding: 14px;
+    font-size: 18px;
+}
+
+.schedule-table td {
+    border-bottom: 1px solid var(--line);
+    padding: 16px 12px;
+    text-align: center;
+}
+
+.time-cell {
+    width: 12%;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--navy);
+}
+
+.cardio-cell {
+    width: 16%;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.testers-cell {
+    width: 72%;
+}
+
+.testers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+.tester {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 8px;
+}
+
+/* Center fewer testers nicely */
+
+.testers-grid.count-1 {
+    grid-template-columns: 1fr;
+}
+
+.testers-grid.count-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.testers-grid.count-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.testers-grid.count-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.empty-message {
+    padding: 50px;
+    text-align: center;
+    font-size: 22px;
+    color: var(--muted);
+}
+
+/* =========================
+   EDIT MODE
+========================= */
+
+.editor {
+    display: none;
+    padding: 25px;
+}
+
+.editor-card {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.editor h2 {
+    margin-top: 0;
+    color: var(--navy);
+}
+
+.editor-row {
+    display: grid;
+    grid-template-columns: 110px 180px repeat(4, 1fr) 60px;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.editor-header {
+    font-weight: bold;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bcc9d4;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.remove-btn {
+    background: #e9ecef;
+    color: #555;
+    padding: 10px;
+}
+
+/* =========================
+   FULL SCREEN DISPLAY
+========================= */
+
+.fullscreen-mode .toolbar {
+    display: none;
+}
+
+.fullscreen-mode .display-container {
+    padding-top: 30px;
+}
+
+.fullscreen-mode .header {
+    padding: 14px 30px;
+}
+
+.fullscreen-mode .header h1 {
+    font-size: 38px;
+}
+
+.fullscreen-mode .time-cell {
+    font-size: 34px;
+}
+
+.fullscreen-mode .tester {
+    font-size: 30px;
+}
+
+.fullscreen-mode .cardio-cell {
+    font-size: 24px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .header-left {
+        flex-direction: column;
+    }
+
+    .date-display {
+        text-align: center;
+    }
+
+    .editor-row {
+        grid-template-columns: 1fr;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .editor-header {
+        display: none;
+    }
+
+    .testers-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<div class="header">
+
+    <div class="header-left">
+
+        <img
+            src="../../Apps/Icons/EFC Brandmark.png"
+            class="logo"
+            alt="Eagle Fitness Center"
+        >
+
+        <div>
+            <h1>Daily FAC Schedule</h1>
+
+            <div class="header-subtitle">
+                707 FSS Fitness Assessment Cell
+            </div>
+        </div>
+
+    </div>
+
+    <div class="date-display" id="currentDate"></div>
+
+</div>
+
+<!-- =========================
+     TOOLBAR
+========================= -->
+
+<div class="toolbar">
+
+    <button
+        class="primary-btn"
+        onclick="showEditor()"
+    >
+        Edit Schedule
+    </button>
+
+    <button
+        class="secondary-btn"
+        onclick="toggleFullscreenMode()"
+    >
+        Display Mode
+    </button>
+
+    <button
+        class="danger-btn"
+        onclick="clearSchedule()"
+    >
+        Clear Schedule
+    </button>
+
+</div>
+
+<!-- =========================
+     DISPLAY
+========================= -->
+
+<div
+    class="display-container"
+    id="displayContainer"
+>
+
+    <div class="schedule-title">
+
+        <h2>Today's Fitness Assessments</h2>
+
+        <p>
+            Please locate your scheduled testing time below.
+        </p>
+
+    </div>
+
+    <table class="schedule-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Time</th>
+
+                <th>Cardio</th>
+
+                <th>Testers</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="scheduleBody"></tbody>
+
+    </table>
+
+    <div
+        id="emptyMessage"
+        class="empty-message"
+    >
+        No schedule has been entered for today.
+    </div>
+
+</div>
+
+<!-- =========================
+     EDITOR
+========================= -->
+
+<div
+    class="editor"
+    id="editor"
+>
+
+    <div class="editor-card">
+
+        <h2>Edit Daily Schedule</h2>
+
+        <div class="editor-row editor-header">
+
+            <div>Time</div>
+
+            <div>Cardio</div>
+
+            <div>Tester 1</div>
+
+            <div>Tester 2</div>
+
+            <div>Tester 3</div>
+
+            <div>Tester 4</div>
+
+            <div></div>
+
+        </div>
+
+        <div id="editorRows"></div>
+
+        <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+
+            <button
+                class="secondary-btn"
+                onclick="addRow()"
+            >
+                + Add Time
+            </button>
+
+            <button
+                class="primary-btn"
+                onclick="saveSchedule()"
+            >
+                Save Schedule
+            </button>
+
+            <button
+                class="secondary-btn"
+                onclick="cancelEditor()"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   DATE
+========================= */
+
+function updateDate() {
+
+    const today = new Date();
+
+    const formatted =
+        today.toLocaleDateString(
+            "en-US",
+            {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+            }
+        );
+
+    document.getElementById(
+        "currentDate"
+    ).textContent = formatted;
+
+}
+
+updateDate();
+
+
+/* =========================
+   STORAGE
+========================= */
+
+const STORAGE_KEY =
+    "facDailySchedule";
+
+
+function getSchedule() {
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+    if (!saved) {
+
+        return [];
+
+    }
+
+    try {
+
+        return JSON.parse(saved);
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function setSchedule(schedule) {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(schedule)
+    );
+
+}
+
+
+/* =========================
+   DISPLAY
+========================= */
+
+function renderSchedule() {
+
+    const schedule =
+        getSchedule();
+
+    const body =
+        document.getElementById(
+            "scheduleBody"
+        );
+
+    const empty =
+        document.getElementById(
+            "emptyMessage"
+        );
+
+    body.innerHTML = "";
+
+    if (!schedule.length) {
+
+        empty.style.display =
+            "block";
+
+        return;
+
+    }
+
+    empty.style.display =
+        "none";
+
+
+    schedule.forEach(item => {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        const time =
+            document.createElement(
+                "td"
+            );
+
+        time.className =
+            "time-cell";
+
+        time.textContent =
+            item.time || "";
+
+
+        const cardio =
+            document.createElement(
+                "td"
+            );
+
+        cardio.className =
+            "cardio-cell";
+
+        cardio.textContent =
+            item.cardio || "";
+
+
+        const testersCell =
+            document.createElement(
+                "td"
+            );
+
+        testersCell.className =
+            "testers-cell";
+
+
+        const testers =
+            (item.testers || [])
+            .filter(
+                name =>
+                name.trim() !== ""
+            );
+
+
+        const grid =
+            document.createElement(
+                "div"
+            );
+
+        grid.className =
+            "testers-grid count-" +
+            Math.min(
+                testers.length,
+                4
+            );
+
+
+        testers.forEach(name => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "tester";
+
+            div.textContent =
+                name;
+
+            grid.appendChild(div);
+
+        });
+
+
+        testersCell.appendChild(
+            grid
+        );
+
+
+        row.appendChild(time);
+
+        row.appendChild(cardio);
+
+        row.appendChild(
+            testersCell
+        );
+
+
+        body.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================
+   EDITOR
+========================= */
+
+function showEditor() {
+
+    document.getElementById(
+        "displayContainer"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "editor"
+    ).style.display =
+        "block";
+
+    buildEditor();
+
+}
+
+
+function cancelEditor() {
+
+    document.getElementById(
+        "editor"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "displayContainer"
+    ).style.display =
+        "block";
+
+}
+
+
+function buildEditor() {
+
+    const container =
+        document.getElementById(
+            "editorRows"
+        );
+
+    container.innerHTML = "";
+
+    const schedule =
+        getSchedule();
+
+
+    if (!schedule.length) {
+
+        addRow();
+
+        return;
+
+    }
+
+
+    schedule.forEach(item => {
+
+        addRow(item);
+
+    });
+
+}
+
+
+function addRow(data = {}) {
+
+    const container =
+        document.getElementById(
+            "editorRows"
+        );
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "editor-row";
+
+
+    row.innerHTML = `
+
+        <input
+            class="time-input"
+            type="text"
+            placeholder="0700"
+            value="${data.time || ""}"
+        >
+
+        <select class="cardio-input">
+
+            <option value="">
+                Select
+            </option>
+
+            <option
+                value="2-Mile Run"
+                ${
+                    data.cardio ===
+                    "2-Mile Run"
+                    ? "selected"
+                    : ""
+                }
+            >
+                2-Mile Run
+            </option>
+
+            <option
+                value="HAMR"
+                ${
+                    data.cardio ===
+                    "HAMR"
+                    ? "selected"
+                    : ""
+                }
+            >
+                HAMR
+            </option>
+
+            <option
+                value="Run / HAMR"
+                ${
+                    data.cardio ===
+                    "Run / HAMR"
+                    ? "selected"
+                    : ""
+                }
+            >
+                Run / HAMR
+            </option>
+
+        </select>
+
+        <input
+            class="tester-input"
+            placeholder="Tester 1"
+            value="${data.testers?.[0] || ""}"
+        >
+
+        <input
+            class="tester-input"
+            placeholder="Tester 2"
+            value="${data.testers?.[1] || ""}"
+        >
+
+        <input
+            class="tester-input"
+            placeholder="Tester 3"
+            value="${data.testers?.[2] || ""}"
+        >
+
+        <input
+            class="tester-input"
+            placeholder="Tester 4"
+            value="${data.testers?.[3] || ""}"
+        >
+
+        <button
+            class="remove-btn"
+            onclick="this.parentElement.remove()"
+        >
+            ✕
+        </button>
+
+    `;
+
+
+    container.appendChild(
+        row
+    );
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function saveSchedule() {
+
+    const rows =
+        document.querySelectorAll(
+            "#editorRows .editor-row"
+        );
+
+    const schedule = [];
+
+
+    rows.forEach(row => {
+
+        const time =
+            row.querySelector(
+                ".time-input"
+            ).value.trim();
+
+
+        const cardio =
+            row.querySelector(
+                ".cardio-input"
+            ).value;
+
+
+        const testerInputs =
+            row.querySelectorAll(
+                ".tester-input"
+            );
+
+
+        const testers =
+            Array.from(
+                testerInputs
+            ).map(
+                input =>
+                input.value.trim()
+            );
+
+
+        if (
+            time ||
+            cardio ||
+            testers.some(
+                name => name
+            )
+        ) {
+
+            schedule.push({
+
+                time,
+
+                cardio,
+
+                testers
+
+            });
+
+        }
+
+    });
+
+
+    setSchedule(
+        schedule
+    );
+
+
+    cancelEditor();
+
+    renderSchedule();
+
+}
+
+
+/* =========================
+   CLEAR
+========================= */
+
+function clearSchedule() {
+
+    const confirmed =
+        confirm(
+            "Clear today's schedule?"
+        );
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+    renderSchedule();
+
+}
+
+
+/* =========================
+   DISPLAY MODE
+========================= */
+
+function toggleFullscreenMode() {
+
+    document.body
+        .classList
+        .toggle(
+            "fullscreen-mode"
+        );
+
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+renderSchedule();
+
+</script>
+
+</body>
+</html>
