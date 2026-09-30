@@ -10,323 +10,444 @@
 <style>
 
 :root {
-    --navy: #0b1f33;
-    --navy2: #163b61;
-    --blue: #2a6f9b;
-    --light: #edf5fb;
+    --navy: #102b46;
+    --light-blue: #bfeaff;
     --white: #ffffff;
-    --line: #c7d5e2;
-    --text: #132333;
-    --muted: #647586;
+    --panel: #ffffff;
+    --text: #172536;
+    --line: #d3dde6;
 }
 
 * {
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f7fa;
-    color: var(--text);
+    min-height: 100%;
 }
 
+body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: var(--navy);
+}
+
+
 /* =========================
-   HEADER
+   DISPLAY
 ========================= */
 
-.header {
+#displayView {
+    min-height: 100vh;
     background: var(--navy);
     color: white;
-    padding: 18px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding:
+        18px
+        25px
+        30px;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
 
-.logo {
-    height: 70px;
-    width: auto;
-}
-
-.header h1 {
-    margin: 0;
-    font-size: 34px;
-}
-
-.header-subtitle {
-    font-size: 15px;
-    opacity: 0.85;
-    margin-top: 3px;
-}
-
-.date-display {
-    text-align: right;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-/* =========================
-   TOOLBAR
-========================= */
-
-.toolbar {
-    padding: 14px 24px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    background: white;
-    border-bottom: 1px solid var(--line);
-}
-
-button {
-    border: none;
-    border-radius: 8px;
-    padding: 11px 18px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.primary-btn {
-    background: var(--navy2);
-    color: white;
-}
-
-.secondary-btn {
-    background: #e4ebf1;
-    color: var(--text);
-}
-
-.danger-btn {
-    background: #c44141;
-    color: white;
-}
-
-/* =========================
-   DISPLAY MODE
-========================= */
-
-.display-container {
-    padding: 22px 30px 40px;
-}
-
-.schedule-title {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.schedule-title h2 {
-    margin: 0;
-    font-size: 30px;
-    color: var(--navy);
-}
-
-.schedule-title p {
-    margin: 5px 0 0;
-    color: var(--muted);
-}
-
-.schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
-.schedule-table th {
-    background: var(--navy2);
-    color: white;
-    padding: 14px;
-    font-size: 18px;
-}
-
-.schedule-table td {
-    border-bottom: 1px solid var(--line);
-    padding: 16px 12px;
+.display-header {
     text-align: center;
 }
 
-.time-cell {
-    width: 12%;
-    font-size: 28px;
+
+.display-header h1 {
+    margin: 0;
+
+    color: var(--light-blue);
+
+    font-size:
+        clamp(
+            26px,
+            3vw,
+            48px
+        );
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+
+.display-date {
+    color: var(--light-blue);
+
+    margin-top: 4px;
+
+    font-size:
+        clamp(
+            18px,
+            2vw,
+            28px
+        );
+
     font-weight: bold;
-    color: var(--navy);
 }
 
-.cardio-cell {
-    width: 16%;
-    font-size: 20px;
-    font-weight: bold;
-}
 
-.testers-cell {
-    width: 72%;
-}
+/* =========================
+   SCHEDULE GRID
+========================= */
 
-.testers-grid {
+.schedule-grid {
+    width: min(
+        1000px,
+        94vw
+    );
+
+    margin:
+        28px
+        auto
+        0;
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    align-items: center;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    column-gap: 90px;
+    row-gap: 38px;
+
+    align-items: start;
 }
 
-.tester {
-    font-size: 24px;
+
+.schedule-block {
+    text-align: center;
+}
+
+
+.schedule-time {
+    color: var(--light-blue);
+
+    font-size:
+        clamp(
+            30px,
+            3vw,
+            46px
+        );
+
+    line-height: 1;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+.schedule-cardio {
+    color: var(--light-blue);
+
+    font-size:
+        clamp(
+            19px,
+            2vw,
+            28px
+        );
+
     font-weight: bold;
-    padding: 8px;
+
+    margin-top: 6px;
+
+    text-transform: uppercase;
 }
 
-/* Center fewer testers nicely */
 
-.testers-grid.count-1 {
-    grid-template-columns: 1fr;
+.tester-list {
+    margin-top: 20px;
 }
 
-.testers-grid.count-2 {
-    grid-template-columns: repeat(2, 1fr);
+
+.tester-name {
+    color: white;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:
+        clamp(
+            15px,
+            1.45vw,
+            21px
+        );
+
+    line-height: 1.18;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
 }
 
-.testers-grid.count-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.testers-grid.count-4 {
-    grid-template-columns: repeat(4, 1fr);
-}
 
 .empty-message {
-    padding: 50px;
     text-align: center;
-    font-size: 22px;
-    color: var(--muted);
+
+    color: var(--light-blue);
+
+    margin-top: 80px;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 20px;
 }
 
+
 /* =========================
-   EDIT MODE
+   ADMIN BUTTON
 ========================= */
+
+.admin-buttons {
+    position: fixed;
+
+    top: 10px;
+    right: 10px;
+
+    display: flex;
+    gap: 6px;
+
+    z-index: 20;
+
+    opacity: .18;
+
+    transition: opacity .2s;
+}
+
+
+.admin-buttons:hover {
+    opacity: 1;
+}
+
+
+.admin-buttons button {
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        .4
+    );
+
+    background: rgba(
+        255,
+        255,
+        255,
+        .12
+    );
+
+    color: white;
+
+    border-radius: 6px;
+
+    padding: 7px 10px;
+
+    cursor: pointer;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   EDIT VIEW
+========================= */
+
+#editView {
+    display: none;
+
+    min-height: 100vh;
+
+    background: #f4f6f8;
+
+    color: var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    padding:
+        25px
+        20px
+        50px;
+}
+
 
 .editor {
-    display: none;
-    padding: 25px;
-}
-
-.editor-card {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: auto;
+}
+
+
+.editor h1 {
+    margin-bottom: 5px;
+}
+
+
+.editor-subtitle {
+    color: #657485;
+    margin-bottom: 22px;
+}
+
+
+.editor-session {
     background: white;
+
     border-radius: 12px;
-    padding: 22px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 2px 8px
+        rgba(
+            0,
+            0,
+            0,
+            .08
+        );
 }
 
-.editor h2 {
-    margin-top: 0;
-    color: var(--navy);
-}
 
-.editor-row {
+.session-top {
     display: grid;
-    grid-template-columns: 110px 180px repeat(4, 1fr) 60px;
-    gap: 8px;
-    margin-bottom: 10px;
-    align-items: center;
+
+    grid-template-columns:
+        160px
+        220px
+        1fr
+        auto;
+
+    gap: 12px;
+
+    align-items: end;
 }
 
-.editor-header {
+
+label {
+    display: block;
+
+    font-size: 13px;
+
     font-weight: bold;
-    color: var(--muted);
-    margin-bottom: 8px;
+
+    margin-bottom: 5px;
 }
+
 
 input,
-select {
+select,
+textarea {
     width: 100%;
+
     padding: 10px;
-    border: 1px solid #bcc9d4;
-    border-radius: 6px;
+
+    border:
+        1px solid
+        #becad4;
+
+    border-radius: 7px;
+
     font-size: 15px;
+
+    font-family:
+        Arial,
+        sans-serif;
 }
 
-.remove-btn {
-    background: #e9ecef;
-    color: #555;
-    padding: 10px;
+
+textarea {
+    margin-top: 12px;
+
+    min-height: 130px;
+
+    resize: vertical;
 }
+
+
+.button-row {
+    display: flex;
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-top: 18px;
+}
+
+
+button.action {
+    border: none;
+
+    border-radius: 8px;
+
+    padding:
+        11px
+        17px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+.primary {
+    background: #163b61;
+    color: white;
+}
+
+
+.secondary {
+    background: #dde5eb;
+    color: #172536;
+}
+
+
+.delete {
+    background: #c94747;
+    color: white;
+}
+
 
 /* =========================
-   FULL SCREEN DISPLAY
+   ROCKBOT MODE
 ========================= */
 
-.fullscreen-mode .toolbar {
+body.rockbot-mode
+.admin-buttons {
     display: none;
 }
 
-.fullscreen-mode .display-container {
-    padding-top: 30px;
-}
-
-.fullscreen-mode .header {
-    padding: 14px 30px;
-}
-
-.fullscreen-mode .header h1 {
-    font-size: 38px;
-}
-
-.fullscreen-mode .time-cell {
-    font-size: 34px;
-}
-
-.fullscreen-mode .tester {
-    font-size: 30px;
-}
-
-.fullscreen-mode .cardio-cell {
-    font-size: 24px;
-}
 
 /* =========================
-   MOBILE
+   SMALL SCREEN
 ========================= */
 
-@media (max-width: 900px) {
+@media
+(max-width: 650px) {
 
-    .header {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
+    .schedule-grid {
+        grid-template-columns:
+            1fr;
+
+        row-gap: 35px;
     }
 
-    .header-left {
-        flex-direction: column;
-    }
-
-    .date-display {
-        text-align: center;
-    }
-
-    .editor-row {
-        grid-template-columns: 1fr;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 12px;
-    }
-
-    .editor-header {
-        display: none;
-    }
-
-    .testers-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .session-top {
+        grid-template-columns:
+            1fr;
     }
 
 }
@@ -334,167 +455,110 @@ select {
 </style>
 </head>
 
+
 <body>
 
+
 <!-- =========================
-     HEADER
+     DISPLAY VIEW
 ========================= -->
 
-<div class="header">
+<div id="displayView">
 
-    <div class="header-left">
 
-        <img
-            src="../../Apps/Icons/EFC Brandmark.png"
-            class="logo"
-            alt="Eagle Fitness Center"
-        >
+    <div class="admin-buttons">
 
-        <div>
-            <h1>Daily FAC Schedule</h1>
+        <button onclick="openEditor()">
+            Edit
+        </button>
 
-            <div class="header-subtitle">
-                707 FSS Fitness Assessment Cell
-            </div>
+        <button onclick="toggleRockbotMode()">
+            Hide Controls
+        </button>
+
+        <button onclick="goHome()">
+            FAC Home
+        </button>
+
+    </div>
+
+
+    <div class="display-header">
+
+        <h1>
+            Today's Fitness Assessments
+        </h1>
+
+        <div
+            class="display-date"
+            id="displayDate">
         </div>
 
     </div>
 
-    <div class="date-display" id="currentDate"></div>
-
-</div>
-
-<!-- =========================
-     TOOLBAR
-========================= -->
-
-<div class="toolbar">
-
-    <button
-        class="primary-btn"
-        onclick="showEditor()"
-    >
-        Edit Schedule
-    </button>
-
-    <button
-        class="secondary-btn"
-        onclick="toggleFullscreenMode()"
-    >
-        Display Mode
-    </button>
-
-    <button
-        class="danger-btn"
-        onclick="clearSchedule()"
-    >
-        Clear Schedule
-    </button>
-
-</div>
-
-<!-- =========================
-     DISPLAY
-========================= -->
-
-<div
-    class="display-container"
-    id="displayContainer"
->
-
-    <div class="schedule-title">
-
-        <h2>Today's Fitness Assessments</h2>
-
-        <p>
-            Please locate your scheduled testing time below.
-        </p>
-
-    </div>
-
-    <table class="schedule-table">
-
-        <thead>
-
-            <tr>
-
-                <th>Time</th>
-
-                <th>Cardio</th>
-
-                <th>Testers</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody id="scheduleBody"></tbody>
-
-    </table>
 
     <div
-        id="emptyMessage"
-        class="empty-message"
-    >
-        No schedule has been entered for today.
+        class="schedule-grid"
+        id="scheduleGrid">
     </div>
+
+
+    <div
+        class="empty-message"
+        id="emptyMessage"
+        style="display:none;">
+        No Fitness Assessments scheduled today.
+    </div>
+
 
 </div>
 
+
 <!-- =========================
-     EDITOR
+     EDIT VIEW
 ========================= -->
 
-<div
-    class="editor"
-    id="editor"
->
+<div id="editView">
 
-    <div class="editor-card">
+    <div class="editor">
 
-        <h2>Edit Daily Schedule</h2>
+        <h1>
+            Daily Schedule
+        </h1>
 
-        <div class="editor-row editor-header">
-
-            <div>Time</div>
-
-            <div>Cardio</div>
-
-            <div>Tester 1</div>
-
-            <div>Tester 2</div>
-
-            <div>Tester 3</div>
-
-            <div>Tester 4</div>
-
-            <div></div>
-
+        <div class="editor-subtitle">
+            Enter one tester per line.
         </div>
 
-        <div id="editorRows"></div>
 
-        <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+        <div id="sessionEditor">
+        </div>
+
+
+        <div class="button-row">
 
             <button
-                class="secondary-btn"
-                onclick="addRow()"
-            >
-                + Add Time
+                class="action secondary"
+                onclick="addSession()">
+                + Add Session
             </button>
 
             <button
-                class="primary-btn"
-                onclick="saveSchedule()"
-            >
+                class="action primary"
+                onclick="saveSchedule()">
                 Save Schedule
             </button>
 
             <button
-                class="secondary-btn"
-                onclick="cancelEditor()"
-            >
+                class="action secondary"
+                onclick="closeEditor()">
                 Cancel
+            </button>
+
+            <button
+                class="action delete"
+                onclick="clearSchedule()">
+                Clear Today
             </button>
 
         </div>
@@ -503,75 +567,226 @@ select {
 
 </div>
 
+
 <script>
-
-/* =========================
-   DATE
-========================= */
-
-function updateDate() {
-
-    const today = new Date();
-
-    const formatted =
-        today.toLocaleDateString(
-            "en-US",
-            {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric"
-            }
-        );
-
-    document.getElementById(
-        "currentDate"
-    ).textContent = formatted;
-
-}
-
-updateDate();
-
 
 /* =========================
    STORAGE
 ========================= */
 
 const STORAGE_KEY =
-    "facDailySchedule";
+    "facDailyScheduleV2";
 
+const DATE_KEY =
+    "facDailyScheduleDateV2";
+
+
+/* =========================
+   DATE
+========================= */
+
+function getTodayKey() {
+
+    const date =
+        new Date();
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
+
+}
+
+
+function showDate() {
+
+    const today =
+        new Date();
+
+    const formatted =
+        today.toLocaleDateString(
+            "en-GB",
+            {
+                weekday:
+                    "long",
+
+                day:
+                    "2-digit",
+
+                month:
+                    "long",
+
+                year:
+                    "2-digit"
+            }
+        );
+
+    document
+        .getElementById(
+            "displayDate"
+        )
+        .textContent =
+            formatted;
+
+}
+
+
+/* =========================
+   DEFAULT SCHEDULE
+========================= */
+
+function defaultSchedule() {
+
+    return [
+
+        {
+            time:
+                "0730",
+
+            cardio:
+                "HAMR",
+
+            testers: []
+        },
+
+        {
+            time:
+                "0900",
+
+            cardio:
+                "HAMR",
+
+            testers: []
+        },
+
+        {
+            time:
+                "1030",
+
+            cardio:
+                "HAMR",
+
+            testers: []
+        },
+
+        {
+            time:
+                "1300",
+
+            cardio:
+                "HAMR",
+
+            testers: []
+        }
+
+    ];
+
+}
+
+
+/* =========================
+   LOAD / SAVE
+========================= */
 
 function getSchedule() {
+
+    const storedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
+
+    const today =
+        getTodayKey();
+
+
+    /*
+       New day:
+       automatically start fresh
+    */
+
+    if (
+        storedDate &&
+        storedDate !== today
+    ) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+    }
+
 
     const saved =
         localStorage.getItem(
             STORAGE_KEY
         );
 
+
     if (!saved) {
 
-        return [];
+        return defaultSchedule();
 
     }
 
+
     try {
 
-        return JSON.parse(saved);
+        return JSON.parse(
+            saved
+        );
 
-    } catch {
+    }
 
-        return [];
+    catch {
+
+        return defaultSchedule();
 
     }
 
 }
 
 
-function setSchedule(schedule) {
+function setSchedule(
+    schedule
+) {
 
     localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(schedule)
+        JSON.stringify(
+            schedule
+        )
+    );
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
     );
 
 }
@@ -586,9 +801,9 @@ function renderSchedule() {
     const schedule =
         getSchedule();
 
-    const body =
+    const grid =
         document.getElementById(
-            "scheduleBody"
+            "scheduleGrid"
         );
 
     const empty =
@@ -596,9 +811,14 @@ function renderSchedule() {
             "emptyMessage"
         );
 
-    body.innerHTML = "";
 
-    if (!schedule.length) {
+    grid.innerHTML = "";
+
+
+    if (
+        !schedule ||
+        schedule.length === 0
+    ) {
 
         empty.style.display =
             "block";
@@ -607,107 +827,107 @@ function renderSchedule() {
 
     }
 
+
     empty.style.display =
         "none";
 
 
-    schedule.forEach(item => {
+    schedule.forEach(
+        session => {
 
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        const time =
-            document.createElement(
-                "td"
-            );
-
-        time.className =
-            "time-cell";
-
-        time.textContent =
-            item.time || "";
-
-
-        const cardio =
-            document.createElement(
-                "td"
-            );
-
-        cardio.className =
-            "cardio-cell";
-
-        cardio.textContent =
-            item.cardio || "";
-
-
-        const testersCell =
-            document.createElement(
-                "td"
-            );
-
-        testersCell.className =
-            "testers-cell";
-
-
-        const testers =
-            (item.testers || [])
-            .filter(
-                name =>
-                name.trim() !== ""
-            );
-
-
-        const grid =
-            document.createElement(
-                "div"
-            );
-
-        grid.className =
-            "testers-grid count-" +
-            Math.min(
-                testers.length,
-                4
-            );
-
-
-        testers.forEach(name => {
-
-            const div =
+            const block =
                 document.createElement(
                     "div"
                 );
 
-            div.className =
-                "tester";
-
-            div.textContent =
-                name;
-
-            grid.appendChild(div);
-
-        });
+            block.className =
+                "schedule-block";
 
 
-        testersCell.appendChild(
-            grid
-        );
+            const time =
+                document.createElement(
+                    "div"
+                );
+
+            time.className =
+                "schedule-time";
+
+            time.textContent =
+                session.time ||
+                "";
 
 
-        row.appendChild(time);
+            const cardio =
+                document.createElement(
+                    "div"
+                );
 
-        row.appendChild(cardio);
+            cardio.className =
+                "schedule-cardio";
 
-        row.appendChild(
-            testersCell
-        );
+            cardio.textContent =
+                session.cardio ||
+                "";
 
 
-        body.appendChild(row);
+            const testerList =
+                document.createElement(
+                    "div"
+                );
 
-    });
+            testerList.className =
+                "tester-list";
+
+
+            (
+                session.testers ||
+                []
+            )
+            .filter(
+                name =>
+                    name.trim()
+            )
+            .forEach(
+                name => {
+
+                    const tester =
+                        document.createElement(
+                            "div"
+                        );
+
+                    tester.className =
+                        "tester-name";
+
+                    tester.textContent =
+                        name;
+
+                    testerList.appendChild(
+                        tester
+                    );
+
+                }
+            );
+
+
+            block.appendChild(
+                time
+            );
+
+            block.appendChild(
+                cardio
+            );
+
+            block.appendChild(
+                testerList
+            );
+
+
+            grid.appendChild(
+                block
+            );
+
+        }
+    );
 
 }
 
@@ -716,15 +936,15 @@ function renderSchedule() {
    EDITOR
 ========================= */
 
-function showEditor() {
+function openEditor() {
 
     document.getElementById(
-        "displayContainer"
+        "displayView"
     ).style.display =
         "none";
 
     document.getElementById(
-        "editor"
+        "editView"
     ).style.display =
         "block";
 
@@ -733,15 +953,15 @@ function showEditor() {
 }
 
 
-function cancelEditor() {
+function closeEditor() {
 
     document.getElementById(
-        "editor"
+        "editView"
     ).style.display =
         "none";
 
     document.getElementById(
-        "displayContainer"
+        "displayView"
     ).style.display =
         "block";
 
@@ -752,139 +972,161 @@ function buildEditor() {
 
     const container =
         document.getElementById(
-            "editorRows"
+            "sessionEditor"
         );
 
-    container.innerHTML = "";
-
-    const schedule =
-        getSchedule();
+    container.innerHTML =
+        "";
 
 
-    if (!schedule.length) {
+    getSchedule().forEach(
+        session => {
 
-        addRow();
+            addSession(
+                session
+            );
 
-        return;
-
-    }
-
-
-    schedule.forEach(item => {
-
-        addRow(item);
-
-    });
+        }
+    );
 
 }
 
 
-function addRow(data = {}) {
+/* =========================
+   ADD SESSION
+========================= */
+
+function addSession(
+    data = {
+        time: "",
+        cardio: "HAMR",
+        testers: []
+    }
+) {
 
     const container =
         document.getElementById(
-            "editorRows"
+            "sessionEditor"
         );
 
 
-    const row =
+    const div =
         document.createElement(
             "div"
         );
 
-    row.className =
-        "editor-row";
+    div.className =
+        "editor-session";
 
 
-    row.innerHTML = `
+    div.innerHTML = `
 
-        <input
-            class="time-input"
-            type="text"
-            placeholder="0700"
-            value="${data.time || ""}"
-        >
+        <div class="session-top">
 
-        <select class="cardio-input">
+            <div>
 
-            <option value="">
-                Select
-            </option>
+                <label>
+                    Time
+                </label>
 
-            <option
-                value="2-Mile Run"
-                ${
-                    data.cardio ===
-                    "2-Mile Run"
-                    ? "selected"
-                    : ""
-                }
-            >
-                2-Mile Run
-            </option>
+                <input
+                    class="session-time"
+                    type="text"
+                    placeholder="0730"
+                    value="${data.time || ""}"
+                >
 
-            <option
-                value="HAMR"
-                ${
-                    data.cardio ===
-                    "HAMR"
-                    ? "selected"
-                    : ""
-                }
-            >
-                HAMR
-            </option>
+            </div>
 
-            <option
-                value="Run / HAMR"
-                ${
-                    data.cardio ===
-                    "Run / HAMR"
-                    ? "selected"
-                    : ""
-                }
-            >
-                Run / HAMR
-            </option>
 
-        </select>
+            <div>
 
-        <input
-            class="tester-input"
-            placeholder="Tester 1"
-            value="${data.testers?.[0] || ""}"
-        >
+                <label>
+                    Cardio
+                </label>
 
-        <input
-            class="tester-input"
-            placeholder="Tester 2"
-            value="${data.testers?.[1] || ""}"
-        >
+                <select
+                    class="session-cardio">
 
-        <input
-            class="tester-input"
-            placeholder="Tester 3"
-            value="${data.testers?.[2] || ""}"
-        >
+                    <option
+                        value="HAMR"
+                        ${
+                            data.cardio ===
+                            "HAMR"
+                            ?
+                            "selected"
+                            :
+                            ""
+                        }>
+                        HAMR
+                    </option>
 
-        <input
-            class="tester-input"
-            placeholder="Tester 4"
-            value="${data.testers?.[3] || ""}"
-        >
+                    <option
+                        value="2-Mile Run"
+                        ${
+                            data.cardio ===
+                            "2-Mile Run"
+                            ?
+                            "selected"
+                            :
+                            ""
+                        }>
+                        2-Mile Run
+                    </option>
 
-        <button
-            class="remove-btn"
-            onclick="this.parentElement.remove()"
-        >
-            ✕
-        </button>
+                    <option
+                        value="HAMR / 2-Mile Run"
+                        ${
+                            data.cardio ===
+                            "HAMR / 2-Mile Run"
+                            ?
+                            "selected"
+                            :
+                            ""
+                        }>
+                        HAMR / 2-Mile Run
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div></div>
+
+
+            <button
+                class="action delete"
+                onclick="
+                    this
+                    .closest('.editor-session')
+                    .remove()
+                ">
+                Remove
+            </button>
+
+        </div>
+
+
+        <label
+            style="margin-top:12px;">
+            Tester Last Names
+        </label>
+
+        <textarea
+            class="session-testers"
+            placeholder="HINTON&#10;COLE&#10;SANTOS&#10;KILLILAY">${(
+                data.testers ||
+                []
+            ).join(
+                "\n"
+            )}</textarea>
 
     `;
 
 
     container.appendChild(
-        row
+        div
     );
 
 }
@@ -896,74 +1138,73 @@ function addRow(data = {}) {
 
 function saveSchedule() {
 
-    const rows =
+    const sessions =
         document.querySelectorAll(
-            "#editorRows .editor-row"
+            ".editor-session"
         );
 
     const schedule = [];
 
 
-    rows.forEach(row => {
+    sessions.forEach(
+        session => {
 
-        const time =
-            row.querySelector(
-                ".time-input"
-            ).value.trim();
-
-
-        const cardio =
-            row.querySelector(
-                ".cardio-input"
-            ).value;
+            const time =
+                session
+                .querySelector(
+                    ".session-time"
+                )
+                .value
+                .trim();
 
 
-        const testerInputs =
-            row.querySelectorAll(
-                ".tester-input"
-            );
+            const cardio =
+                session
+                .querySelector(
+                    ".session-cardio"
+                )
+                .value;
 
 
-        const testers =
-            Array.from(
-                testerInputs
-            ).map(
-                input =>
-                input.value.trim()
-            );
+            const testerText =
+                session
+                .querySelector(
+                    ".session-testers"
+                )
+                .value;
 
 
-        if (
-            time ||
-            cardio ||
-            testers.some(
-                name => name
-            )
-        ) {
+            const testers =
+                testerText
+                .split(
+                    /\r?\n/
+                )
+                .map(
+                    name =>
+                        name.trim()
+                )
+                .filter(
+                    Boolean
+                );
+
 
             schedule.push({
-
                 time,
-
                 cardio,
-
                 testers
-
             });
 
         }
-
-    });
+    );
 
 
     setSchedule(
         schedule
     );
 
-
-    cancelEditor();
-
     renderSchedule();
+
+    closeEditor();
 
 }
 
@@ -974,20 +1215,31 @@ function saveSchedule() {
 
 function clearSchedule() {
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             "Clear today's schedule?"
-        );
-
-    if (!confirmed) {
-
+        )
+    ) {
         return;
-
     }
+
 
     localStorage.removeItem(
         STORAGE_KEY
     );
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
+    );
+
+
+    setSchedule(
+        defaultSchedule()
+    );
+
+
+    buildEditor();
 
     renderSchedule();
 
@@ -995,23 +1247,37 @@ function clearSchedule() {
 
 
 /* =========================
-   DISPLAY MODE
+   ROCKBOT CONTROLS
 ========================= */
 
-function toggleFullscreenMode() {
+function toggleRockbotMode() {
 
     document.body
         .classList
         .toggle(
-            "fullscreen-mode"
+            "rockbot-mode"
         );
 
 }
 
 
 /* =========================
-   INITIAL LOAD
+   FAC HOME
 ========================= */
+
+function goHome() {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =========================
+   INITIALIZE
+========================= */
+
+showDate();
 
 renderSchedule();
 
