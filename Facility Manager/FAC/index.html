@@ -142,64 +142,79 @@
        ========================= */
 
     .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin-top: 20px;
+}
 
-    .quick-card {
-      min-height: 230px;
+.quick-card {
+  min-height: 220px;
 
-      border: 2px solid #e5e9ed;
-      border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-      padding: 22px 15px;
+  text-align: center;
 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+  background: #f8fafc;
 
-      text-align: center;
+  border: 1px solid #d9e1e8;
+  border-radius: 18px;
 
-      background: #fafbfc;
-    }
+  text-decoration: none;
+  color: #111c27;
 
-    .quick-icon {
-      font-size: 44px;
-      margin-bottom: 16px;
-    }
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
 
-    .quick-title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: .5px;
-    }
+.quick-card:hover {
+  transform: translateY(-2px);
 
-    .coming-soon {
-      margin-top: 10px;
+  box-shadow:
+    0 6px 18px
+    rgba(0,0,0,0.08);
+}
 
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 1px;
+.quick-icon {
+  font-size: 44px;
+  line-height: 1;
+  margin-bottom: 18px;
+}
 
-      color: #8a949e;
-    }
+.quick-title {
+  font-size: 23px;
+  font-weight: 800;
 
-    /* =========================
-       FOOTER
-       ========================= */
+  letter-spacing: 0.5px;
 
-    .footer {
-      max-width: 1400px;
-      margin: 22px auto 0;
+  text-transform: uppercase;
 
-      text-align: center;
+  margin-bottom: 12px;
+}
 
-      font-size: 13px;
-      color: #89939c;
-    }
+.quick-subtitle {
+  font-size: 15px;
+  font-weight: 700;
 
+  letter-spacing: 1.5px;
+
+  color: #8a98a6;
+
+  text-transform: uppercase;
+}
+
+.quick-card.disabled {
+  cursor: default;
+}
+
+.quick-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
     /* =========================
        TABLET
        ========================= */
@@ -347,64 +362,76 @@
 
     <!-- QUICK ACCESS -->
 
-<div class="quick-access-grid">
+<!-- QUICK ACCESS -->
 
+<section class="panel">
+
+  <h2 class="panel-title">
+    QUICK ACCESS
+  </h2>
+
+  <div class="quick-grid">
+
+
+    <!-- DAILY SCHEDULE -->
     <a
-        href="./Daily%20Schedule/"
-        class="quick-card"
+      class="quick-card"
+      href="./Daily%20Schedule/"
     >
-        <div class="quick-icon">🕒</div>
-
-        <div class="quick-card-title">
-            Daily Schedule
-        </div>
-
-        <div class="quick-card-text">
-            View today's FAC testing schedule.
-        </div>
-    </a>
-
-
-    <a
-        href="./pfra_calculator.html"
-        class="quick-card"
-    >
-        <div class="quick-icon">🧮</div>
-
-        <div class="quick-card-title">
-            PFRA Calculator
-        </div>
-
-        <div class="quick-card-text">
-            Calculate PFRA scores and minimum passing requirements.
-        </div>
-    </a>
-
-</div>
-
-
-        <!-- RESOURCES -->
-
-        <div class="quick-card">
-
-          <div class="quick-icon">
-            📚
-          </div>
-
-          <div class="quick-title">
-            RESOURCES
-          </div>
-
-          <div class="coming-soon">
-            COMING SOON
-          </div>
-
-        </div>
-
-
+      <div class="quick-icon">
+        🕒
       </div>
 
-    </section>
+      <div class="quick-title">
+        DAILY SCHEDULE
+      </div>
+
+      <div class="quick-subtitle">
+        VIEW TODAY'S FAC TESTING SCHEDULE
+      </div>
+    </a>
+
+
+    <!-- PFRA CALCULATOR -->
+    <a
+      class="quick-card"
+      href="./pfra_calculator.html"
+    >
+      <div class="quick-icon">
+        🧮
+      </div>
+
+      <div class="quick-title">
+        PFRA CALCULATOR
+      </div>
+
+      <div class="quick-subtitle">
+        CALCULATE PFRA SCORES
+      </div>
+    </a>
+
+
+    <!-- RESOURCES -->
+    <div class="quick-card disabled">
+
+      <div class="quick-icon">
+        📚
+      </div>
+
+      <div class="quick-title">
+        RESOURCES
+      </div>
+
+      <div class="quick-subtitle">
+        COMING SOON
+      </div>
+
+    </div>
+
+
+  </div>
+
+</section>
 
   </main>
 
