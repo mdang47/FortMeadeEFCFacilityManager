@@ -383,7 +383,13 @@ button:disabled {
     background: var(--navy2);
     color: white;
 }
-
+.runner-select-btn:disabled {
+    background: #eceff2;
+    border-color: #d5d9de;
+    color: #8a939d;
+    opacity: .65;
+    cursor: not-allowed;
+}
 .selector-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -975,6 +981,9 @@ let serverOffset = 0;
 let connected = false;
 
 let requestInProgress = false;
+
+const lapRequestsInProgress =
+    new Set();
 
 let pollTimer = null;
 
@@ -1813,18 +1822,24 @@ function applyTestState(data) {
             : [];
 
 
-    /*
-      Remove IDs that are no longer
-      part of this test.
-    */
+/*
+  My Runners are controlled by the
+  shared server assignment.
 
-    myRunnerIds =
-        myRunnerIds.filter(
-            id =>
-                runners.some(
-                    runner =>
-                        runner.id === id
-                )
+  Any runner assigned to this
+  counter belongs in My Runners.
+*/
+
+myRunnerIds =
+    runners
+        .filter(
+            runner =>
+                runner.assignedCounterId ===
+                    counterId
+        )
+        .map(
+            runner =>
+                runner.id
         );
 
 
@@ -1897,48 +1912,19 @@ function getRunnerViewKey() {
 
 function loadRunnerPreferences() {
 
-    const runnerKey =
-        getRunnerPreferenceKey();
+    /*
+      Runner assignments now come from
+      the shared server.
+
+      Only remember this device's
+      preferred runner VIEW locally.
+    */
+
+    myRunnerIds = [];
+
 
     const viewKey =
         getRunnerViewKey();
-
-
-    myRunnerIds =
-        [];
-
-
-    if (runnerKey) {
-
-        try {
-
-            const saved =
-                JSON.parse(
-                    localStorage.getItem(
-                        runnerKey
-                    ) || "[]"
-                );
-
-
-            if (
-                Array.isArray(saved)
-            ) {
-
-                myRunnerIds =
-                    saved;
-
-            }
-
-        }
-
-        catch (error) {
-
-            myRunnerIds =
-                [];
-
-        }
-
-    }
 
 
     const savedView =
@@ -1955,9 +1941,6 @@ function loadRunnerPreferences() {
             : "all";
 
 }
-
-
-
 /* =========================================================
    RUNNER VIEW
 ========================================================= */
@@ -2058,7 +2041,7 @@ function updateRunnerViewControls() {
         ) {
 
             summary.textContent =
-                "No runners selected on this device.";
+    "No runners assigned to this counter.";
 
         }
 
@@ -2159,8 +2142,7 @@ function renderRunnerSelector() {
     }
 
 
-    grid.innerHTML =
-        "";
+    grid.innerHTML = "";
 
 
     runners.forEach(
@@ -2179,6 +2161,17 @@ function renderRunnerSelector() {
                 "runner-select-btn";
 
 
+            const assignedToMe =
+                runner.assignedCounterId ===
+                    counterId;
+
+
+            const assignedToOther =
+                runner.assignedCounterId &&
+                runner.assignedCounterId !==
+                    counterId;
+
+
             if (
                 pendingRunnerIds.includes(
                     runner.id
@@ -2192,15 +2185,30 @@ function renderRunnerSelector() {
             }
 
 
-            button.textContent =
-                runner.id;
+            if (assignedToOther) {
+
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    runner.id +
+                    " — ASSIGNED";
+
+            }
+
+            else {
+
+                button.textContent =
+                    runner.id;
 
 
-            button.onclick =
-                () =>
-                    togglePendingRunner(
-                        runner.id
-                    );
+                button.onclick =
+                    () =>
+                        togglePendingRunner(
+                            runner.id
+                        );
+
+            }
 
 
             grid.appendChild(
@@ -2211,7 +2219,6 @@ function renderRunnerSelector() {
     );
 
 }
-
 
 function togglePendingRunner(
     runnerId
@@ -2255,37 +2262,110 @@ function clearMyRunners() {
 }
 
 
-function saveMyRunners() {
+async function saveMyRunners() {
 
-    myRunnerIds =
-        [...pendingRunnerIds];
+    if (
+        !connected ||
+        !currentTestId
+    ) {
+
+        showTestMessage(
+            "Connection required to assign runners.",
+            "error"
+        );
+
+        return;
+    }
 
 
-    const key =
-        getRunnerPreferenceKey();
+    requestInProgress =
+        true;
+
+    updateControls();
 
 
-    if (key) {
+    try {
 
-        localStorage.setItem(
-            key,
-            JSON.stringify(
-                myRunnerIds
-            )
+        const result =
+            await apiPost(
+                "saveRunAssignments",
+                {
+                    testId:
+                        currentTestId,
+
+                    counterId:
+                        counterId,
+
+                    runnerIds:
+                        [...pendingRunnerIds]
+                }
+            );
+
+
+        if (!result.success) {
+
+            /*
+              Another counter may have claimed
+              one of these runners while this
+              selector was open.
+            */
+
+            showTestMessage(
+                result.message ||
+                "Unable to save runner assignments.",
+                "error"
+            );
+
+            await refreshTest();
+
+            pendingRunnerIds =
+                [...myRunnerIds];
+
+            renderRunnerSelector();
+
+            return;
+        }
+
+
+        /*
+          Reload the shared state.
+
+          applyTestState() will rebuild
+          myRunnerIds from assignedCounterId.
+        */
+
+        await refreshTest();
+
+        pendingRunnerIds =
+            [...myRunnerIds];
+
+        closeRunnerSelector();
+
+        updateRunnerViewControls();
+
+        renderRunnerCards();
+
+    }
+
+    catch (error) {
+
+        showTestMessage(
+            "Unable to save runner assignments. Check your connection.",
+            "error"
         );
 
     }
 
+    finally {
 
-    closeRunnerSelector();
+        requestInProgress =
+            false;
 
-    updateRunnerViewControls();
+        updateControls();
 
-    renderRunnerCards();
+    }
 
 }
-
-
 
 /* =========================================================
    START CLOCK
@@ -2379,7 +2459,6 @@ await refreshTest();
 }
 
 
-
 /* =========================================================
    RECORD LAP
 ========================================================= */
@@ -2388,8 +2467,18 @@ async function recordLap(
     runnerId
 ) {
 
+    /*
+      Do not allow the same runner to be
+      tapped again while their previous
+      lap is still being confirmed.
+
+      Other runners remain tappable.
+    */
+
     if (
-        requestInProgress ||
+        lapRequestsInProgress.has(
+            runnerId
+        ) ||
         !connected ||
         !currentTest ||
         currentTest.status !==
@@ -2415,14 +2504,46 @@ async function recordLap(
     }
 
 
-    requestInProgress =
-        true;
+    /*
+      IMPORTANT:
 
-    updateControls();
+      Capture the crossing time NOW,
+      before making the network request.
+
+      getServerNow() uses this phone's
+      synchronized estimate of the
+      official server clock.
+
+      Apps Script processing time will
+      therefore NOT be added to the
+      runner's lap time.
+    */
+
+    const tappedAt =
+        Math.round(
+            getServerNow()
+        );
 
 
     const eventId =
         crypto.randomUUID();
+
+
+    /*
+      Lock only this runner.
+
+      R6 can be waiting for the server
+      while B2, Y4, etc. remain tappable.
+    */
+
+    lapRequestsInProgress.add(
+        runnerId
+    );
+
+
+    renderRunnerCards();
+
+    updateControls();
 
 
     try {
@@ -2441,7 +2562,10 @@ async function recordLap(
                         counterId,
 
                     eventId:
-                        eventId
+                        eventId,
+
+                    tappedAt:
+                        tappedAt
                 }
             );
 
@@ -2475,12 +2599,6 @@ async function recordLap(
         }
 
         else {
-
-            /*
-              Only show confirmation after
-              the server says the lap was
-              successfully recorded.
-            */
 
             lastRecordedRunnerId =
                 runnerId;
@@ -2521,16 +2639,22 @@ async function recordLap(
 
     finally {
 
-        requestInProgress =
-            false;
+        /*
+          Unlock only this runner.
+        */
+
+        lapRequestsInProgress.delete(
+            runnerId
+        );
+
+
+        renderRunnerCards();
 
         updateControls();
 
     }
 
 }
-
-
 
 /* =========================================================
    LAP CONFIRMATION
@@ -2998,12 +3122,15 @@ function renderRunnerCards() {
 
 
             card.disabled =
-                !connected ||
-                requestInProgress ||
-                !currentTest ||
-                currentTest.status !==
-                    "RUNNING" ||
-                finished;
+    !connected ||
+    requestInProgress ||
+    lapRequestsInProgress.has(
+        runner.id
+    ) ||
+    !currentTest ||
+    currentTest.status !==
+        "RUNNING" ||
+    finished;
 
 
             card.onclick =
@@ -3234,12 +3361,14 @@ function updateControls() {
                     TOTAL_LAPS;
 
 
-            card.disabled =
-                !connected ||
-                requestInProgress ||
-                status !== "RUNNING" ||
-                finished;
-
+           card.disabled =
+    !connected ||
+    requestInProgress ||
+    lapRequestsInProgress.has(
+        runnerId
+    ) ||
+    status !== "RUNNING" ||
+    finished;
         }
     );
 
