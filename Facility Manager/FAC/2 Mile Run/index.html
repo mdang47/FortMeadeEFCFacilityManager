@@ -1,0 +1,2853 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>2-Mile Run Counter</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --navy: #0b1f33;
+    --navy2: #163b61;
+    --blue: #2a6f9b;
+    --light: #edf5fb;
+    --line: #c7d5e2;
+    --text: #17202a;
+    --green: #1d7a46;
+    --red: #b42318;
+    --yellow: #f4b400;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: var(--text);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 32px;
+}
+
+.subtitle {
+    margin-top: 6px;
+    color: #667085;
+}
+
+
+/* =========================
+   CONNECTION
+========================= */
+
+.connection-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.connection-status {
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.connection-status.online {
+    background: #dff6e8;
+    color: #146c3b;
+}
+
+.connection-status.offline {
+    background: #fde4e1;
+    color: #9f1d16;
+}
+
+
+/* =========================
+   PANELS
+========================= */
+
+.panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.panel-title {
+    margin-top: 0;
+    color: var(--navy);
+}
+
+
+/* =========================
+   SETUP
+========================= */
+
+.runner-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+select,
+input {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px;
+    border: 1px solid #bfc9d4;
+    border-radius: 8px;
+    font-size: 17px;
+    background: white;
+}
+
+.remove-runner {
+    min-width: 48px;
+    border: 0;
+    border-radius: 8px;
+    background: #f3d7d4;
+    color: #9f1d16;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.setup-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    font-family: inherit;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.start-btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: var(--navy2);
+    color: white;
+}
+
+.secondary-btn {
+    background: #e8eef4;
+    color: var(--navy);
+}
+
+.danger-btn {
+    background: var(--red);
+    color: white;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.message {
+    display: none;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.message.error {
+    display: block;
+    background: #fde7e4;
+    color: #9f1d16;
+}
+
+.message.info {
+    display: block;
+    background: #e8f1f8;
+    color: var(--navy2);
+}
+
+
+/* =========================
+   TEST HEADER
+========================= */
+
+.test-screen {
+    display: none;
+}
+
+.test-status {
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #667085;
+    margin-bottom: 5px;
+}
+
+.master-timer {
+    text-align: center;
+    font-size: clamp(54px, 10vw, 96px);
+    line-height: 1;
+    font-weight: bold;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    margin: 15px 0 20px;
+}
+
+.start-btn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 22px;
+    min-height: 75px;
+    background: var(--green);
+    color: white;
+    font-size: 28px;
+}
+
+
+/* =========================
+   COUNTER INFO
+========================= */
+
+.counter-info {
+    text-align: center;
+    color: #667085;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+
+/* =========================
+   RUNNER GRID
+========================= */
+
+.runner-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+}
+
+.runner-card {
+    position: relative;
+    min-height: 235px;
+    border: 3px solid var(--navy2);
+    border-radius: 14px;
+    background: white;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    transition:
+        transform .08s ease,
+        opacity .15s ease;
+}
+
+.runner-card:active:not(:disabled) {
+    transform: scale(.97);
+}
+
+.runner-card:disabled {
+    cursor: not-allowed;
+}
+
+.runner-card.waiting {
+    opacity: .6;
+}
+
+.runner-card.finished {
+    background: #e5f5eb;
+    border-color: var(--green);
+    opacity: 1;
+}
+
+.runner-id {
+    font-size: 42px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.runner-lap {
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.runner-times {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.time-label {
+    color: #667085;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.time-value {
+    margin-top: 4px;
+    font-size: 21px;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+.finished-label {
+    margin-top: 10px;
+    color: var(--green);
+    font-weight: bold;
+}
+
+
+/* =========================
+   CONTROLS
+========================= */
+
+.test-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.test-controls button {
+    min-height: 60px;
+    font-size: 18px;
+}
+
+
+/* =========================
+   RESULTS
+========================= */
+
+.results {
+    display: none;
+}
+
+.result-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.result-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--navy);
+}
+
+.result-finish {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 7px 0;
+}
+
+.lap-history {
+    margin-top: 10px;
+    line-height: 1.7;
+}
+
+
+/* =========================
+   BUSY OVERLAY
+========================= */
+
+.busy {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.72);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--navy);
+}
+
+.busy.show {
+    display: flex;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .panel {
+        padding: 15px;
+    }
+
+    .runner-entry {
+        grid-template-columns: 1fr 1fr 45px;
+    }
+
+    .runner-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .runner-card {
+        min-height: 190px;
+        padding: 12px 7px;
+    }
+
+    .runner-id {
+        font-size: 34px;
+    }
+
+    .runner-lap {
+        font-size: 20px;
+    }
+
+    .time-value {
+        font-size: 17px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<div class="header">
+
+    <h1>2-Mile Run Counter</h1>
+
+    <div class="subtitle">
+        707 FSS Fitness Assessment Cell
+    </div>
+
+</div>
+
+
+<div class="connection-bar">
+
+    <div
+        id="connectionStatus"
+        class="connection-status offline"
+    >
+        CONNECTING...
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     SETUP
+========================= -->
+
+<section
+    id="setupPanel"
+    class="panel"
+>
+
+    <h2 class="panel-title">
+        Runner Setup
+    </h2>
+
+    <p>
+        Enter each runner's jersey color and number.
+    </p>
+
+
+    <div id="runnerEntries"></div>
+
+
+    <div class="setup-actions">
+
+        <button
+            class="secondary-btn"
+            onclick="addRunnerEntry()"
+        >
+            + Add Runner
+        </button>
+
+
+        <button
+            id="loadTestButton"
+            class="primary-btn"
+            onclick="loadTest()"
+        >
+            LOAD TEST
+        </button>
+
+    </div>
+
+
+    <div
+        id="setupMessage"
+        class="message"
+    ></div>
+
+</section>
+
+
+
+<!-- =========================
+     TEST SCREEN
+========================= -->
+
+<section
+    id="testScreen"
+    class="test-screen"
+>
+
+
+    <section class="panel">
+
+        <div
+            id="testStatus"
+            class="test-status"
+        >
+            READY
+        </div>
+
+
+        <div
+            id="masterTimer"
+            class="master-timer"
+        >
+            00:00.0
+        </div>
+
+
+        <button
+            id="startButton"
+            class="start-btn"
+            onclick="startClock()"
+        >
+            START CLOCK
+        </button>
+
+
+        <div
+            id="counterInfo"
+            class="counter-info"
+        ></div>
+
+
+        <div
+            id="runnerGrid"
+            class="runner-grid"
+        ></div>
+
+
+        <div class="test-controls">
+
+            <button
+                id="undoButton"
+                class="secondary-btn"
+                onclick="undoLastTap()"
+            >
+                ↶ UNDO LAST TAP
+            </button>
+
+
+            <button
+                id="endButton"
+                class="danger-btn"
+                onclick="endTest()"
+            >
+                END TEST
+            </button>
+
+        </div>
+
+
+        <div
+            id="testMessage"
+            class="message"
+        ></div>
+
+    </section>
+
+</section>
+
+
+
+<!-- =========================
+     RESULTS
+========================= -->
+
+<section
+    id="resultsPanel"
+    class="panel results"
+>
+
+    <h2 class="panel-title">
+        Results
+    </h2>
+
+    <div id="resultsList"></div>
+
+</section>
+
+
+</div>
+
+
+
+<div
+    id="busy"
+    class="busy"
+>
+    Working...
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec";
+
+
+const TOTAL_LAPS = 8;
+
+
+/*
+  Polling is only for synchronizing
+  state between counter tablets.
+
+  The visible timer animates locally
+  between server syncs.
+*/
+
+const POLL_INTERVAL = 1000;
+
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentTestId = null;
+
+let currentTest = null;
+
+let runners = [];
+
+let serverOffset = 0;
+
+let connected = false;
+
+let requestInProgress = false;
+
+let pollTimer = null;
+
+let displayTimer = null;
+
+
+/*
+  Each tablet gets a permanent
+  counter identifier.
+
+  This is NOT runner/test data.
+  It only identifies which counter
+  recorded an event.
+*/
+
+let counterId =
+    localStorage.getItem(
+        "twoMileCounterId"
+    );
+
+
+if (!counterId) {
+
+    counterId =
+        "COUNTER-" +
+        crypto.randomUUID()
+            .substring(0, 8)
+            .toUpperCase();
+
+    localStorage.setItem(
+        "twoMileCounterId",
+        counterId
+    );
+
+}
+
+
+
+/* =========================================================
+   COLORS
+========================================================= */
+
+const colors = [
+
+    ["R", "Red"],
+
+    ["B", "Blue"],
+
+    ["Y", "Yellow"],
+
+    ["G", "Green"],
+
+    ["O", "Orange"],
+
+    ["P", "Purple"],
+
+    ["BK", "Black"],
+
+    ["W", "White"]
+
+];
+
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialize
+);
+
+
+async function initialize() {
+
+    document.getElementById(
+        "counterInfo"
+    ).textContent =
+        "Counter: " + counterId;
+
+
+    addRunnerEntry();
+
+    addRunnerEntry();
+
+
+    startDisplayTimer();
+
+
+    await findActiveTest();
+
+
+    startPolling();
+
+}
+
+
+
+/* =========================================================
+   CONNECTION
+========================================================= */
+
+function setConnectionState(isOnline) {
+
+    connected = isOnline;
+
+
+    const status =
+        document.getElementById(
+            "connectionStatus"
+        );
+
+
+    if (isOnline) {
+
+        status.textContent =
+            "● ONLINE";
+
+        status.className =
+            "connection-status online";
+
+    }
+
+    else {
+
+        status.textContent =
+            "● CONNECTION LOST";
+
+        status.className =
+            "connection-status offline";
+
+    }
+
+
+    updateControls();
+
+}
+
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function apiGet(
+    action,
+    parameters = {}
+) {
+
+    const url =
+        new URL(API_URL);
+
+
+    url.searchParams.set(
+        "action",
+        action
+    );
+
+
+    Object.entries(parameters)
+        .forEach(
+            ([key, value]) => {
+
+                url.searchParams.set(
+                    key,
+                    value
+                );
+
+            }
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                url.toString(),
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            throw new Error(
+                "Server returned " +
+                response.status
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        setConnectionState(true);
+
+        syncServerClock(data);
+
+
+        return data;
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setConnectionState(false);
+
+        throw error;
+
+    }
+
+}
+
+
+
+async function apiPost(
+    action,
+    payload = {}
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            action:
+                                action,
+
+                            ...payload
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+            throw new Error(
+                "Server returned " +
+                response.status
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        setConnectionState(true);
+
+        syncServerClock(data);
+
+
+        return data;
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setConnectionState(false);
+
+        throw error;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SERVER CLOCK
+========================================================= */
+
+function syncServerClock(data) {
+
+    if (
+        !data ||
+        !data.serverTime
+    ) {
+        return;
+    }
+
+
+    /*
+      serverOffset lets the tablet
+      approximate server time even if
+      its own clock is slightly different.
+    */
+
+    serverOffset =
+        Number(data.serverTime) -
+        Date.now();
+
+}
+
+
+function getServerNow() {
+
+    return (
+        Date.now() +
+        serverOffset
+    );
+
+}
+
+
+
+/* =========================================================
+   RUNNER SETUP
+========================================================= */
+
+function addRunnerEntry() {
+
+    const container =
+        document.getElementById(
+            "runnerEntries"
+        );
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "runner-entry";
+
+
+    const select =
+        document.createElement(
+            "select"
+        );
+
+
+    colors.forEach(
+        color => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                color[0];
+
+            option.textContent =
+                color[1];
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    const input =
+        document.createElement(
+            "input"
+        );
+
+    input.type =
+        "number";
+
+    input.min =
+        "1";
+
+    input.step =
+        "1";
+
+    input.placeholder =
+        "Jersey #";
+
+    input.inputMode =
+        "numeric";
+
+
+    const remove =
+        document.createElement(
+            "button"
+        );
+
+    remove.type =
+        "button";
+
+    remove.className =
+        "remove-runner";
+
+    remove.textContent =
+        "×";
+
+    remove.onclick =
+        () => row.remove();
+
+
+    row.appendChild(
+        select
+    );
+
+    row.appendChild(
+        input
+    );
+
+    row.appendChild(
+        remove
+    );
+
+
+    container.appendChild(
+        row
+    );
+
+}
+
+
+
+/* =========================================================
+   CREATE / LOAD TEST
+========================================================= */
+
+async function loadTest() {
+
+    if (!connected) {
+
+        showSetupMessage(
+            "Connection required to load a test.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const entries =
+        document.querySelectorAll(
+            ".runner-entry"
+        );
+
+
+    const newRunners = [];
+
+    const seen =
+        new Set();
+
+
+    for (
+        const entry of entries
+    ) {
+
+        const color =
+            entry
+                .querySelector("select")
+                .value;
+
+
+        const rawNumber =
+            entry
+                .querySelector("input")
+                .value
+                .trim();
+
+
+        if (!rawNumber) {
+            continue;
+        }
+
+
+        /*
+          Require digits only.
+
+          Prevents values such as:
+          7abc
+    */
+
+        if (
+            !/^\d+$/.test(
+                rawNumber
+            )
+        ) {
+
+            showSetupMessage(
+                "Runner numbers must contain numbers only.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const number =
+            String(
+                parseInt(
+                    rawNumber,
+                    10
+                )
+            );
+
+
+        if (
+            Number(number) <= 0
+        ) {
+
+            showSetupMessage(
+                "Runner numbers must be greater than 0.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const runnerId =
+            color + number;
+
+
+        if (
+            seen.has(
+                runnerId
+            )
+        ) {
+
+            showSetupMessage(
+                "Duplicate runner: " +
+                runnerId,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        seen.add(
+            runnerId
+        );
+
+
+        newRunners.push({
+
+            color:
+                color,
+
+            number:
+                number
+
+        });
+
+    }
+
+
+    if (
+        newRunners.length === 0
+    ) {
+
+        showSetupMessage(
+            "Add at least one runner.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    setBusy(
+        true,
+        "Loading test..."
+    );
+
+
+    try {
+
+        const result =
+            await apiPost(
+                "createRunTest",
+                {
+                    runners:
+                        newRunners
+                }
+            );
+
+
+        if (!result.success) {
+
+            /*
+              Another counter may have
+              created the test first.
+            */
+
+            if (result.testId) {
+
+                await joinTest(
+                    result.testId
+                );
+
+                return;
+
+            }
+
+
+            showSetupMessage(
+                result.message ||
+                "Unable to create test.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        currentTestId =
+            result.testId;
+
+
+        await refreshTest();
+
+
+    }
+
+    catch (error) {
+
+        showSetupMessage(
+            "Unable to reach the server.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+/* =========================================================
+   FIND EXISTING TEST
+========================================================= */
+
+async function findActiveTest() {
+
+    try {
+
+        const result =
+            await apiGet(
+                "getActiveRunTest"
+            );
+
+
+        if (
+            result.success &&
+            result.active &&
+            result.test
+        ) {
+
+            currentTestId =
+                result.test.testId;
+
+            applyTestState(
+                result
+            );
+
+        }
+
+        else {
+
+            showSetup();
+
+        }
+
+    }
+
+    catch (error) {
+
+        showSetupMessage(
+            "Unable to connect to the run server.",
+            "error"
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   JOIN TEST
+========================================================= */
+
+async function joinTest(
+    testId
+) {
+
+    currentTestId =
+        testId;
+
+    await refreshTest();
+
+}
+
+
+
+/* =========================================================
+   REFRESH TEST
+========================================================= */
+
+async function refreshTest() {
+
+    if (!currentTestId) {
+        return;
+    }
+
+
+    const result =
+        await apiGet(
+            "getRunTest",
+            {
+                testId:
+                    currentTestId
+            }
+        );
+
+
+    if (!result.success) {
+
+        showTestMessage(
+            result.message ||
+            "Unable to load test.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    applyTestState(
+        result
+    );
+
+}
+
+
+
+/* =========================================================
+   APPLY SERVER STATE
+========================================================= */
+
+function applyTestState(data) {
+
+    if (!data.test) {
+        return;
+    }
+
+
+    currentTest =
+        data.test;
+
+    currentTestId =
+        data.test.testId;
+
+    runners =
+        Array.isArray(data.runners)
+            ? data.runners
+            : [];
+
+
+    showTestScreen();
+
+    renderRunnerCards();
+
+    updateControls();
+
+
+    if (
+        currentTest.status ===
+        "ENDED"
+    ) {
+
+        showResults();
+
+    }
+
+    else {
+
+        document.getElementById(
+            "resultsPanel"
+        ).style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   START CLOCK
+========================================================= */
+
+async function startClock() {
+
+    if (
+        !connected ||
+        !currentTestId
+    ) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Start the 2-mile run?"
+        )
+    ) {
+        return;
+    }
+
+
+    setBusy(
+        true,
+        "Starting..."
+    );
+
+
+    try {
+
+        const result =
+            await apiPost(
+                "startRunTest",
+                {
+                    testId:
+                        currentTestId
+                }
+            );
+
+
+        if (!result.success) {
+
+            showTestMessage(
+                result.message ||
+                "Unable to start test.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        await refreshTest();
+
+    }
+
+    catch (error) {
+
+        showTestMessage(
+            "Connection error. The test was not started.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+/* =========================================================
+   RECORD LAP
+========================================================= */
+
+async function recordLap(
+    runnerId
+) {
+
+    if (
+        requestInProgress ||
+        !connected ||
+        !currentTest ||
+        currentTest.status !==
+            "RUNNING"
+    ) {
+        return;
+    }
+
+
+    const runner =
+        runners.find(
+            item =>
+                item.id === runnerId
+        );
+
+
+    if (
+        !runner ||
+        runner.laps.length >=
+            TOTAL_LAPS
+    ) {
+        return;
+    }
+
+
+    /*
+      Prevent this tablet from sending
+      several taps while the previous
+      one is still being processed.
+    */
+
+    requestInProgress =
+        true;
+
+    updateControls();
+
+
+    const eventId =
+        crypto.randomUUID();
+
+
+    try {
+
+        const result =
+            await apiPost(
+                "recordRunLap",
+                {
+                    testId:
+                        currentTestId,
+
+                    runnerId:
+                        runnerId,
+
+                    counterId:
+                        counterId,
+
+                    eventId:
+                        eventId
+                }
+            );
+
+
+        if (
+            !result.success
+        ) {
+
+            if (
+                result.duplicate
+            ) {
+
+                showTestMessage(
+                    runnerId +
+                    ": duplicate tap ignored.",
+                    "info"
+                );
+
+            }
+
+            else {
+
+                showTestMessage(
+                    result.message ||
+                    "Lap was not recorded.",
+                    "error"
+                );
+
+            }
+
+        }
+
+
+        await refreshTest();
+
+    }
+
+    catch (error) {
+
+        /*
+          IMPORTANT:
+
+          We do NOT save this tap locally
+          or attempt to queue it.
+
+          This app is intentionally
+          online-only for official timing.
+        */
+
+        showTestMessage(
+            "CONNECTION LOST — lap was not confirmed. Check the runner before tapping again.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        requestInProgress =
+            false;
+
+        updateControls();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   UNDO
+========================================================= */
+
+async function undoLastTap() {
+
+    if (
+        requestInProgress ||
+        !connected ||
+        !currentTestId ||
+        !currentTest ||
+        currentTest.status !==
+            "RUNNING"
+    ) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Undo the most recent lap tap for this test?"
+        )
+    ) {
+        return;
+    }
+
+
+    requestInProgress =
+        true;
+
+    updateControls();
+
+
+    try {
+
+        const result =
+            await apiPost(
+                "undoRunLap",
+                {
+                    testId:
+                        currentTestId
+                }
+            );
+
+
+        if (!result.success) {
+
+            showTestMessage(
+                result.message ||
+                "Nothing to undo.",
+                "error"
+            );
+
+        }
+
+        else {
+
+            showTestMessage(
+                "Removed " +
+                result.runnerId +
+                " Lap " +
+                result.removedLap +
+                ".",
+                "info"
+            );
+
+        }
+
+
+        await refreshTest();
+
+    }
+
+    catch (error) {
+
+        showTestMessage(
+            "Unable to undo. Connection lost.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        requestInProgress =
+            false;
+
+        updateControls();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   END TEST
+========================================================= */
+
+async function endTest() {
+
+    if (
+        requestInProgress ||
+        !connected ||
+        !currentTestId ||
+        !currentTest
+    ) {
+        return;
+    }
+
+
+    if (
+        currentTest.status ===
+        "ENDED"
+    ) {
+        return;
+    }
+
+
+    const message =
+        currentTest.status ===
+        "READY"
+
+        ? "End this test without starting it?"
+
+        : "END the 2-mile run for everyone? Any runners below 8 laps will be marked INCOMPLETE.";
+
+
+    if (
+        !confirm(message)
+    ) {
+        return;
+    }
+
+
+    requestInProgress =
+        true;
+
+    updateControls();
+
+
+    try {
+
+        const result =
+            await apiPost(
+                "endRunTest",
+                {
+                    testId:
+                        currentTestId
+                }
+            );
+
+
+        if (!result.success) {
+
+            showTestMessage(
+                result.message ||
+                "Unable to end test.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        await refreshTest();
+
+    }
+
+    catch (error) {
+
+        showTestMessage(
+            "Connection error. End Test was not confirmed.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        requestInProgress =
+            false;
+
+        updateControls();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   RUNNER CARDS
+========================================================= */
+
+function renderRunnerCards() {
+
+    const grid =
+        document.getElementById(
+            "runnerGrid"
+        );
+
+
+    grid.innerHTML =
+        "";
+
+
+    runners.forEach(
+        runner => {
+
+            const card =
+                document.createElement(
+                    "button"
+                );
+
+
+            card.type =
+                "button";
+
+            card.className =
+                "runner-card";
+
+
+            const lapCount =
+                runner.laps.length;
+
+
+            const finished =
+                lapCount >=
+                TOTAL_LAPS;
+
+
+            if (
+                !currentTest ||
+                currentTest.status !==
+                    "RUNNING"
+            ) {
+
+                card.classList.add(
+                    "waiting"
+                );
+
+            }
+
+
+            if (finished) {
+
+                card.classList.add(
+                    "finished"
+                );
+
+            }
+
+
+            card.disabled =
+                !connected ||
+                requestInProgress ||
+                !currentTest ||
+                currentTest.status !==
+                    "RUNNING" ||
+                finished;
+
+
+            card.onclick =
+                () =>
+                    recordLap(
+                        runner.id
+                    );
+
+
+            let lastLapText =
+                "--:--.-";
+
+            let totalText =
+                "--:--.-";
+
+
+            if (
+                lapCount > 0
+            ) {
+
+                const last =
+                    runner.laps[
+                        lapCount - 1
+                    ];
+
+
+                totalText =
+                    formatTime(
+                        last.elapsedMs
+                    );
+
+
+                if (
+                    lapCount === 1
+                ) {
+
+                    lastLapText =
+                        formatTime(
+                            last.elapsedMs
+                        );
+
+                }
+
+                else {
+
+                    const previous =
+                        runner.laps[
+                            lapCount - 2
+                        ];
+
+
+                    lastLapText =
+                        formatTime(
+                            last.elapsedMs -
+                            previous.elapsedMs
+                        );
+
+                }
+
+            }
+
+
+            card.innerHTML = `
+
+                <div class="runner-id">
+                    ${escapeHtml(runner.id)}
+                </div>
+
+                <div class="runner-lap">
+                    LAP ${lapCount}/${TOTAL_LAPS}
+                </div>
+
+                <div class="runner-times">
+
+                    <div>
+
+                        <div class="time-label">
+                            LAST LAP
+                        </div>
+
+                        <div class="time-value">
+                            ${lastLapText}
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="time-label">
+                            TOTAL
+                        </div>
+
+                        <div class="time-value">
+                            ${totalText}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                ${
+                    finished
+                    ? `
+                        <div class="finished-label">
+                            ✓ FINISHED
+                        </div>
+                      `
+                    : ""
+                }
+
+            `;
+
+
+            grid.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+function updateControls() {
+
+    const startButton =
+        document.getElementById(
+            "startButton"
+        );
+
+    const undoButton =
+        document.getElementById(
+            "undoButton"
+        );
+
+    const endButton =
+        document.getElementById(
+            "endButton"
+        );
+
+
+    if (!currentTest) {
+
+        startButton.disabled =
+            true;
+
+        undoButton.disabled =
+            true;
+
+        endButton.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    const status =
+        currentTest.status;
+
+
+    document.getElementById(
+        "testStatus"
+    ).textContent =
+        status;
+
+
+    startButton.style.display =
+        status === "READY"
+            ? "block"
+            : "none";
+
+
+    startButton.disabled =
+        !connected ||
+        requestInProgress ||
+        status !== "READY";
+
+
+    undoButton.disabled =
+        !connected ||
+        requestInProgress ||
+        status !== "RUNNING" ||
+        getTotalEventCount() === 0;
+
+
+    endButton.disabled =
+        !connected ||
+        requestInProgress ||
+        status === "ENDED";
+
+
+    /*
+      Re-render so cards also react
+      immediately to connection status.
+    */
+
+    const cards =
+        document.querySelectorAll(
+            ".runner-card"
+        );
+
+
+    cards.forEach(
+        card => {
+
+            const runnerId =
+                card
+                    .querySelector(
+                        ".runner-id"
+                    )
+                    ?.textContent
+                    .trim();
+
+
+            const runner =
+                runners.find(
+                    r =>
+                        r.id ===
+                        runnerId
+                );
+
+
+            const finished =
+                runner &&
+                runner.laps.length >=
+                    TOTAL_LAPS;
+
+
+            card.disabled =
+                !connected ||
+                requestInProgress ||
+                status !== "RUNNING" ||
+                finished;
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   MASTER TIMER
+========================================================= */
+
+function startDisplayTimer() {
+
+    if (displayTimer) {
+        clearInterval(
+            displayTimer
+        );
+    }
+
+
+    displayTimer =
+        setInterval(
+            updateMasterTimer,
+            50
+        );
+
+}
+
+
+function updateMasterTimer() {
+
+    const timer =
+        document.getElementById(
+            "masterTimer"
+        );
+
+
+    if (!currentTest) {
+
+        timer.textContent =
+            "00:00.0";
+
+        return;
+
+    }
+
+
+    if (
+        currentTest.status ===
+        "READY"
+    ) {
+
+        timer.textContent =
+            "00:00.0";
+
+        return;
+
+    }
+
+
+    if (
+        currentTest.status ===
+            "RUNNING" &&
+        currentTest.startTime
+    ) {
+
+        const elapsed =
+            Math.max(
+                0,
+                getServerNow() -
+                Number(
+                    currentTest.startTime
+                )
+            );
+
+
+        timer.textContent =
+            formatTime(
+                elapsed
+            );
+
+        return;
+
+    }
+
+
+    if (
+        currentTest.status ===
+            "ENDED" &&
+        currentTest.startTime &&
+        currentTest.endTime
+    ) {
+
+        timer.textContent =
+            formatTime(
+                Number(
+                    currentTest.endTime
+                ) -
+                Number(
+                    currentTest.startTime
+                )
+            );
+
+        return;
+
+    }
+
+
+    timer.textContent =
+        "00:00.0";
+
+}
+
+
+
+/* =========================================================
+   POLLING
+========================================================= */
+
+function startPolling() {
+
+    if (pollTimer) {
+
+        clearInterval(
+            pollTimer
+        );
+
+    }
+
+
+    pollTimer =
+        setInterval(
+            pollServer,
+            POLL_INTERVAL
+        );
+
+}
+
+
+async function pollServer() {
+
+    /*
+      Don't poll over a lap write,
+      undo, start or end request.
+    */
+
+    if (requestInProgress) {
+        return;
+    }
+
+
+    try {
+
+        if (currentTestId) {
+
+            const result =
+                await apiGet(
+                    "getRunTest",
+                    {
+                        testId:
+                            currentTestId
+                    }
+                );
+
+
+            if (result.success) {
+
+                applyTestState(
+                    result
+                );
+
+            }
+
+        }
+
+        else {
+
+            const result =
+                await apiGet(
+                    "getActiveRunTest"
+                );
+
+
+            if (
+                result.success &&
+                result.active &&
+                result.test
+            ) {
+
+                currentTestId =
+                    result.test.testId;
+
+                applyTestState(
+                    result
+                );
+
+            }
+
+        }
+
+    }
+
+    catch (error) {
+
+        /*
+          apiGet already changes the
+          interface to CONNECTION LOST.
+        */
+
+    }
+
+}
+
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+function showResults() {
+
+    const panel =
+        document.getElementById(
+            "resultsPanel"
+        );
+
+
+    const list =
+        document.getElementById(
+            "resultsList"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    runners.forEach(
+        runner => {
+
+            const result =
+                document.createElement(
+                    "div"
+                );
+
+
+            result.className =
+                "result-card";
+
+
+            const lapCount =
+                runner.laps.length;
+
+
+            const finished =
+                lapCount >=
+                    TOTAL_LAPS;
+
+
+            let finishText =
+                "INCOMPLETE";
+
+
+            if (finished) {
+
+                finishText =
+                    formatTime(
+                        runner
+                            .laps[
+                                TOTAL_LAPS - 1
+                            ]
+                            .elapsedMs
+                    );
+
+            }
+
+
+            let history =
+                "";
+
+
+            runner.laps.forEach(
+                (
+                    lap,
+                    index
+                ) => {
+
+                    let split =
+                        lap.elapsedMs;
+
+
+                    if (index > 0) {
+
+                        split =
+                            lap.elapsedMs -
+                            runner
+                                .laps[
+                                    index - 1
+                                ]
+                                .elapsedMs;
+
+                    }
+
+
+                    history += `
+
+                        <div>
+
+                            Lap ${lap.lap}:
+                            ${formatTime(split)}
+
+                            —
+                            Total
+                            ${formatTime(
+                                lap.elapsedMs
+                            )}
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+
+            if (!history) {
+
+                history =
+                    "<div>No laps recorded.</div>";
+
+            }
+
+
+            result.innerHTML = `
+
+                <div class="result-title">
+                    ${escapeHtml(runner.id)}
+                </div>
+
+                <div class="result-finish">
+                    ${
+                        finished
+                        ? "Finish: " +
+                          finishText
+                        : "INCOMPLETE"
+                    }
+                </div>
+
+                <div>
+                    ${lapCount} of
+                    ${TOTAL_LAPS} laps
+                </div>
+
+                <div class="lap-history">
+                    ${history}
+                </div>
+
+            `;
+
+
+            list.appendChild(
+                result
+            );
+
+        }
+    );
+
+
+    panel.style.display =
+        "block";
+
+}
+
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function showSetup() {
+
+    document.getElementById(
+        "setupPanel"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "testScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "resultsPanel"
+    ).style.display =
+        "none";
+
+}
+
+
+function showTestScreen() {
+
+    document.getElementById(
+        "setupPanel"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "testScreen"
+    ).style.display =
+        "block";
+
+}
+
+
+function showSetupMessage(
+    text,
+    type
+) {
+
+    const box =
+        document.getElementById(
+            "setupMessage"
+        );
+
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+
+}
+
+
+function showTestMessage(
+    text,
+    type
+) {
+
+    const box =
+        document.getElementById(
+            "testMessage"
+        );
+
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+
+
+    setTimeout(
+        () => {
+
+            if (
+                box.textContent ===
+                text
+            ) {
+
+                box.className =
+                    "message";
+
+                box.textContent =
+                    "";
+
+            }
+
+        },
+        4000
+    );
+
+}
+
+
+function setBusy(
+    show,
+    text = "Working..."
+) {
+
+    const busy =
+        document.getElementById(
+            "busy"
+        );
+
+
+    busy.textContent =
+        text;
+
+
+    if (show) {
+
+        busy.classList.add(
+            "show"
+        );
+
+    }
+
+    else {
+
+        busy.classList.remove(
+            "show"
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getTotalEventCount() {
+
+    return runners.reduce(
+        (
+            total,
+            runner
+        ) =>
+            total +
+            runner.laps.length,
+        0
+    );
+
+}
+
+
+function formatTime(ms) {
+
+    ms =
+        Math.max(
+            0,
+            Number(ms) || 0
+        );
+
+
+    const totalTenths =
+        Math.floor(
+            ms / 100
+        );
+
+
+    const tenths =
+        totalTenths % 10;
+
+
+    const totalSeconds =
+        Math.floor(
+            totalTenths / 10
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    const minutes =
+        Math.floor(
+            totalSeconds / 60
+        );
+
+
+    return (
+        String(minutes)
+            .padStart(2, "0") +
+        ":" +
+        String(seconds)
+            .padStart(2, "0") +
+        "." +
+        tenths
+    );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+</script>
+
+</body>
+</html>
