@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v8";
+const CACHE_NAME = "efc-tools-v9";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -42,6 +42,7 @@ const CORE_FILES = [
 // -------------------------
 
 self.addEventListener("install", event => {
+
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(CORE_FILES);
@@ -49,6 +50,7 @@ self.addEventListener("install", event => {
   );
 
   self.skipWaiting();
+
 });
 
 
@@ -57,17 +59,25 @@ self.addEventListener("install", event => {
 // -------------------------
 
 self.addEventListener("activate", event => {
+
   event.waitUntil(
+
     caches.keys().then(keys => {
+
       return Promise.all(
+
         keys
           .filter(key => key !== CACHE_NAME)
           .map(key => caches.delete(key))
+
       );
+
     })
+
   );
 
   self.clients.claim();
+
 });
 
 
@@ -77,10 +87,48 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
 
-  // Only cache GET requests
+  // Only handle GET requests
   if (event.request.method !== "GET") {
     return;
   }
+
+
+  const url = new URL(event.request.url);
+
+
+  // -------------------------------------------------
+  // 2-MILE RUN COUNTER
+  //
+  // This tool must always be online.
+  // Do NOT serve it from cache and do NOT save it
+  // to the cache.
+  // -------------------------------------------------
+
+  if (
+    url.origin === self.location.origin &&
+    url.pathname.includes(
+      "/Facility%20Manager/FAC/2%20Mile%20Run/"
+    )
+  ) {
+
+    event.respondWith(
+      fetch(event.request, {
+        cache: "no-store"
+      })
+    );
+
+    return;
+
+  }
+
+
+  // -------------------------------------------------
+  // NORMAL EFC TOOLS
+  //
+  // Network first.
+  // Save successful responses for offline use.
+  // If the network fails, use the cached version.
+  // -------------------------------------------------
 
   event.respondWith(
 
@@ -88,18 +136,27 @@ self.addEventListener("fetch", event => {
 
       .then(response => {
 
-        // Only cache successful same-origin responses
+        // Only cache successful
+        // same-origin responses
         if (
           response &&
           response.status === 200 &&
           response.type === "basic"
         ) {
 
-          const responseCopy = response.clone();
+          const responseCopy =
+            response.clone();
 
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseCopy);
-          });
+
+          caches.open(CACHE_NAME)
+            .then(cache => {
+
+              cache.put(
+                event.request,
+                responseCopy
+              );
+
+            });
 
         }
 
@@ -107,9 +164,15 @@ self.addEventListener("fetch", event => {
 
       })
 
-      // If internet isn't available, use cached version
+
+      // If internet isn't available,
+      // use cached version
       .catch(() => {
-        return caches.match(event.request);
+
+        return caches.match(
+          event.request
+        );
+
       })
 
   );
