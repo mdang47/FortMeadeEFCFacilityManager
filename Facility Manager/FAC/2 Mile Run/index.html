@@ -870,6 +870,82 @@ button:disabled {
 }
 
 
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>2-Mile Run Counter</h1>
+    <div class="subtitle">Shared live lap counter for FAC testing</div>
+  </div>
+
+  <div class="connection-bar">
+    <div id="connectionStatus" class="connection-status offline">● CONNECTING...</div>
+  </div>
+
+  <section id="setupPanel" class="panel">
+    <h2 class="panel-title">Runner Setup</h2>
+    <div id="runnerEntries"></div>
+    <div class="setup-actions">
+      <button type="button" class="secondary-btn" onclick="addRunnerEntry()">+ ADD RUNNER</button>
+      <button type="button" class="primary-btn" onclick="loadTest()">LOAD TEST</button>
+    </div>
+    <div id="setupMessage" class="message"></div>
+  </section>
+
+  <section id="testScreen" class="test-screen">
+    <div class="panel">
+      <div id="testStatus" class="test-status">READY</div>
+      <div id="masterTimer" class="master-timer">00:00.0</div>
+      <button id="startButton" type="button" class="start-btn" onclick="startClock()">START CLOCK</button>
+
+      <div id="counterInfo" class="counter-info"></div>
+
+      <div class="runner-view-controls">
+        <div class="view-toggle">
+          <button id="myRunnersToggle" type="button" onclick="setRunnerView('my')">MY RUNNERS</button>
+          <button id="allRunnersToggle" type="button" class="active" onclick="setRunnerView('all')">ALL RUNNERS</button>
+        </div>
+        <button id="chooseRunnersButton" type="button" class="choose-runners-btn" onclick="toggleRunnerSelector()">CHOOSE MY RUNNERS</button>
+        <div id="assignmentSummary" class="assignment-summary"></div>
+      </div>
+
+      <div id="runnerSelector" class="runner-selector">
+        <div class="runner-selector-title">Choose My Runners</div>
+        <div class="runner-selector-help">Select the runners assigned to this counter.</div>
+        <div id="runnerSelectorGrid" class="runner-selector-grid"></div>
+        <div class="selector-actions">
+          <button type="button" class="secondary-btn" onclick="clearMyRunners()">CLEAR</button>
+          <button type="button" class="primary-btn" onclick="saveMyRunners()">DONE</button>
+        </div>
+      </div>
+
+      <div id="runnerGrid" class="runner-grid"></div>
+
+      <div class="test-controls">
+        <button id="undoButton" type="button" class="secondary-btn" onclick="undoLastTap()">UNDO LAST TAP</button>
+        <button id="endButton" type="button" class="danger-btn" onclick="endTest()">END TEST</button>
+      </div>
+
+      <div id="testMessage" class="message"></div>
+    </div>
+  </section>
+
+  <section id="resultsPanel" class="panel results">
+    <h2 class="panel-title">Results</h2>
+    <div id="resultsList"></div>
+  </section>
+
+</div>
+
+<div id="lapConfirmation" class="lap-confirmation"></div>
+<div id="busy" class="busy">Working...</div>
+
+<script>
+
 /* =========================================================
    CONFIGURATION
 ========================================================= */
