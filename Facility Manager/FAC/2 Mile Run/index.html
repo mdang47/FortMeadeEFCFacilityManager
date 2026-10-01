@@ -190,7 +190,7 @@ button:disabled {
 
 
 /* =========================
-   ERROR
+   MESSAGE
 ========================= */
 
 .message {
@@ -211,6 +211,12 @@ button:disabled {
     display: block;
     background: #e8f1f8;
     color: var(--navy2);
+}
+
+.message.success {
+    display: block;
+    background: #dff6e8;
+    color: #146c3b;
 }
 
 
@@ -265,6 +271,128 @@ button:disabled {
 
 
 /* =========================
+   RUNNER VIEW CONTROLS
+========================= */
+
+.runner-view-controls {
+    margin-bottom: 18px;
+}
+
+.view-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+    background: #e8eef4;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.view-toggle button {
+    min-height: 46px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--navy);
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.view-toggle button.active {
+    background: var(--navy2);
+    color: white;
+}
+
+.choose-runners-btn {
+    display: none;
+    width: 100%;
+    max-width: 520px;
+    margin: 10px auto 0;
+    min-height: 48px;
+    border: 1px solid var(--navy2);
+    border-radius: 8px;
+    background: white;
+    color: var(--navy2);
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.assignment-summary {
+    display: none;
+    text-align: center;
+    margin-top: 8px;
+    color: #667085;
+    font-size: 13px;
+}
+
+
+/* =========================
+   RUNNER SELECTOR
+========================= */
+
+.runner-selector {
+    display: none;
+    margin: 0 auto 18px;
+    max-width: 720px;
+    padding: 16px;
+    background: #f7f9fb;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.runner-selector.show {
+    display: block;
+}
+
+.runner-selector-title {
+    text-align: center;
+    font-weight: bold;
+    color: var(--navy);
+    margin-bottom: 5px;
+}
+
+.runner-selector-help {
+    text-align: center;
+    color: #667085;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+.runner-selector-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(95px, 1fr));
+    gap: 8px;
+}
+
+.runner-select-btn {
+    min-height: 55px;
+    border-radius: 9px;
+    border: 2px solid #c7d5e2;
+    background: white;
+    color: var(--navy);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.runner-select-btn.selected {
+    border-color: var(--navy2);
+    background: var(--navy2);
+    color: white;
+}
+
+.selector-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+
+/* =========================
    RUNNER GRID
 ========================= */
 
@@ -278,7 +406,7 @@ button:disabled {
 .runner-card {
     position: relative;
     min-height: 235px;
-    border: 3px solid var(--navy2);
+    border: 4px solid var(--navy2);
     border-radius: 14px;
     background: white;
     padding: 18px;
@@ -286,9 +414,21 @@ button:disabled {
     cursor: pointer;
     touch-action: manipulation;
     user-select: none;
+    overflow: hidden;
     transition:
         transform .08s ease,
-        opacity .15s ease;
+        opacity .15s ease,
+        box-shadow .15s ease;
+}
+
+.runner-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 11px;
+    background: var(--runner-color, var(--navy2));
 }
 
 .runner-card:active:not(:disabled) {
@@ -309,11 +449,22 @@ button:disabled {
     opacity: 1;
 }
 
+.runner-card.finished::before {
+    background: var(--green);
+}
+
+.runner-card.just-recorded {
+    box-shadow:
+        0 0 0 5px rgba(29, 122, 70, .20),
+        0 5px 18px rgba(0,0,0,.15);
+}
+
 .runner-id {
     font-size: 42px;
     line-height: 1;
     font-weight: 800;
     color: var(--navy);
+    margin-top: 5px;
 }
 
 .runner-lap {
@@ -346,6 +497,55 @@ button:disabled {
     margin-top: 10px;
     color: var(--green);
     font-weight: bold;
+}
+
+.no-runners-message {
+    grid-column: 1 / -1;
+    padding: 30px 15px;
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    text-align: center;
+    color: #667085;
+}
+
+.no-runners-message strong {
+    display: block;
+    color: var(--navy);
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+
+/* =========================
+   LAP CONFIRMATION
+========================= */
+
+.lap-confirmation {
+    position: fixed;
+    left: 50%;
+    top: 20px;
+    transform: translate(-50%, -120px);
+    z-index: 2000;
+    min-width: 280px;
+    max-width: calc(100% - 30px);
+    padding: 15px 22px;
+    border-radius: 12px;
+    background: var(--green);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.25);
+    opacity: 0;
+    transition:
+        transform .18s ease,
+        opacity .18s ease;
+    pointer-events: none;
+}
+
+.lap-confirmation.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
 }
 
 
@@ -462,6 +662,10 @@ button:disabled {
         font-size: 17px;
     }
 
+    .test-controls {
+        grid-template-columns: 1fr;
+    }
+
 }
 
 </style>
@@ -473,9 +677,7 @@ button:disabled {
 <div class="container">
 
 
-<!-- =========================
-     HEADER
-========================= -->
+<!-- HEADER -->
 
 <div class="header">
 
@@ -501,9 +703,7 @@ button:disabled {
 
 
 
-<!-- =========================
-     SETUP
-========================= -->
+<!-- SETUP -->
 
 <section
     id="setupPanel"
@@ -518,7 +718,6 @@ button:disabled {
         Enter each runner's jersey color and number.
     </p>
 
-
     <div id="runnerEntries"></div>
 
 
@@ -530,7 +729,6 @@ button:disabled {
         >
             + Add Runner
         </button>
-
 
         <button
             id="loadTestButton"
@@ -552,91 +750,181 @@ button:disabled {
 
 
 
-<!-- =========================
-     TEST SCREEN
-========================= -->
+<!-- TEST SCREEN -->
 
 <section
     id="testScreen"
     class="test-screen"
 >
 
-
-    <section class="panel">
-
-        <div
-            id="testStatus"
-            class="test-status"
-        >
-            READY
-        </div>
+<section class="panel">
 
 
-        <div
-            id="masterTimer"
-            class="master-timer"
-        >
-            00:00.0
+    <div
+        id="testStatus"
+        class="test-status"
+    >
+        READY
+    </div>
+
+
+    <div
+        id="masterTimer"
+        class="master-timer"
+    >
+        00:00.0
+    </div>
+
+
+    <button
+        id="startButton"
+        class="start-btn"
+        onclick="startClock()"
+    >
+        START CLOCK
+    </button>
+
+
+    <div
+        id="counterInfo"
+        class="counter-info"
+    ></div>
+
+
+
+    <!-- RUNNER VIEW -->
+
+    <div class="runner-view-controls">
+
+        <div class="view-toggle">
+
+            <button
+                id="myRunnersToggle"
+                type="button"
+                onclick="setRunnerView('my')"
+            >
+                MY RUNNERS
+            </button>
+
+            <button
+                id="allRunnersToggle"
+                type="button"
+                class="active"
+                onclick="setRunnerView('all')"
+            >
+                ALL RUNNERS
+            </button>
+
         </div>
 
 
         <button
-            id="startButton"
-            class="start-btn"
-            onclick="startClock()"
+            id="chooseRunnersButton"
+            type="button"
+            class="choose-runners-btn"
+            onclick="toggleRunnerSelector()"
         >
-            START CLOCK
+            CHOOSE MY RUNNERS
         </button>
 
 
         <div
-            id="counterInfo"
-            class="counter-info"
+            id="assignmentSummary"
+            class="assignment-summary"
         ></div>
 
-
-        <div
-            id="runnerGrid"
-            class="runner-grid"
-        ></div>
+    </div>
 
 
-        <div class="test-controls">
 
-            <button
-                id="undoButton"
-                class="secondary-btn"
-                onclick="undoLastTap()"
-            >
-                ↶ UNDO LAST TAP
-            </button>
+    <!-- RUNNER SELECTOR -->
 
+    <div
+        id="runnerSelector"
+        class="runner-selector"
+    >
 
-            <button
-                id="endButton"
-                class="danger-btn"
-                onclick="endTest()"
-            >
-                END TEST
-            </button>
+        <div class="runner-selector-title">
+            Choose My Runners
+        </div>
 
+        <div class="runner-selector-help">
+            Select the runners you are responsible for on this device.
         </div>
 
 
         <div
-            id="testMessage"
-            class="message"
+            id="runnerSelectorGrid"
+            class="runner-selector-grid"
         ></div>
 
-    </section>
+
+        <div class="selector-actions">
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="clearMyRunners()"
+            >
+                CLEAR
+            </button>
+
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="saveMyRunners()"
+            >
+                DONE
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <div
+        id="runnerGrid"
+        class="runner-grid"
+    ></div>
+
+
+
+    <div class="test-controls">
+
+        <button
+            id="undoButton"
+            class="secondary-btn"
+            onclick="undoLastTap()"
+        >
+            ↶ UNDO LAST TAP
+        </button>
+
+
+        <button
+            id="endButton"
+            class="danger-btn"
+            onclick="endTest()"
+        >
+            END TEST
+        </button>
+
+    </div>
+
+
+    <div
+        id="testMessage"
+        class="message"
+    ></div>
+
+
+</section>
 
 </section>
 
 
 
-<!-- =========================
-     RESULTS
-========================= -->
+<!-- RESULTS -->
 
 <section
     id="resultsPanel"
@@ -656,12 +944,23 @@ button:disabled {
 
 
 
+<!-- BUSY -->
+
 <div
     id="busy"
     class="busy"
 >
     Working...
 </div>
+
+
+
+<!-- LAP CONFIRMATION -->
+
+<div
+    id="lapConfirmation"
+    class="lap-confirmation"
+></div>
 
 
 
@@ -676,15 +975,6 @@ const API_URL =
 
 
 const TOTAL_LAPS = 8;
-
-
-/*
-  Polling is only for synchronizing
-  state between counter tablets.
-
-  The visible timer animates locally
-  between server syncs.
-*/
 
 const POLL_INTERVAL = 1000;
 
@@ -712,13 +1002,26 @@ let displayTimer = null;
 
 
 /*
-  Each tablet gets a permanent
-  counter identifier.
-
-  This is NOT runner/test data.
-  It only identifies which counter
-  recorded an event.
+  "all" = show everybody
+  "my"  = only runners selected
+          on this device
 */
+
+let runnerView = "all";
+
+let myRunnerIds = [];
+
+let pendingRunnerIds = [];
+
+let lastRecordedRunnerId = null;
+
+let lapConfirmationTimer = null;
+
+
+
+/* =========================================================
+   COUNTER ID
+========================================================= */
 
 let counterId =
     localStorage.getItem(
@@ -750,22 +1053,36 @@ if (!counterId) {
 const colors = [
 
     ["R", "Red"],
-
     ["B", "Blue"],
-
     ["Y", "Yellow"],
-
     ["G", "Green"],
-
     ["O", "Orange"],
-
     ["P", "Purple"],
-
     ["BK", "Black"],
-
     ["W", "White"]
 
 ];
+
+
+const runnerColorValues = {
+
+    R: "#d92d20",
+
+    B: "#2e6fbb",
+
+    Y: "#f2c94c",
+
+    G: "#2f855a",
+
+    O: "#ed7d31",
+
+    P: "#805ad5",
+
+    BK: "#202124",
+
+    W: "#c5cbd3"
+
+};
 
 
 
@@ -891,10 +1208,12 @@ async function apiGet(
 
 
         if (!response.ok) {
+
             throw new Error(
                 "Server returned " +
                 response.status
             );
+
         }
 
 
@@ -955,10 +1274,12 @@ async function apiPost(
 
 
         if (!response.ok) {
+
             throw new Error(
                 "Server returned " +
                 response.status
             );
+
         }
 
 
@@ -1002,12 +1323,6 @@ function syncServerClock(data) {
         return;
     }
 
-
-    /*
-      serverOffset lets the tablet
-      approximate server time even if
-      its own clock is slightly different.
-    */
 
     serverOffset =
         Number(data.serverTime) -
@@ -1189,13 +1504,6 @@ async function loadTest() {
         }
 
 
-        /*
-          Require digits only.
-
-          Prevents values such as:
-          7abc
-    */
-
         if (
             !/^\d+$/.test(
                 rawNumber
@@ -1308,11 +1616,6 @@ async function loadTest() {
 
         if (!result.success) {
 
-            /*
-              Another counter may have
-              created the test first.
-            */
-
             if (result.testId) {
 
                 await joinTest(
@@ -1339,8 +1642,10 @@ async function loadTest() {
             result.testId;
 
 
-        await refreshTest();
+        loadRunnerPreferences();
 
+
+        await refreshTest();
 
     }
 
@@ -1386,6 +1691,10 @@ async function findActiveTest() {
             currentTestId =
                 result.test.testId;
 
+
+            loadRunnerPreferences();
+
+
             applyTestState(
                 result
             );
@@ -1423,6 +1732,10 @@ async function joinTest(
 
     currentTestId =
         testId;
+
+
+    loadRunnerPreferences();
+
 
     await refreshTest();
 
@@ -1483,11 +1796,36 @@ function applyTestState(data) {
     }
 
 
+    const incomingTestId =
+        data.test.testId;
+
+
+    /*
+      If we have moved to a different
+      test, load that test's local
+      runner assignments.
+    */
+
+    if (
+        currentTestId !==
+        incomingTestId
+    ) {
+
+        currentTestId =
+            incomingTestId;
+
+        loadRunnerPreferences();
+
+    }
+
+
     currentTest =
         data.test;
 
+
     currentTestId =
-        data.test.testId;
+        incomingTestId;
+
 
     runners =
         Array.isArray(data.runners)
@@ -1495,9 +1833,28 @@ function applyTestState(data) {
             : [];
 
 
+    /*
+      Remove IDs that are no longer
+      part of this test.
+    */
+
+    myRunnerIds =
+        myRunnerIds.filter(
+            id =>
+                runners.some(
+                    runner =>
+                        runner.id === id
+                )
+        );
+
+
     showTestScreen();
 
+    renderRunnerSelector();
+
     renderRunnerCards();
+
+    updateRunnerViewControls();
 
     updateControls();
 
@@ -1519,6 +1876,432 @@ function applyTestState(data) {
             "none";
 
     }
+
+}
+
+
+
+/* =========================================================
+   MY RUNNERS STORAGE
+========================================================= */
+
+function getRunnerPreferenceKey() {
+
+    if (!currentTestId) {
+        return null;
+    }
+
+
+    return (
+        "twoMileMyRunners_" +
+        currentTestId
+    );
+
+}
+
+
+function getRunnerViewKey() {
+
+    if (!currentTestId) {
+        return null;
+    }
+
+
+    return (
+        "twoMileRunnerView_" +
+        currentTestId
+    );
+
+}
+
+
+function loadRunnerPreferences() {
+
+    const runnerKey =
+        getRunnerPreferenceKey();
+
+    const viewKey =
+        getRunnerViewKey();
+
+
+    myRunnerIds =
+        [];
+
+
+    if (runnerKey) {
+
+        try {
+
+            const saved =
+                JSON.parse(
+                    localStorage.getItem(
+                        runnerKey
+                    ) || "[]"
+                );
+
+
+            if (
+                Array.isArray(saved)
+            ) {
+
+                myRunnerIds =
+                    saved;
+
+            }
+
+        }
+
+        catch (error) {
+
+            myRunnerIds =
+                [];
+
+        }
+
+    }
+
+
+    const savedView =
+        viewKey
+            ? localStorage.getItem(
+                viewKey
+              )
+            : null;
+
+
+    runnerView =
+        savedView === "my"
+            ? "my"
+            : "all";
+
+}
+
+
+
+/* =========================================================
+   RUNNER VIEW
+========================================================= */
+
+function setRunnerView(view) {
+
+    runnerView =
+        view === "my"
+            ? "my"
+            : "all";
+
+
+    const viewKey =
+        getRunnerViewKey();
+
+
+    if (viewKey) {
+
+        localStorage.setItem(
+            viewKey,
+            runnerView
+        );
+
+    }
+
+
+    /*
+      If My Runners has never been
+      configured, immediately open
+      the selector.
+    */
+
+    if (
+        runnerView === "my" &&
+        myRunnerIds.length === 0
+    ) {
+
+        openRunnerSelector();
+
+    }
+
+
+    updateRunnerViewControls();
+
+    renderRunnerCards();
+
+}
+
+
+function updateRunnerViewControls() {
+
+    const myToggle =
+        document.getElementById(
+            "myRunnersToggle"
+        );
+
+    const allToggle =
+        document.getElementById(
+            "allRunnersToggle"
+        );
+
+    const chooseButton =
+        document.getElementById(
+            "chooseRunnersButton"
+        );
+
+    const summary =
+        document.getElementById(
+            "assignmentSummary"
+        );
+
+
+    myToggle.classList.toggle(
+        "active",
+        runnerView === "my"
+    );
+
+
+    allToggle.classList.toggle(
+        "active",
+        runnerView === "all"
+    );
+
+
+    if (
+        runnerView === "my"
+    ) {
+
+        chooseButton.style.display =
+            "block";
+
+        summary.style.display =
+            "block";
+
+
+        if (
+            myRunnerIds.length === 0
+        ) {
+
+            summary.textContent =
+                "No runners selected on this device.";
+
+        }
+
+        else {
+
+            summary.textContent =
+                "Assigned: " +
+                myRunnerIds.join(", ");
+
+        }
+
+    }
+
+    else {
+
+        chooseButton.style.display =
+            "none";
+
+        summary.style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   RUNNER SELECTOR
+========================================================= */
+
+function toggleRunnerSelector() {
+
+    const selector =
+        document.getElementById(
+            "runnerSelector"
+        );
+
+
+    if (
+        selector.classList.contains(
+            "show"
+        )
+    ) {
+
+        closeRunnerSelector();
+
+    }
+
+    else {
+
+        openRunnerSelector();
+
+    }
+
+}
+
+
+function openRunnerSelector() {
+
+    pendingRunnerIds =
+        [...myRunnerIds];
+
+
+    renderRunnerSelector();
+
+
+    document.getElementById(
+        "runnerSelector"
+    ).classList.add(
+        "show"
+    );
+
+}
+
+
+function closeRunnerSelector() {
+
+    document.getElementById(
+        "runnerSelector"
+    ).classList.remove(
+        "show"
+    );
+
+}
+
+
+function renderRunnerSelector() {
+
+    const grid =
+        document.getElementById(
+            "runnerSelectorGrid"
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    grid.innerHTML =
+        "";
+
+
+    runners.forEach(
+        runner => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+            button.className =
+                "runner-select-btn";
+
+
+            if (
+                pendingRunnerIds.includes(
+                    runner.id
+                )
+            ) {
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+
+
+            button.textContent =
+                runner.id;
+
+
+            button.onclick =
+                () =>
+                    togglePendingRunner(
+                        runner.id
+                    );
+
+
+            grid.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+function togglePendingRunner(
+    runnerId
+) {
+
+    if (
+        pendingRunnerIds.includes(
+            runnerId
+        )
+    ) {
+
+        pendingRunnerIds =
+            pendingRunnerIds.filter(
+                id =>
+                    id !== runnerId
+            );
+
+    }
+
+    else {
+
+        pendingRunnerIds.push(
+            runnerId
+        );
+
+    }
+
+
+    renderRunnerSelector();
+
+}
+
+
+function clearMyRunners() {
+
+    pendingRunnerIds =
+        [];
+
+    renderRunnerSelector();
+
+}
+
+
+function saveMyRunners() {
+
+    myRunnerIds =
+        [...pendingRunnerIds];
+
+
+    const key =
+        getRunnerPreferenceKey();
+
+
+    if (key) {
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(
+                myRunnerIds
+            )
+        );
+
+    }
+
+
+    closeRunnerSelector();
+
+    updateRunnerViewControls();
+
+    renderRunnerCards();
 
 }
 
@@ -1636,12 +2419,6 @@ async function recordLap(
     }
 
 
-    /*
-      Prevent this tablet from sending
-      several taps while the previous
-      one is still being processed.
-    */
-
     requestInProgress =
         true;
 
@@ -1701,22 +2478,43 @@ async function recordLap(
 
         }
 
+        else {
+
+            /*
+              Only show confirmation after
+              the server says the lap was
+              successfully recorded.
+            */
+
+            lastRecordedRunnerId =
+                runnerId;
+
+
+            showLapConfirmation(
+                runnerId,
+                result.lap,
+                result.finished
+            );
+
+        }
+
 
         await refreshTest();
+
+
+        if (
+            result.success
+        ) {
+
+            flashRunnerCard(
+                runnerId
+            );
+
+        }
 
     }
 
     catch (error) {
-
-        /*
-          IMPORTANT:
-
-          We do NOT save this tap locally
-          or attempt to queue it.
-
-          This app is intentionally
-          online-only for official timing.
-        */
 
         showTestMessage(
             "CONNECTION LOST — lap was not confirmed. Check the runner before tapping again.",
@@ -1733,6 +2531,119 @@ async function recordLap(
         updateControls();
 
     }
+
+}
+
+
+
+/* =========================================================
+   LAP CONFIRMATION
+========================================================= */
+
+function showLapConfirmation(
+    runnerId,
+    lap,
+    finished
+) {
+
+    const confirmation =
+        document.getElementById(
+            "lapConfirmation"
+        );
+
+
+    if (finished) {
+
+        confirmation.textContent =
+            runnerId +
+            " — FINISHED";
+
+    }
+
+    else {
+
+        confirmation.textContent =
+            runnerId +
+            " — LAP " +
+            lap +
+            " RECORDED";
+
+    }
+
+
+    confirmation.classList.add(
+        "show"
+    );
+
+
+    if (lapConfirmationTimer) {
+
+        clearTimeout(
+            lapConfirmationTimer
+        );
+
+    }
+
+
+    lapConfirmationTimer =
+        setTimeout(
+            () => {
+
+                confirmation.classList.remove(
+                    "show"
+                );
+
+            },
+            1300
+        );
+
+}
+
+
+function flashRunnerCard(
+    runnerId
+) {
+
+    requestAnimationFrame(
+        () => {
+
+            const cards =
+                document.querySelectorAll(
+                    ".runner-card"
+                );
+
+
+            cards.forEach(
+                card => {
+
+                    if (
+                        card.dataset.runnerId ===
+                        runnerId
+                    ) {
+
+                        card.classList.add(
+                            "just-recorded"
+                        );
+
+
+                        setTimeout(
+                            () => {
+
+                                card.classList.remove(
+                                    "just-recorded"
+                                );
+
+                            },
+                            900
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
 
 }
 
@@ -1934,6 +2845,52 @@ async function endTest() {
    RUNNER CARDS
 ========================================================= */
 
+function getVisibleRunners() {
+
+    if (
+        runnerView === "all"
+    ) {
+
+        return runners;
+
+    }
+
+
+    return runners.filter(
+        runner =>
+            myRunnerIds.includes(
+                runner.id
+            )
+    );
+
+}
+
+
+function getRunnerColor(
+    runner
+) {
+
+    const code =
+        String(
+            runner.color || ""
+        ).toUpperCase();
+
+
+    return (
+        runnerColorValues[code] ||
+        varFallback()
+    );
+
+}
+
+
+function varFallback() {
+
+    return "#163b61";
+
+}
+
+
 function renderRunnerCards() {
 
     const grid =
@@ -1946,7 +2903,47 @@ function renderRunnerCards() {
         "";
 
 
-    runners.forEach(
+    const visibleRunners =
+        getVisibleRunners();
+
+
+    if (
+        visibleRunners.length === 0
+    ) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "no-runners-message";
+
+
+        empty.innerHTML = `
+
+            <strong>
+                No runners selected
+            </strong>
+
+            Choose the runners assigned
+            to this counter.
+
+        `;
+
+
+        grid.appendChild(
+            empty
+        );
+
+
+        return;
+
+    }
+
+
+    visibleRunners.forEach(
         runner => {
 
             const card =
@@ -1960,6 +2957,17 @@ function renderRunnerCards() {
 
             card.className =
                 "runner-card";
+
+            card.dataset.runnerId =
+                runner.id;
+
+
+            card.style.setProperty(
+                "--runner-color",
+                getRunnerColor(
+                    runner
+                )
+            );
 
 
             const lapCount =
@@ -2198,11 +3206,6 @@ function updateControls() {
         status === "ENDED";
 
 
-    /*
-      Re-render so cards also react
-      immediately to connection status.
-    */
-
     const cards =
         document.querySelectorAll(
             ".runner-card"
@@ -2213,12 +3216,12 @@ function updateControls() {
         card => {
 
             const runnerId =
-                card
-                    .querySelector(
-                        ".runner-id"
-                    )
-                    ?.textContent
-                    .trim();
+                card.dataset.runnerId;
+
+
+            if (!runnerId) {
+                return;
+            }
 
 
             const runner =
@@ -2255,9 +3258,11 @@ function updateControls() {
 function startDisplayTimer() {
 
     if (displayTimer) {
+
         clearInterval(
             displayTimer
         );
+
     }
 
 
@@ -2382,11 +3387,6 @@ function startPolling() {
 
 async function pollServer() {
 
-    /*
-      Don't poll over a lap write,
-      undo, start or end request.
-    */
-
     if (requestInProgress) {
         return;
     }
@@ -2433,6 +3433,10 @@ async function pollServer() {
                 currentTestId =
                     result.test.testId;
 
+
+                loadRunnerPreferences();
+
+
                 applyTestState(
                     result
                 );
@@ -2446,8 +3450,8 @@ async function pollServer() {
     catch (error) {
 
         /*
-          apiGet already changes the
-          interface to CONNECTION LOST.
+          apiGet already changes
+          connection state.
         */
 
     }
