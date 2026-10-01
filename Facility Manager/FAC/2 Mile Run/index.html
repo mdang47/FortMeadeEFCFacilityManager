@@ -620,351 +620,255 @@ button:disabled {
     display: flex;
 }
 
-
 /* =========================
-   MOBILE
+   MOBILE - COUNTER MODE
 ========================= */
 
 @media (max-width: 600px) {
 
     body {
-        padding: 10px;
+        padding: 6px;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    .header {
+        margin-bottom: 6px;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        display: none;
+    }
+
+    .connection-bar {
+        margin-bottom: 6px;
+    }
+
+    .connection-status {
+        padding: 4px 10px;
+        font-size: 11px;
     }
 
     .panel {
-        padding: 15px;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 10px;
     }
 
-    .runner-entry {
-        grid-template-columns: 1fr 1fr 45px;
+
+    /* -------------------------
+       MASTER CLOCK
+    ------------------------- */
+
+    .test-status {
+        font-size: 11px;
+        margin-bottom: 0;
     }
+
+    .master-timer {
+        font-size: 48px;
+        margin: 5px 0 8px;
+    }
+
+    .start-btn {
+        min-height: 60px;
+        margin-bottom: 10px;
+        font-size: 23px;
+    }
+
+
+    /* -------------------------
+       COUNTER INFORMATION
+    ------------------------- */
+
+    .counter-info {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+
+
+    /* -------------------------
+       MY / ALL RUNNERS
+    ------------------------- */
+
+    .runner-view-controls {
+        margin-bottom: 8px;
+    }
+
+    .view-toggle {
+        max-width: 100%;
+    }
+
+    .view-toggle button {
+        min-height: 36px;
+        font-size: 12px;
+    }
+
+    .choose-runners-btn {
+        min-height: 36px;
+        margin-top: 5px;
+        padding: 7px;
+        font-size: 12px;
+    }
+
+    .assignment-summary {
+        margin-top: 4px;
+        font-size: 10px;
+    }
+
+
+    /* -------------------------
+       RUNNER SELECTOR
+    ------------------------- */
+
+    .runner-selector {
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    .runner-selector-grid {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+
+    /* -------------------------
+       RUNNER GRID
+    ------------------------- */
 
     .runner-grid {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
-        gap: 9px;
+
+        gap: 7px;
     }
+
+
+    /* -------------------------
+       RUNNER CARD
+    ------------------------- */
 
     .runner-card {
-        min-height: 190px;
-        padding: 12px 7px;
+        min-height: 170px;
+        padding: 0 6px 8px;
+        border-width: 3px;
+        border-radius: 11px;
     }
+
+
+    /*
+      Make the jersey-color area
+      much more prominent.
+    */
+
+    .runner-card::before {
+        height: 12px;
+    }
+
+
+    /* -------------------------
+       RUNNER ID
+    ------------------------- */
 
     .runner-id {
-        font-size: 34px;
+        margin-top: 19px;
+        font-size: 48px;
+        line-height: .95;
+        font-weight: 900;
+        letter-spacing: -1px;
     }
 
+
+    /* -------------------------
+       LAP NUMBER
+    ------------------------- */
+
     .runner-lap {
-        font-size: 20px;
+        margin-top: 7px;
+        font-size: 22px;
+        line-height: 1;
+        font-weight: 900;
+    }
+
+
+    /* -------------------------
+       TIMES
+    ------------------------- */
+
+    .runner-times {
+        gap: 3px;
+        margin-top: 12px;
+        padding-top: 8px;
+        border-top: 1px solid #d8dee5;
+    }
+
+    .time-label {
+        font-size: 9px;
     }
 
     .time-value {
-        font-size: 17px;
+        margin-top: 2px;
+        font-size: 16px;
     }
 
+
+    /* -------------------------
+       FINISHED
+    ------------------------- */
+
+    .finished-label {
+        margin-top: 6px;
+        font-size: 12px;
+    }
+
+
+    /* -------------------------
+       BOTTOM CONTROLS
+    ------------------------- */
+
     .test-controls {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .test-controls button {
+        min-height: 44px;
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+
+
+    /* -------------------------
+       MESSAGES
+    ------------------------- */
+
+    .message {
+        margin-top: 7px;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+
+    /* -------------------------
+       LAP CONFIRMATION
+    ------------------------- */
+
+    .lap-confirmation {
+        top: 10px;
+        min-width: 240px;
+        padding: 12px 16px;
+        font-size: 17px;
     }
 
 }
 
-</style>
-</head>
-
-
-<body>
-
-<div class="container">
-
-
-<!-- HEADER -->
-
-<div class="header">
-
-    <h1>2-Mile Run Counter</h1>
-
-    <div class="subtitle">
-        707 FSS Fitness Assessment Cell
-    </div>
-
-</div>
-
-
-<div class="connection-bar">
-
-    <div
-        id="connectionStatus"
-        class="connection-status offline"
-    >
-        CONNECTING...
-    </div>
-
-</div>
-
-
-
-<!-- SETUP -->
-
-<section
-    id="setupPanel"
-    class="panel"
->
-
-    <h2 class="panel-title">
-        Runner Setup
-    </h2>
-
-    <p>
-        Enter each runner's jersey color and number.
-    </p>
-
-    <div id="runnerEntries"></div>
-
-
-    <div class="setup-actions">
-
-        <button
-            class="secondary-btn"
-            onclick="addRunnerEntry()"
-        >
-            + Add Runner
-        </button>
-
-        <button
-            id="loadTestButton"
-            class="primary-btn"
-            onclick="loadTest()"
-        >
-            LOAD TEST
-        </button>
-
-    </div>
-
-
-    <div
-        id="setupMessage"
-        class="message"
-    ></div>
-
-</section>
-
-
-
-<!-- TEST SCREEN -->
-
-<section
-    id="testScreen"
-    class="test-screen"
->
-
-<section class="panel">
-
-
-    <div
-        id="testStatus"
-        class="test-status"
-    >
-        READY
-    </div>
-
-
-    <div
-        id="masterTimer"
-        class="master-timer"
-    >
-        00:00.0
-    </div>
-
-
-    <button
-        id="startButton"
-        class="start-btn"
-        onclick="startClock()"
-    >
-        START CLOCK
-    </button>
-
-
-    <div
-        id="counterInfo"
-        class="counter-info"
-    ></div>
-
-
-
-    <!-- RUNNER VIEW -->
-
-    <div class="runner-view-controls">
-
-        <div class="view-toggle">
-
-            <button
-                id="myRunnersToggle"
-                type="button"
-                onclick="setRunnerView('my')"
-            >
-                MY RUNNERS
-            </button>
-
-            <button
-                id="allRunnersToggle"
-                type="button"
-                class="active"
-                onclick="setRunnerView('all')"
-            >
-                ALL RUNNERS
-            </button>
-
-        </div>
-
-
-        <button
-            id="chooseRunnersButton"
-            type="button"
-            class="choose-runners-btn"
-            onclick="toggleRunnerSelector()"
-        >
-            CHOOSE MY RUNNERS
-        </button>
-
-
-        <div
-            id="assignmentSummary"
-            class="assignment-summary"
-        ></div>
-
-    </div>
-
-
-
-    <!-- RUNNER SELECTOR -->
-
-    <div
-        id="runnerSelector"
-        class="runner-selector"
-    >
-
-        <div class="runner-selector-title">
-            Choose My Runners
-        </div>
-
-        <div class="runner-selector-help">
-            Select the runners you are responsible for on this device.
-        </div>
-
-
-        <div
-            id="runnerSelectorGrid"
-            class="runner-selector-grid"
-        ></div>
-
-
-        <div class="selector-actions">
-
-            <button
-                type="button"
-                class="secondary-btn"
-                onclick="clearMyRunners()"
-            >
-                CLEAR
-            </button>
-
-            <button
-                type="button"
-                class="primary-btn"
-                onclick="saveMyRunners()"
-            >
-                DONE
-            </button>
-
-        </div>
-
-    </div>
-
-
-
-    <div
-        id="runnerGrid"
-        class="runner-grid"
-    ></div>
-
-
-
-    <div class="test-controls">
-
-        <button
-            id="undoButton"
-            class="secondary-btn"
-            onclick="undoLastTap()"
-        >
-            ↶ UNDO LAST TAP
-        </button>
-
-
-        <button
-            id="endButton"
-            class="danger-btn"
-            onclick="endTest()"
-        >
-            END TEST
-        </button>
-
-    </div>
-
-
-    <div
-        id="testMessage"
-        class="message"
-    ></div>
-
-
-</section>
-
-</section>
-
-
-
-<!-- RESULTS -->
-
-<section
-    id="resultsPanel"
-    class="panel results"
->
-
-    <h2 class="panel-title">
-        Results
-    </h2>
-
-    <div id="resultsList"></div>
-
-</section>
-
-
-</div>
-
-
-
-<!-- BUSY -->
-
-<div
-    id="busy"
-    class="busy"
->
-    Working...
-</div>
-
-
-
-<!-- LAP CONFIRMATION -->
-
-<div
-    id="lapConfirmation"
-    class="lap-confirmation"
-></div>
-
-
-
-<script>
 
 /* =========================================================
    CONFIGURATION
@@ -2350,18 +2254,34 @@ async function startClock() {
 
         if (!result.success) {
 
-            showTestMessage(
-                result.message ||
-                "Unable to start test.",
-                "error"
-            );
+    showTestMessage(
+        result.message ||
+        "Unable to start test.",
+        "error"
+    );
 
-            return;
+    return;
 
-        }
+}
 
 
-        await refreshTest();
+/*
+  Once the race starts, move this
+  counter directly into their
+  assigned runner view.
+
+  If they have not selected any
+  runners, leave All Runners open.
+*/
+
+if (myRunnerIds.length > 0) {
+
+    setRunnerView("my");
+
+}
+
+
+await refreshTest();
 
     }
 
