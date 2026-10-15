@@ -13,7 +13,7 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;padding:22px}
 .app{max-width:850px;margin:auto}.hero{padding:24px;border-radius:20px;background:linear-gradient(115deg,#0c2239,#173f65);color:white}
 .hero h1{margin:4px 0 8px;font-size:clamp(25px,4vw,36px)}.hero p{margin:0;opacity:.9;font-size:14px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.tab{background:white;border:1px solid var(--line);border-radius:13px;padding:17px;font-weight:bold;font-size:16px;color:var(--navy);cursor:pointer}.tab.active{background:#dcecf8;border:2px solid var(--blue)}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.tab{background:white;border:1px solid var(--line);border-radius:13px;padding:17px;font-weight:bold;font-size:16px;color:var(--navy);cursor:pointer}.tab.active{background:#dcecf8;border:2px solid var(--blue)}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 2px 8px #102d4b0a}
 h2{font-size:23px;margin:0 0 8px}.sub{color:var(--muted);margin:0 0 22px;font-size:14px;line-height:1.45}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}label{display:block;font-weight:bold;font-size:14px;margin-bottom:7px}
@@ -38,6 +38,25 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 .secondary{border:1px solid var(--line);border-radius:9px;background:white;padding:10px 15px;color:var(--navy);cursor:pointer}.countertools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:15px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:17px}.stat{background:#f1f6fa;border-radius:12px;padding:18px;text-align:center}.stat strong{font-size:28px;display:block;margin-top:7px}.stat small{font-size:13px;color:var(--muted)}
 .history{width:100%;border-collapse:collapse;margin-top:15px;font-size:14px}.history th,.history td{padding:10px;border-bottom:1px solid var(--line);text-align:left}.history th:last-child,.history td:last-child{text-align:right}
+
+/* Traffic analytics */
+.headcount-analytics{margin-top:26px;padding-top:4px}
+.analytics-divider{border:0;border-top:1px solid var(--line);margin:28px 0 22px}
+.dashboard-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 20px}
+.dashboard-controls select{padding:11px 14px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:15px;color:var(--navy)}
+.dash-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0 26px}
+.dash-kpi{background:#f1f6fa;border:1px solid #e0eaf2;padding:16px;border-radius:13px}
+.dash-kpi small{display:block;font-size:12px;color:var(--muted)}.dash-kpi strong{display:block;font-size:24px;margin:7px 0 3px;font-variant-numeric:tabular-nums}
+.dash-kpi span{font-size:12px;color:var(--muted)}
+.dash-title{font-size:18px;margin:24px 0 6px}.dash-description{font-size:13px;line-height:1.5;color:var(--muted);margin:0 0 13px}
+.bar-list{display:grid;gap:8px}.bar-row{display:grid;grid-template-columns:55px minmax(0,1fr) 58px;gap:10px;align-items:center;font-size:13px}
+.bar-track{height:19px;background:#e8f0f7;border-radius:6px;overflow:hidden}.bar-fill{height:100%;background:#3686bb;border-radius:6px;min-width:0}
+.bar-row.peak .bar-fill{background:#ef9b51}.bar-value{text-align:right;font-weight:bold;font-variant-numeric:tabular-nums}
+.heatmap-wrap{overflow-x:auto}.heatmap{border-collapse:separate;border-spacing:4px;width:100%;min-width:480px;table-layout:fixed}
+.heatmap th{font-size:12px;color:var(--muted);font-weight:600;padding:8px 2px}.heatmap td{text-align:center;border-radius:6px;padding:10px 2px;font-size:12px;font-weight:bold;font-variant-numeric:tabular-nums}
+.dash-empty{padding:22px;text-align:center;background:#f5f8fb;border-radius:12px;color:var(--muted)}
+@media(max-width:560px){.tab{font-size:12px;padding:12px 5px}.dash-kpis{grid-template-columns:1fr 1fr}.dash-kpi strong{font-size:20px}}
+
 [hidden]{display:none!important}.foot{text-align:center;font-size:12px;color:var(--muted);margin:25px 0}
 @media(max-width:560px){body{padding:11px}.panel{padding:17px}.formgrid{grid-template-columns:1fr}.field.wide{grid-column:auto}.adjusts{grid-template-columns:repeat(3,1fr)}.count{font-size:80px}.branches{gap:8px}.branch{font-size:15px;padding:17px 5px}.tab{font-size:14px;padding:13px}}
 </style>
@@ -58,10 +77,31 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 <div class="adjusts"><button class="adjust" data-amount="-10">−10</button><button class="adjust" data-amount="-5">−5</button><button class="adjust" data-amount="-1">−1</button><button class="adjust" data-amount="1">+1</button><button class="adjust" data-amount="5">+5</button><button class="adjust" data-amount="10">+10</button></div>
 <div class="countertools"><span class="sub" style="margin:0" id="countDate"></span><button class="secondary" type="button" id="resetCount">Reset to 0</button></div>
 <button class="primary" id="submitCount" type="button">Submit Headcount</button><div role="status" class="status" id="countStatus" aria-live="polite"></div>
-<div class="stats"><div class="stat"><small>Today's Sign-Ins</small><strong id="visitorTotal">—</strong></div><div class="stat"><small>Today's Headcounts</small><strong id="headTotal">—</strong></div></div>
+<div class="stats" style="grid-template-columns:1fr"><div class="stat"><small>Today's Recorded Headcounts</small><strong id="headTotal">—</strong></div></div>
 <h3>Today's Headcount History</h3><table class="history"><thead><tr><th>Recorded at</th><th>Hour</th><th>People</th></tr></thead><tbody id="historyBody"><tr><td colspan="3">No headcounts available.</td></tr></tbody></table>
 <button class="secondary" id="refreshTraffic" type="button" style="margin-top:15px">Refresh Stats</button>
+<hr class="analytics-divider">
+<section id="dashPanel" class="headcount-analytics" aria-label="Gym occupancy statistics">
+<h2>Facility Traffic Dashboard</h2>
+<p class="sub">Historical occupancy based on staff headcount snapshots. Counts are averaged, not added together.</p>
+<div class="dashboard-controls"><label for="dashDays" style="margin:0">View period</label><select id="dashDays"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select><button type="button" id="dashRefresh" class="secondary">Refresh Dashboard</button></div>
+<div id="dashStatus" class="status" aria-live="polite">Loading historical headcounts…</div>
+<div class="dash-kpis">
+<div class="dash-kpi"><small>Busiest Hour (Average)</small><strong id="dashBusiest">—</strong><span id="dashBusiestSub">—</span></div>
+<div class="dash-kpi"><small>Peak Recorded Occupancy</small><strong id="dashPeak">—</strong><span id="dashPeakSub">—</span></div>
+<div class="dash-kpi"><small>Days with Headcounts</small><strong id="dashDaysCount">—</strong><span id="dashEntries">—</span></div>
+</div>
+<h3 class="dash-title">Average Occupancy by Hour</h3>
+<p class="dash-description">Each day contributes one average per hour, even if multiple counts were taken during that hour.</p>
+<div id="dashBars" class="bar-list"><div class="dash-empty">No data loaded yet.</div></div>
+<h3 class="dash-title">Weekday × Hour Heatmap</h3>
+<p class="dash-description">Darker cells indicate busier periods on average. A dash means no headcount was recorded for that combination.</p>
+<div id="dashHeatmap" class="heatmap-wrap"><div class="dash-empty">No data loaded yet.</div></div>
+<p class="dash-description" style="margin-top:20px">Sign-ins count arrivals; headcounts measure people present at a point in time. This dashboard uses headcounts only. No visitor names are retrieved.</p>
 </section>
+</section>
+
+
 <footer class="foot">707 FSS Fitness Assessment Cell <span id="syncLabel">• Checking sync status...</span></footer>
 </main>
 <script>
@@ -78,7 +118,7 @@ function status(element,message,type=''){element.textContent=message;element.cla
 function displaySync(){ $('syncLabel').textContent = syncing?'• Syncing…':pending.length?'• '+pending.length+' pending sync':'• All entries synced';}
 function keepPending(){localStorage.setItem(PENDING_KEY,JSON.stringify(pending));displaySync()}
 function setCount(n){count=Math.max(0,Math.floor(n));$('countValue').textContent=count;localStorage.setItem(DRAFT_KEY,String(count))}
-function showTab(which){let head=which==='count';$('signinPanel').hidden=head;$('countPanel').hidden=!head;$('signinTab').classList.toggle('active',!head);$('countTab').classList.toggle('active',head);if(head)refreshTraffic();}
+function showTab(which){const head=which==='count';$('signinPanel').hidden=head;$('countPanel').hidden=!head;$('signinTab').classList.toggle('active',!head);$('countTab').classList.toggle('active',head);if(head){refreshTraffic();refreshDashboard();}}
 $('signinTab').onclick=()=>showTab('signin');$('countTab').onclick=()=>showTab('count');
 branches.forEach(branch=>{let btn=document.createElement('button');btn.className='branch '+branch.toLowerCase().replace(/\s+/g,'-');btn.type='button';btn.textContent=branch;btn.onclick=()=>signIn(branch);$('branchButtons').append(btn)});
 function queue(event){pending.push(event);keepPending();syncPending()}
@@ -107,16 +147,50 @@ const data=await response.json();if(!data.success)throw Error(data.message||'Sav
 }
 async function syncPending(){if(syncing||!pending.length){displaySync();return}syncing=true;displaySync();let changed=false;
 try{for(const event of [...pending]){try{await send(event);pending=pending.filter(x=>x.eventId!==event.eventId);keepPending();changed=true}catch(error){console.warn('Sync paused:',error);break}}}
-finally{syncing=false;displaySync();if(changed&&!$('countPanel').hidden)refreshTraffic()}}
+finally{syncing=false;displaySync();if(changed&&!$('countPanel').hidden){refreshTraffic();refreshDashboard()}}}
 let cachedHeadcounts=[];
 function renderPendingHeadcounts(){const today=new Date().toLocaleDateString('en-US',{timeZone:'America/New_York'});
 const local=pending.filter(e=>e.action==='submitHourlyHeadcount'&&new Date(e.localTimestamp).toLocaleDateString('en-US',{timeZone:'America/New_York'})===today).map(e=>({time:new Date(e.localTimestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),hour:new Date(e.localTimestamp).toLocaleTimeString('en-US',{hour:'2-digit',hour12:false})+':00',count:e.count,pending:true}));
 const all=[...cachedHeadcounts,...local];$('headTotal').textContent=all.length;
 $('historyBody').replaceChildren();if(!all.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=3;td.textContent='No headcounts recorded today.';tr.append(td);$('historyBody').append(tr);return}
 all.slice(-12).reverse().forEach(row=>{const tr=document.createElement('tr');[row.time+(row.pending?' (pending)':''),row.hour,String(row.count)].forEach(t=>{const td=document.createElement('td');td.textContent=t;tr.append(td)});$('historyBody').append(tr)})}
-async function refreshTraffic(){try{const response=await fetch(API_URL+'?action=getFacilityTraffic&t='+Date.now());const data=await response.json();if(!data.success)throw Error(data.message||'Cannot refresh');cachedHeadcounts=data.headcountsToday||[];$('visitorTotal').textContent=data.visitorsToday+pending.filter(e=>e.action==='submitVisitorSignIn').length;renderPendingHeadcounts()}catch(e){$('visitorTotal').textContent='Offline';renderPendingHeadcounts();console.warn(e)}}
+async function refreshTraffic(){try{const response=await fetch(API_URL+'?action=getFacilityTraffic&t='+Date.now());const data=await response.json();if(!data.success)throw Error(data.message||'Cannot refresh');cachedHeadcounts=data.headcountsToday||[];renderPendingHeadcounts()}catch(e){renderPendingHeadcounts();console.warn(e)}}
 $('refreshTraffic').onclick=refreshTraffic;
-window.addEventListener('online',()=>{syncPending();refreshTraffic()});
+
+// Anonymized aggregate data only. The API does not return patron names.
+let dashboardBusy = false;
+function makeCell(tag,content){const node=document.createElement(tag);node.textContent=content;return node}
+function renderDashboard(data){
+ const hours=data.hours||[],cells=data.heatmap||[];
+ $('dashDaysCount').textContent=String(data.daysMeasured||0);
+ $('dashEntries').textContent=(data.snapshots||0)+' headcount snapshots';
+ $('dashBusiest').textContent=data.busiestHour?data.busiestHour.hour:'—';
+ $('dashBusiestSub').textContent=data.busiestHour?data.busiestHour.average.toFixed(1)+' people on average':'Not enough data';
+ $('dashPeak').textContent=data.peak?String(data.peak.count):'—';
+ $('dashPeakSub').textContent=data.peak?(data.peak.date+' at '+data.peak.time):'No readings';
+ const bars=$('dashBars');bars.replaceChildren();
+ if(!hours.length){bars.append(makeCell('div','No headcount data recorded for this period.'));bars.firstChild.className='dash-empty';}
+ else{
+  const max=Math.max(1,...hours.map(h=>h.average));
+  hours.forEach(h=>{const row=document.createElement('div');row.className='bar-row'+(data.busiestHour&&h.hour===data.busiestHour.hour?' peak':'');
+   row.append(makeCell('span',h.hour));const track=document.createElement('div');track.className='bar-track';const fill=document.createElement('div');fill.className='bar-fill';fill.style.width=(h.average/max*100)+'%';track.append(fill);row.append(track);const value=makeCell('span',h.average.toFixed(1));value.className='bar-value';row.append(value);row.title=h.days+' measured day(s)';bars.append(row)});
+ }
+ const wrap=$('dashHeatmap');wrap.replaceChildren();
+ if(!cells.length){const empty=makeCell('div','No headcount data for a heatmap yet.');empty.className='dash-empty';wrap.append(empty);return}
+ const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const hourLabels=[...new Set(cells.map(c=>c.hour))].sort();
+ const maxAvg=Math.max(1,...cells.map(c=>c.average));
+ const lookup=new Map(cells.map(c=>[c.day+'|'+c.hour,c]));
+ const table=document.createElement('table');table.className='heatmap';const thead=document.createElement('thead');const header=document.createElement('tr');header.append(makeCell('th','Hour'));weekdays.forEach(w=>header.append(makeCell('th',w)));thead.append(header);table.append(thead);
+ const tbody=document.createElement('tbody');hourLabels.forEach(hour=>{const tr=document.createElement('tr');tr.append(makeCell('th',hour));weekdays.forEach(w=>{const cell=lookup.get(w+'|'+hour),td=makeCell('td',cell?cell.average.toFixed(0):'—');if(cell){const strength=cell.average/maxAvg;td.style.background=`rgba(42,111,155,${(0.12+strength*.73).toFixed(2)})`;td.style.color=strength>.52?'white':'#17334a';td.title=cell.average.toFixed(1)+' avg · '+cell.days+' measured day(s)';}else{td.style.background='#f1f5f8';td.style.color='#8996a5'}tr.append(td)});tbody.append(tr)});table.append(tbody);wrap.append(table);
+}
+async function refreshDashboard(){if(dashboardBusy)return;dashboardBusy=true;status($('dashStatus'),'Loading historical headcounts…');$('dashRefresh').disabled=true;
+ try{const days=Number($('dashDays').value);const response=await fetch(API_URL+'?action=getTrafficAnalytics&days='+days+'&t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(!data.success)throw Error(data.message||'Unable to load analytics');renderDashboard(data);status($('dashStatus'),'Updated from Facility Manager Database.','good')}
+ catch(e){status($('dashStatus'),'Could not retrieve analytics: '+e.message,'error')}
+ finally{dashboardBusy=false;$('dashRefresh').disabled=false}
+}
+$('dashDays').onchange=refreshDashboard;$('dashRefresh').onclick=refreshDashboard;
+
+window.addEventListener('online',()=>{syncPending();refreshTraffic();if(!$('countPanel').hidden)refreshDashboard()});
 window.addEventListener('storage',()=>{try{const v=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');if(Array.isArray(v))pending=v}catch(e){}displaySync()});
 setInterval(()=>{syncPending();if(!$('countPanel').hidden)refreshTraffic()},30000);
 setCount(count);displaySync();syncPending();
