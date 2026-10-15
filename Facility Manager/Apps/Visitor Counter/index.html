@@ -87,7 +87,7 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 <div class="adjusts"><button class="adjust" data-amount="-10">−10</button><button class="adjust" data-amount="-5">−5</button><button class="adjust" data-amount="-1">−1</button><button class="adjust" data-amount="1">+1</button><button class="adjust" data-amount="5">+5</button><button class="adjust" data-amount="10">+10</button></div>
 <div class="countertools"><span class="sub" style="margin:0" id="countDate"></span><button class="secondary" type="button" id="resetCount">Reset to 0</button></div>
 <button class="primary" id="submitCount" type="button">Submit Headcount</button><div role="status" class="status" id="countStatus" aria-live="polite"></div>
-<div class="stats" style="grid-template-columns:1fr"><div class="stat"><small>Today's Recorded Headcounts</small><strong id="headTotal">—</strong></div></div>
+<div class="stats" style="grid-template-columns:1fr"><div class="stat"><small>Today's Total Recorded Headcount</small><strong id="headTotal">—</strong><div class="sub" style="margin-top:6px" id="headTotalNote">Sum of today's hourly counts (not unique visitors).</div></div></div>
 <h3>Today's Headcount History</h3><table class="history"><thead><tr><th>Recorded at</th><th>Hour</th><th>People</th></tr></thead><tbody id="historyBody"><tr><td colspan="3">No headcounts available.</td></tr></tbody></table>
 <button class="secondary" id="refreshTraffic" type="button" style="margin-top:15px">Refresh Stats</button>
 <hr class="analytics-divider">
@@ -161,7 +161,10 @@ finally{syncing=false;displaySync();if(changed&&!$('countPanel').hidden){refresh
 let cachedHeadcounts=[];
 function renderPendingHeadcounts(){const today=new Date().toLocaleDateString('en-US',{timeZone:'America/New_York'});
 const local=pending.filter(e=>e.action==='submitHourlyHeadcount'&&new Date(e.localTimestamp).toLocaleDateString('en-US',{timeZone:'America/New_York'})===today).map(e=>({time:new Date(e.localTimestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),hour:new Date(e.localTimestamp).toLocaleTimeString('en-US',{hour:'2-digit',hour12:false})+':00',count:e.count,pending:true}));
-const all=[...cachedHeadcounts,...local];$('headTotal').textContent=all.length;
+const all=[...cachedHeadcounts,...local];
+const total=all.reduce((sum,row)=>sum+(Number(row.count)||0),0);
+$('headTotal').textContent=total.toLocaleString('en-US');
+$('headTotalNote').textContent=all.length+' hourly snapshot'+(all.length===1?'':'s')+' • Sum of recorded counts, not unique visitors'+(local.length?' • includes '+local.length+' pending':'');
 $('historyBody').replaceChildren();if(!all.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=3;td.textContent='No headcounts recorded today.';tr.append(td);$('historyBody').append(tr);return}
 all.slice(-12).reverse().forEach(row=>{const tr=document.createElement('tr');[row.time+(row.pending?' (pending)':''),row.hour,String(row.count)].forEach(t=>{const td=document.createElement('td');td.textContent=t;tr.append(td)});$('historyBody').append(tr)})}
 async function refreshTraffic(){try{const response=await fetch(API_URL+'?action=getFacilityTraffic&t='+Date.now());const data=await response.json();if(!data.success)throw Error(data.message||'Cannot refresh');cachedHeadcounts=data.headcountsToday||[];renderPendingHeadcounts()}catch(e){renderPendingHeadcounts();console.warn(e)}}
