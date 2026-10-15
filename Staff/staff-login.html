@@ -27,7 +27,7 @@ $('login').onclick=async()=>{const btn=$('login');btn.disabled=true;try{const j=
 $('logout').onclick=async()=>{try{await acting({action:'authLogout'});}catch(e){}localStorage.removeItem(KEY);token='';me=null;location.reload();};
 $('showChange').onclick=()=>$('changePanel').classList.toggle('hide');
 $('changePin').onclick=async()=>{try{await acting({action:'authChangePin',oldPin:$('oldPin').value,newPin:$('newPin').value});localStorage.removeItem(KEY);alert('PIN changed. All devices have been signed out. Please sign in again.');location.reload();}catch(e){message('accountMsg',e.message);}};
-async function loadStaff(){try{const j=await acting({action:'authListStaff'});const root=$('accounts');root.replaceChildren();for(const s of j.staff){const row=document.createElement('div');row.className='staffrow';const header=document.createElement('strong');header.textContent=s.name+' — '+s.roles.join(', ')+(s.active?'':' (INACTIVE)');row.append(header);const controls=document.createElement('div');controls.className='buttons';for(const [label,action] of [['Reset PIN',async()=>{const pin=prompt('Enter a NEW temporary six-digit PIN for '+s.name+'. Share it privately.');if(pin===null)return;await acting({action:'authResetPin',staffId:s.id,temporaryPin:pin});}],['Issue Device Code',async()=>{const j=await acting({action:'authIssueDeviceCode',staffId:s.id});message('adminMsg','Enrollment code emailed to '+(s.email||'the registered work address')+'.',true);}],[(s.active?'Deactivate':'Activate'),async()=>{if(!confirm('Change status for '+s.name+'?'))return;await acting({action:'authSetActive',staffId:s.id,active:!s.active});}]]){const btn=document.createElement('button');btn.className='secondary';btn.textContent=label;btn.onclick=async()=>{try{await action();message('adminMsg',label+' completed for '+s.name,true);await loadStaff();}catch(e){message('adminMsg',e.message);}};controls.append(btn);}
+async function loadStaff(){try{const j=await acting({action:'authListStaff'});const root=$('accounts');root.replaceChildren();for(const s of j.staff){const row=document.createElement('div');row.className='staffrow';const header=document.createElement('strong');header.textContent=s.name+' — '+s.roles.join(', ')+(s.active?'':' (INACTIVE)');row.append(header);const controls=document.createElement('div');controls.className='buttons';for(const [label,action] of [['Reset PIN',async()=>{const pin=prompt('Enter a NEW temporary six-digit PIN for '+s.name+'. Share it privately.');if(pin===null)return;await acting({action:'authResetPin',staffId:s.id,temporaryPin:pin});}],['Issue Device Code',async()=>{const j=await acting({action:'authIssueDeviceCode',staffId:s.id});alert('Trusted-device code for '+s.name+': '+j.code+'\nValid for 15 minutes. Share directly with the verified employee.');}],[(s.active?'Deactivate':'Activate'),async()=>{if(!confirm('Change status for '+s.name+'?'))return;await acting({action:'authSetActive',staffId:s.id,active:!s.active});}]]){const btn=document.createElement('button');btn.className='secondary';btn.textContent=label;btn.onclick=async()=>{try{await action();message('adminMsg',label+' completed for '+s.name,true);await loadStaff();}catch(e){message('adminMsg',e.message);}};controls.append(btn);}
   const emailLabel=document.createElement('label');emailLabel.textContent='Work email';
   const emailInput=document.createElement('input');emailInput.type='email';emailInput.value=s.email||'';emailInput.placeholder='name@us.af.mil';
   const saveEmail=document.createElement('button');saveEmail.className='secondary';saveEmail.textContent='Save Email';
@@ -76,14 +76,14 @@ async function loadRequests(){
       if(!confirm((approve?'Approve':'Deny')+' '+r.name+'? Verify identity before approving.'))return;
       const roles=[...(f.checked?['FAC']:[]),...(e.checked?['EFC']:[])];
       const j=await acting({action:'authReviewRequest',requestId:r.id,approve,roles});
-      if(j.emailSent)message('requestAdminMsg','Activation code emailed to '+r.email+'.',true);
+      if(j.activationCode)alert('Activation code for '+r.name+': '+j.activationCode+'\nValid for 15 minutes. Share directly with the verified employee.');
       message('requestAdminMsg',label+' completed for '+r.name,true);await loadRequests();
     }catch(err){message('requestAdminMsg',err.message);}};controls.append(btn);
    }
   } else {
    const btn=document.createElement('button');btn.className='secondary';btn.textContent='Reissue Activation Code';
    btn.onclick=async()=>{try{const j=await acting({action:'authReissueActivation',requestId:r.id});
-      message('requestAdminMsg','Replacement activation code emailed to '+r.email+'.',true);
+      if(j.activationCode)alert('Replacement activation code for '+r.name+': '+j.activationCode+'\nValid for 15 minutes. Share directly with the verified employee.');
       message('requestAdminMsg','Replacement code issued.',true);
    }catch(err){message('requestAdminMsg',err.message);}};controls.append(btn);
   }
