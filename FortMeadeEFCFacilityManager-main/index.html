@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#001522">
+
+<!-- iPhone/iPad Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EFC Tools">
+<link rel="apple-touch-icon" href="./Facility%20Manager/Apps/Icons/EFC%20Brandmark.png">
+  
+  <title>Eagle Fitness Center Tools</title>
+
+  <style>
+    :root {
+      --navy: #0b1f33;
+      --navy2: #163b61;
+      --blue: #2a6f9b;
+      --light: #edf5fb;
+      --line: #c7d5e2;
+      --text: #172033;
+      --muted: #64748b;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fa;
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(
+        135deg,
+        var(--navy),
+        var(--navy2)
+      );
+
+      color: white;
+
+      border-radius: 22px;
+
+      padding: 30px;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        210px;
+
+      gap: 24px;
+
+      align-items: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+
+      font-size: clamp(
+        30px,
+        5vw,
+        48px
+      );
+
+      line-height: 1.05;
+    }
+
+    .hero .sub {
+      margin: 12px 0 0;
+
+      color: #dceaf7;
+
+      font-size: 17px;
+
+      font-weight: 700;
+    }
+
+    .hero .location {
+      margin: 6px 0 0;
+
+      color: #dceaf7;
+
+      font-size: 15px;
+    }
+
+    .logo {
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+    }
+
+    .logo img {
+      width: 100%;
+
+      max-width: 180px;
+
+      height: auto;
+
+      display: block;
+    }
+
+    .section-title {
+      margin: 30px 0 14px;
+
+      font-size: 14px;
+
+      letter-spacing: .09em;
+
+      text-transform: uppercase;
+
+      color: var(--blue);
+
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+      gap: 16px;
+    }
+
+    .card {
+      display: block;
+
+      text-decoration: none;
+
+      color: inherit;
+
+      background: white;
+
+      border: 1px solid var(--line);
+
+      border-radius: 16px;
+
+      padding: 20px;
+
+      transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+
+      border-color: #9fb9cf;
+
+      box-shadow:
+        0 10px 24px
+        rgba(15, 38, 59, .08);
+    }
+
+    .card h2 {
+      margin: 0 0 7px;
+
+      font-size: 20px;
+
+      color: var(--navy);
+    }
+
+    .card p {
+      margin: 0;
+
+      color: var(--muted);
+
+      line-height: 1.45;
+
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-block;
+
+      margin-top: 14px;
+
+      padding: 6px 9px;
+
+      border-radius: 999px;
+
+      background: var(--light);
+
+      color: var(--blue);
+
+      font-size: 11px;
+
+      font-weight: 800;
+
+      letter-spacing: .05em;
+
+      text-transform: uppercase;
+    }
+
+    footer {
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      margin: 24px 0 6px;
+    }
+
+    @media (max-width: 700px) {
+
+      .wrap {
+        padding: 0;
+      }
+
+      .hero {
+        border-radius: 0;
+
+        grid-template-columns: 1fr;
+
+        padding: 24px 20px;
+      }
+
+      .logo {
+        max-width: 180px;
+
+        margin: 0 auto;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+
+        padding: 0 16px;
+      }
+
+      .section-title {
+        padding: 0 16px;
+      }
+
+      footer {
+        padding:
+          0 16px
+          18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <header class="hero">
+
+      <div>
+
+        <h1>
+          Eagle Fitness Center Tools
+        </h1>
+
+        <div class="sub">
+          Brought to you by
+          707 FSS Fitness Assessment Cell
+        </div>
+
+        <div class="location">
+          Fort George G. Meade, Maryland
+        </div>
+
+      </div>
+
+      <div class="logo">
+
+        <img
+          src="./Facility%20Manager/Apps/Icons/Eagle%20Logo.png"
+          alt="Eagle Fitness Center logo"
+        >
+
+      </div>
+
+    </header>
+
+
+    <!-- FAC -->
+
+    <div class="section-title">
+      FAC
+    </div>
+
+    <div class="grid">
+
+      <a
+        class="card"
+        href="./Facility%20Manager/FAC/"
+      >
+
+        <h2>
+          FAC Portal
+        </h2>
+
+        <p>
+          Fitness Assessment Cell information,
+          resources, and quick-access tools.
+        </p>
+
+        <span class="tag">
+          Open FAC
+        </span>
+
+      </a>
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/FAC/pfra_calculator.html"
+      >
+
+        <h2>
+          PFRA Calculator
+        </h2>
+
+        <p>
+          Calculate PFRA scores and determine
+          minimum performance needed to reach
+          a target score.
+        </p>
+
+        <span class="tag">
+          Open Calculator
+        </span>
+
+      </a>
+
+
+      <a
+        class="card"
+        href="http://192.168.4.1/"
+      >
+
+        <h2>
+          HAMR Controller
+        </h2>
+
+        <p>
+          Connect to the HAMR Wi-Fi network,
+          then open the LED Rabbit controller.
+        </p>
+
+        <span class="tag">
+          Open HAMR
+        </span>
+
+      </a>
+<a
+  class="card"
+  href="./Facility%20Manager/FAC/2%20Mile%20Run/"
+>
+
+  <h2>
+    2-Mile Run Counter
+  </h2>
+
+  <p>
+    Track runners, laps, splits, and finish
+    times across multiple synchronized counters.
+  </p>
+
+  <span class="tag">
+    Open Counter
+  </span>
+
+</a>
+    </div>
+
+    <!-- FACILITY MANAGEMENT -->
+
+    <div class="section-title">
+      Facility Management
+    </div>
+
+    <div class="grid">
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/Apps/Inventory/inventory.html"
+      >
+
+        <h2>
+          Inventory
+        </h2>
+
+        <p>
+          Track inventory quantities,
+          low-stock items, and supply levels.
+        </p>
+
+        <span class="tag">
+          Open Inventory
+        </span>
+
+      </a>
+
+
+<a class="card" href="./Facility%20Manager/Apps/Visitor%20Counter/">
+  <h2>Visitor Tracking</h2>
+  <p>Visitor sign-in, hourly headcounts, and facility traffic tracking.</p>
+  <span class="tag">Open Visitor Tracking</span>
+</a>
+
+
+      <a
+        class="card"
+        href="./Facility%20Manager/Apps/Leave%20Tracker/Leave.html"
+      >
+
+        <h2>
+          Leave Tracker
+        </h2>
+
+        <p>
+          View and manage leave information
+          from the web app.
+        </p>
+
+        <span class="tag">
+          Open Tracker
+        </span>
+
+      </a>
+<a
+  class="card"
+  href="./Facility%20Manager/Apps/Fitness%20Access/fitness-access.html"
+>
+
+  <h2>
+    Fitness Access
+  </h2>
+
+  <p>
+    Complete and submit the Fitness Access
+    Statement of Understanding &amp;
+    Assumption of Risk Form.
+  </p>
+
+  <span class="tag">
+    Open Form
+  </span>
+
+</a>
+
+    </div>
+
+
+    <footer>
+      Eagle Fitness Center Tools
+      •
+      707 FSS Fitness Assessment Cell
+    </footer>
+
+  </div>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(registration => {
+          console.log("EFC service worker registered:", registration.scope);
+        })
+        .catch(error => {
+          console.error("EFC service worker registration failed:", error);
+        });
+    });
+  }
+</script>
+  <!-- Refresh GitHub Pages deployment -->
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Leave Tracker",
+  "short_name": "Leave",
+  "id": "./Leave%20Tracker/",
+  "start_url": "./Leave%20Tracker/Leave.html",
+  "scope": "./Leave Tracker/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "./Icons/Leave.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+  ]
+}
