@@ -52,6 +52,16 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 .bar-list{display:grid;gap:8px}.bar-row{display:grid;grid-template-columns:55px minmax(0,1fr) 58px;gap:10px;align-items:center;font-size:13px}
 .bar-track{height:19px;background:#e8f0f7;border-radius:6px;overflow:hidden}.bar-fill{height:100%;background:#3686bb;border-radius:6px;min-width:0}
 .bar-row.peak .bar-fill{background:#ef9b51}.bar-value{text-align:right;font-weight:bold;font-variant-numeric:tabular-nums}
+/* Hours across X, occupancy up Y */
+.occupancy-chart{overflow-x:auto;padding:12px 4px 5px}
+.occupancy-plot{display:flex;min-width:570px;gap:9px;align-items:stretch}
+.occupancy-yaxis{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;font-size:11px;color:var(--muted);width:38px;flex-shrink:0;padding-bottom:27px}
+.occupancy-columns{display:flex;align-items:flex-end;gap:8px;flex:1;height:225px;border-bottom:1px solid #b7cadd;background:repeating-linear-gradient(to top,transparent 0,transparent calc(25% - 1px),#e9eff5 calc(25% - 1px),#e9eff5 25%);padding:0 4px}
+.occupancy-slot{flex:1;min-width:28px;height:100%;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;position:relative}
+.occupancy-amount{font-size:11px;color:var(--navy);font-weight:700;margin-bottom:4px;white-space:nowrap}
+.occupancy-bar{width:80%;max-width:46px;min-height:1px;background:#3686bb;border-radius:5px 5px 0 0}
+.occupancy-slot.peak .occupancy-bar{background:#ef9b51}
+.occupancy-hour{position:absolute;top:calc(100% + 7px);font-size:11px;color:var(--muted);white-space:nowrap}
 .heatmap-wrap{overflow-x:auto}.heatmap{border-collapse:separate;border-spacing:4px;width:100%;min-width:480px;table-layout:fixed}
 .heatmap th{font-size:12px;color:var(--muted);font-weight:600;padding:8px 2px}.heatmap td{text-align:center;border-radius:6px;padding:10px 2px;font-size:12px;font-weight:bold;font-variant-numeric:tabular-nums}
 .dash-empty{padding:22px;text-align:center;background:#f5f8fb;border-radius:12px;color:var(--muted)}
@@ -92,10 +102,10 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 <div class="dash-kpi"><small>Days with Headcounts</small><strong id="dashDaysCount">—</strong><span id="dashEntries">—</span></div>
 </div>
 <h3 class="dash-title">Average Occupancy by Hour</h3>
-<p class="dash-description">Each day contributes one average per hour, even if multiple counts were taken during that hour.</p>
-<div id="dashBars" class="bar-list"><div class="dash-empty">No data loaded yet.</div></div>
+<p class="dash-description">Hours run along the X-axis; average people present is the Y-axis. Multiple readings in the same hour are averaged per day.</p>
+<div id="dashBars" class="occupancy-chart"><div class="dash-empty">No data loaded yet.</div></div>
 <h3 class="dash-title">Weekday × Hour Heatmap</h3>
-<p class="dash-description">Darker cells indicate busier periods on average. A dash means no headcount was recorded for that combination.</p>
+<p class="dash-description">Hours run left to right, weekdays run top to bottom, and each cell shows the average people present. Darker means busier; a dash means no reading.</p>
 <div id="dashHeatmap" class="heatmap-wrap"><div class="dash-empty">No data loaded yet.</div></div>
 <p class="dash-description" style="margin-top:20px">Sign-ins count arrivals; headcounts measure people present at a point in time. This dashboard uses headcounts only. No visitor names are retrieved.</p>
 </section>
@@ -169,19 +179,37 @@ function renderDashboard(data){
  $('dashPeak').textContent=data.peak?String(data.peak.count):'—';
  $('dashPeakSub').textContent=data.peak?(data.peak.date+' at '+data.peak.time):'No readings';
  const bars=$('dashBars');bars.replaceChildren();
- if(!hours.length){bars.append(makeCell('div','No headcount data recorded for this period.'));bars.firstChild.className='dash-empty';}
+ if(!hours.length){const empty=makeCell('div','No headcount data recorded for this period.');empty.className='dash-empty';bars.append(empty)}
  else{
-  const max=Math.max(1,...hours.map(h=>h.average));
-  hours.forEach(h=>{const row=document.createElement('div');row.className='bar-row'+(data.busiestHour&&h.hour===data.busiestHour.hour?' peak':'');
-   row.append(makeCell('span',h.hour));const track=document.createElement('div');track.className='bar-track';const fill=document.createElement('div');fill.className='bar-fill';fill.style.width=(h.average/max*100)+'%';track.append(fill);row.append(track);const value=makeCell('span',h.average.toFixed(1));value.className='bar-value';row.append(value);row.title=h.days+' measured day(s)';bars.append(row)});
+  bars.className='occupancy-chart';
+  const maximum=Math.max(1,...hours.map(h=>h.average));
+  const ceiling=Math.max(4,Math.ceil(maximum/4)*4);
+  const plot=document.createElement('div');plot.className='occupancy-plot';
+  const y=document.createElement('div');y.className='occupancy-yaxis';
+  for(let n=4;n>=0;n--)y.append(makeCell('span',String(Math.round(ceiling*n/4))));
+  plot.append(y);
+  const columns=document.createElement('div');columns.className='occupancy-columns';
+  hours.forEach(h=>{
+   const slot=document.createElement('div');slot.className='occupancy-slot'+(data.busiestHour&&h.hour===data.busiestHour.hour?' peak':'');
+   const amount=makeCell('span',h.average.toFixed(1));amount.className='occupancy-amount';slot.append(amount);
+   const bar=document.createElement('div');bar.className='occupancy-bar';bar.style.height=(h.average/ceiling*172)+'px';slot.append(bar);
+   const hour=makeCell('span',h.hour);hour.className='occupancy-hour';slot.append(hour);
+   slot.title=h.hour+': '+h.average.toFixed(1)+' people on average · '+h.days+' measured day(s)';columns.append(slot);
+  });
+  plot.append(columns);bars.append(plot);
  }
  const wrap=$('dashHeatmap');wrap.replaceChildren();
  if(!cells.length){const empty=makeCell('div','No headcount data for a heatmap yet.');empty.className='dash-empty';wrap.append(empty);return}
  const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const hourLabels=[...new Set(cells.map(c=>c.hour))].sort();
  const maxAvg=Math.max(1,...cells.map(c=>c.average));
  const lookup=new Map(cells.map(c=>[c.day+'|'+c.hour,c]));
- const table=document.createElement('table');table.className='heatmap';const thead=document.createElement('thead');const header=document.createElement('tr');header.append(makeCell('th','Hour'));weekdays.forEach(w=>header.append(makeCell('th',w)));thead.append(header);table.append(thead);
- const tbody=document.createElement('tbody');hourLabels.forEach(hour=>{const tr=document.createElement('tr');tr.append(makeCell('th',hour));weekdays.forEach(w=>{const cell=lookup.get(w+'|'+hour),td=makeCell('td',cell?cell.average.toFixed(0):'—');if(cell){const strength=cell.average/maxAvg;td.style.background=`rgba(42,111,155,${(0.12+strength*.73).toFixed(2)})`;td.style.color=strength>.52?'white':'#17334a';td.title=cell.average.toFixed(1)+' avg · '+cell.days+' measured day(s)';}else{td.style.background='#f1f5f8';td.style.color='#8996a5'}tr.append(td)});tbody.append(tr)});table.append(tbody);wrap.append(table);
+ const table=document.createElement('table');table.className='heatmap';table.style.minWidth=Math.max(490,95+hourLabels.length*60)+'px';
+ const thead=document.createElement('thead'),header=document.createElement('tr');header.append(makeCell('th','Day / Hour'));
+ hourLabels.forEach(hour=>header.append(makeCell('th',hour)));thead.append(header);table.append(thead);
+ const tbody=document.createElement('tbody');weekdays.forEach(w=>{const tr=document.createElement('tr');tr.append(makeCell('th',w));
+ hourLabels.forEach(hour=>{const cell=lookup.get(w+'|'+hour),td=makeCell('td',cell?cell.average.toFixed(0):'—');
+ if(cell){const strength=cell.average/maxAvg;td.style.background=`rgba(42,111,155,${(0.12+strength*.73).toFixed(2)})`;td.style.color=strength>.52?'white':'#17334a';td.title=cell.average.toFixed(1)+' avg · '+cell.days+' measured day(s)';}
+ else{td.style.background='#f1f5f8';td.style.color='#8996a5'}tr.append(td)});tbody.append(tr)});table.append(tbody);wrap.append(table);
 }
 async function refreshDashboard(){if(dashboardBusy)return;dashboardBusy=true;status($('dashStatus'),'Loading historical headcounts…');$('dashRefresh').disabled=true;
  try{const days=Number($('dashDays').value);const response=await fetch(API_URL+'?action=getTrafficAnalytics&days='+days+'&t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(!data.success)throw Error(data.message||'Unable to load analytics');renderDashboard(data);status($('dashStatus'),'Updated from Facility Manager Database.','good')}
