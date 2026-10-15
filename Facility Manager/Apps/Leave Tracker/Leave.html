@@ -607,7 +607,7 @@ h1 {
 </head>
 
 
-<body>
+<body class="efc-locked"><style>body.efc-locked>:not(#efcGate){display:none!important}#efcGate{position:fixed;inset:0;background:#eef4f8;z-index:100000;display:grid;place-items:center;font:16px system-ui;padding:20px}#efcGate>div{background:white;border-radius:12px;padding:28px;max-width:420px}#efcGate a{color:#064b75}</style><div id="efcGate"><div><h2>Staff sign-in required</h2><p id="efcGateMessage">Checking your staff session…</p><a href="../../../Staff/staff-login.html">Open Staff Login</a> · <a href="../../../index.html">Return Home</a></div></div>
 <nav class="efc-return-home-bar" aria-label="Home navigation"><a href="../../../index.html">← Return Home</a></nav>
 
 
@@ -1005,6 +1005,22 @@ const API_URL =
 "https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec";
 
 
+const EFC_STAFF_TOKEN_KEY="efc-staff-token-v1";
+let efcLeaveAuthorized=false;
+let efcLeaveToken="";
+async function efcVerifyLeaveSession(){
+ const token=localStorage.getItem(EFC_STAFF_TOKEN_KEY)||"";
+ if(!token){document.getElementById("efcGateMessage").textContent="Please sign in to continue.";return;}
+ try{
+  const response=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"authValidate",token})});
+  const data=await response.json();
+  if(!data.success||!data.staff||data.staff.forceReset||!data.staff.roles.some(r=>["FAC","EFC","ADMIN"].includes(r)))throw Error(data.message||"Not authorized.");
+  efcLeaveToken=token;efcLeaveAuthorized=true;
+  document.body.classList.remove("efc-locked");document.getElementById("efcGate").remove();
+  loadLocalData();refreshViews();updateSyncStatus();
+  await loadServerRequests();await syncPending();
+ }catch(e){document.getElementById("efcGateMessage").textContent="Session unavailable: "+e.message;}
+}
 const CACHE_KEY =
 "facilityLeaveShared";
 
@@ -3769,6 +3785,7 @@ async function sendAction(
 action
 ) {
 
+    if(!efcLeaveAuthorized) throw Error("Staff sign-in required.");
     let payload;
 
 
@@ -3844,7 +3861,7 @@ action
 
             body:
             JSON.stringify(
-                payload
+                {...payload,token:efcLeaveToken}
             )
         }
 
@@ -3985,14 +4002,15 @@ async function syncPending() {
 ========================================================= */
 
 async function loadServerRequests() {
+    if(!efcLeaveAuthorized)return;
 
     try {
 
         const response =
         await fetch(
 
-            API_URL +
-            "?action=getLeave"
+            API_URL,
+            {method:"POST",body:JSON.stringify({action:"getLeaveSecure",token:efcLeaveToken})}
 
         );
 
@@ -4279,6 +4297,7 @@ setInterval(
 
     async () => {
 
+        if (!efcLeaveAuthorized) return;
         await syncPending();
 
         await loadServerRequests();
@@ -4296,7 +4315,7 @@ window.addEventListener(
 
     () => {
 
-        syncEverything();
+        if(efcLeaveAuthorized)syncEverything();
 
     }
 
@@ -4308,17 +4327,7 @@ window.addEventListener(
    START
 ========================================================= */
 
-loadLocalData();
-
-refreshViews();
-
-updateSyncStatus();
-
-loadServerRequests()
-.then(
-    () =>
-    syncPending()
-);
+efcVerifyLeaveSession();
 
 </script>
 
