@@ -86,7 +86,12 @@ self.addEventListener("activate", event => {
 // -------------------------
 
 self.addEventListener("fetch", event => {
+const url = new URL(event.request.url);
 
+// Ignore unsupported URL schemes
+if (url.protocol !== "http:" && url.protocol !== "https:") {
+  return;
+}
   // Only handle GET requests
   if (event.request.method !== "GET") {
     return;
