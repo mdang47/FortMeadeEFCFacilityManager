@@ -886,7 +886,7 @@ button:disabled {
 </style>
 </head>
 
-<body>
+<body class="fac-auth-pending">
 <nav class="efc-return-home-bar" aria-label="Home navigation"><a href="../../../index.html">← Return Home</a></nav>
 
 
@@ -959,6 +959,15 @@ button:disabled {
 <div id="lapConfirmation" class="lap-confirmation"></div>
 <div id="busy" class="busy">Working...</div>
 
+<style>
+body.fac-auth-pending > :not(#facAccessGate):not(script):not(style),
+body.fac-auth-denied > :not(#facAccessGate):not(script):not(style) { display:none !important; }
+#facAccessGate {position:fixed;inset:0;background:#f4f6f8;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif}
+#facAccessGate[hidden]{display:none!important}
+#facAccessGate .gate-box{background:#fff;border-radius:12px;box-shadow:0 4px 22px #0002;padding:26px;max-width:440px;text-align:center}
+#facAccessGate a{display:inline-block;background:#0b1f33;color:white;padding:12px 18px;margin:10px;border-radius:8px;text-decoration:none}
+</style>
+<div id="facAccessGate" role="status"><div class="gate-box"><h2>FAC Staff Access</h2><p id="facGateMessage">Verifying staff session…</p><a id="facGateLogin" href="../../../Staff/staff-login.html">Staff Sign-In</a><a href="../../../index.html">Return Home</a></div></div>
 <script>
 
 /* =========================================================
@@ -968,6 +977,23 @@ button:disabled {
 const API_URL =
     "https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec";
 
+
+const FAC_TOKEN_KEY = "efc-staff-token-v1";
+let facToken = "";
+async function facVerifySession(){
+  facToken = localStorage.getItem(FAC_TOKEN_KEY) || "";
+  if (!facToken) return false;
+  try {
+    const response=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"authValidate",token:facToken})});
+    const data=await response.json();
+    return data.success===true && Array.isArray(data.staff?.roles) && data.staff.roles.some(r=>r==="FAC"||r==="ADMIN");
+  } catch(error) {console.error("FAC session verification unavailable",error);return false;}
+}
+function facShowDenied(){
+ document.body.classList.remove("fac-auth-pending");
+ document.body.classList.add("fac-auth-denied");
+ document.getElementById("facGateMessage").textContent="FAC or Administrator login required. Sign in and return to this page.";
+}
 
 const TOTAL_LAPS = 8;
 
@@ -1095,6 +1121,9 @@ document.addEventListener(
 
 
 async function initialize() {
+    if (!(await facVerifySession())) { facShowDenied(); return; }
+    document.getElementById("facAccessGate").hidden=true;
+    document.body.classList.remove("fac-auth-pending");
 
     document.getElementById(
         "counterInfo"
@@ -1165,82 +1194,11 @@ function setConnectionState(isOnline) {
    API
 ========================================================= */
 
-async function apiGet(
-    action,
-    parameters = {}
-) {
-
-    const url =
-        new URL(API_URL);
-
-
-    url.searchParams.set(
-        "action",
-        action
-    );
-
-
-    Object.entries(parameters)
-        .forEach(
-            ([key, value]) => {
-
-                url.searchParams.set(
-                    key,
-                    value
-                );
-
-            }
-        );
-
-
-    try {
-
-        const response =
-            await fetch(
-                url.toString(),
-                {
-                    method: "GET",
-                    cache: "no-store"
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Server returned " +
-                response.status
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        setConnectionState(true);
-
-        syncServerClock(data);
-
-
-        return data;
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        setConnectionState(false);
-
-        throw error;
-
-    }
-
+async function apiGet(action,parameters={}) {
+    const secureAction={getRunTest:"getRunTestSecure",getActiveRunTest:"getActiveRunTestSecure"}[action];
+    if(!secureAction) throw Error("Unsupported 2-mile read action");
+    return apiPost(secureAction,parameters);
 }
-
-
 
 async function apiPost(
     action,
@@ -1265,7 +1223,8 @@ async function apiPost(
                             action:
                                 action,
 
-                            ...payload
+                            ...payload,
+                            token:facToken
                         })
                 }
             );
@@ -1285,8 +1244,10 @@ async function apiPost(
             await response.json();
 
 
+        if(data.success===false && /login required|session expired|account inactive|insufficient permissions/i.test(String(data.message||""))){
+          facShowDenied(); throw new Error(data.message);
+        }
         setConnectionState(true);
-
         syncServerClock(data);
 
 
