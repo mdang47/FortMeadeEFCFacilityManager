@@ -83,6 +83,7 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 
 <main class="app">
 <header class="hero"><small>707 FSS • EAGLE FITNESS CENTER</small><h1>Visitor Tracking</h1><p>Fort George G. Meade, Maryland</p></header>
+<p class="sub" style="margin:12px 0 0">Visitor Sign-In is public. Hourly Headcount and statistics require an EFC staff login.</p>
 <nav class="tabs" aria-label="Tracking mode"><button type="button" class="tab active" id="signinTab">Visitor Sign-In</button><button type="button" class="tab" id="countTab">Hourly Headcount</button></nav>
 <section id="signinPanel" class="panel"><h2>Welcome to Eagle Fitness Center</h2><p class="sub">Enter your information and tap your service branch to sign in.</p>
 <form id="signinForm" autocomplete="off" onsubmit="return false"><div class="formgrid">
@@ -91,6 +92,7 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 <div class="field wide"><label for="unit">Unit / Organization</label><input id="unit" maxlength="120" required autocomplete="off"></div>
 </div><p class="sectionlabel">TAP YOUR BRANCH TO SIGN IN</p><div class="branches" id="branchButtons"></div></form>
 <div role="status" class="status" id="signStatus" aria-live="polite"></div></section>
+<section id="headcountGate" class="panel" hidden><h2>EFC Staff Access Required</h2><p id="headcountGateMessage" class="sub">Checking staff access…</p><p><a href="../../../Staff/staff-login.html">Open Staff Login</a> · <button type="button" class="secondary" id="headcountRetry">Check Again</button></p></section>
 <section id="countPanel" class="panel" hidden><h2>Hourly Facility Headcount</h2><p class="sub">Count everyone currently inside the gym. This is an occupancy snapshot, not a number of visits.</p>
 <div class="count" id="countValue" aria-live="polite">0</div>
 <div class="adjusts"><button class="adjust" data-amount="-10">−10</button><button class="adjust" data-amount="-5">−5</button><button class="adjust" data-amount="-1">−1</button><button class="adjust" data-amount="1">+1</button><button class="adjust" data-amount="5">+5</button><button class="adjust" data-amount="10">+10</button></div>
@@ -127,6 +129,8 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 const API_URL = 'https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec';
 const PENDING_KEY='efcVisitorTrackingV2Pending';
 const DRAFT_KEY='efcVisitorHeadcountDraft';
+const STAFF_KEY='efc-staff-token-v1';
+let headcountAuthorized=false;let headcountToken='';let verifyingHeadcount=null;
 const branches=['Air Force','Army','Space Force','Navy','Marines','Coast Guard','Civilian','Other'];
 const $=id=>document.getElementById(id);
 let pending=[];let syncing=false;let count=0;let submitting=false;
@@ -137,7 +141,31 @@ function status(element,message,type=''){element.textContent=message;element.cla
 function displaySync(){ $('syncLabel').textContent = syncing?'• Syncing…':pending.length?'• '+pending.length+' pending sync':'• All entries synced';}
 function keepPending(){localStorage.setItem(PENDING_KEY,JSON.stringify(pending));displaySync()}
 function setCount(n){count=Math.max(0,Math.floor(n));$('countValue').textContent=count;localStorage.setItem(DRAFT_KEY,String(count))}
-function showTab(which){const head=which==='count';$('signinPanel').hidden=head;$('countPanel').hidden=!head;$('signinTab').classList.toggle('active',!head);$('countTab').classList.toggle('active',head);if(head){refreshTraffic();refreshDashboard();}}
+async function verifyHeadcount(){
+ if(verifyingHeadcount)return verifyingHeadcount;
+ verifyingHeadcount=(async()=>{
+  const token=localStorage.getItem(STAFF_KEY)||'';
+  headcountAuthorized=false;headcountToken='';
+  if(!token)throw Error('Sign in with an EFC or administrator account to use Headcount.');
+  const response=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'authValidate',token})});
+  if(!response.ok)throw Error('Session check unavailable. Try again when online.');
+  const data=await response.json();
+  if(!data.success||!data.staff||data.staff.forceReset||!Array.isArray(data.staff.roles)||!data.staff.roles.some(r=>r==='EFC'||r==='ADMIN'))throw Error('EFC or administrator access required.');
+  headcountAuthorized=true;headcountToken=token;
+  return true;
+ })();
+ try{return await verifyingHeadcount}finally{verifyingHeadcount=null}
+}
+async function showTab(which){
+ const head=which==='count';$('signinPanel').hidden=head;
+ $('signinTab').classList.toggle('active',!head);$('countTab').classList.toggle('active',head);
+ $('countPanel').hidden=true;$('headcountGate').hidden=true;
+ if(!head)return;
+ $('headcountGate').hidden=false;$('headcountGateMessage').textContent='Checking your staff session…';
+ try{await verifyHeadcount();$('headcountGate').hidden=true;$('countPanel').hidden=false;renderPendingHeadcounts();await Promise.all([refreshTraffic(),refreshDashboard()]);syncPending();}
+ catch(e){$('headcountGateMessage').textContent=e.message;}
+}
+$('headcountRetry').onclick=()=>showTab('count');
 $('signinTab').onclick=()=>showTab('signin');$('countTab').onclick=()=>showTab('count');
 branches.forEach(branch=>{let btn=document.createElement('button');btn.className='branch '+branch.toLowerCase().replace(/\s+/g,'-');btn.type='button';btn.textContent=branch;btn.onclick=()=>signIn(branch);$('branchButtons').append(btn)});
 function queue(event){pending.push(event);keepPending();syncPending()}
@@ -155,17 +183,23 @@ $('countDate').textContent=new Date().toLocaleString('en-US',{weekday:'short',mo
 document.querySelectorAll('.adjust').forEach(btn=>btn.onclick=()=>setCount(count+Number(btn.dataset.amount)));
 $('resetCount').onclick=()=>{if(confirm('Reset the unsent count to zero?'))setCount(0)};
 $('submitCount').onclick=()=>{
+if(!headcountAuthorized||!headcountToken){status($('countStatus'),'EFC staff sign-in required.','error');return;}
 const value=count;if(!confirm('Submit headcount of '+value+' people?'))return;
 try{queue({action:'submitHourlyHeadcount',eventId:id(),count:value,localTimestamp:new Date().toISOString()});setCount(0);status($('countStatus'),'✓ Headcount saved on this device and queued for Google Sheets.','good');renderPendingHeadcounts();}
 catch(e){status($('countStatus'),'Unable to save. Try again.','error')}
 };
 async function send(event){
-const response=await fetch(API_URL,{method:'POST',body:JSON.stringify(event),redirect:'follow'});
+let payload=event;
+if(event.action==='submitHourlyHeadcount'){
+  if(!headcountAuthorized||!headcountToken)throw Error('EFC staff login required to synchronize headcounts.');
+  payload={...event,token:headcountToken};
+}
+const response=await fetch(API_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow'});
 if(!response.ok)throw Error('HTTP '+response.status);
 const data=await response.json();if(!data.success)throw Error(data.message||'Save failed');return data;
 }
 async function syncPending(){if(syncing||!pending.length){displaySync();return}syncing=true;displaySync();let changed=false;
-try{for(const event of [...pending]){try{await send(event);pending=pending.filter(x=>x.eventId!==event.eventId);keepPending();changed=true}catch(error){console.warn('Sync paused:',error);break}}}
+try{for(const event of [...pending]){if(event.action==='submitHourlyHeadcount'&&!headcountAuthorized)continue;try{await send(event);pending=pending.filter(x=>x.eventId!==event.eventId);keepPending();changed=true}catch(error){console.warn('Sync paused:',error);if(event.action==='submitHourlyHeadcount')continue;break}}}
 finally{syncing=false;displaySync();if(changed&&!$('countPanel').hidden){refreshTraffic();refreshDashboard()}}}
 let cachedHeadcounts=[];
 function renderPendingHeadcounts(){const today=new Date().toLocaleDateString('en-US',{timeZone:'America/New_York'});
@@ -176,7 +210,7 @@ $('headTotal').textContent=total.toLocaleString('en-US');
 $('headTotalNote').textContent=all.length+' hourly snapshot'+(all.length===1?'':'s')+' • Sum of recorded counts, not unique visitors'+(local.length?' • includes '+local.length+' pending':'');
 $('historyBody').replaceChildren();if(!all.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=3;td.textContent='No headcounts recorded today.';tr.append(td);$('historyBody').append(tr);return}
 all.slice(-12).reverse().forEach(row=>{const tr=document.createElement('tr');[row.time+(row.pending?' (pending)':''),row.hour,String(row.count)].forEach(t=>{const td=document.createElement('td');td.textContent=t;tr.append(td)});$('historyBody').append(tr)})}
-async function refreshTraffic(){try{const response=await fetch(API_URL+'?action=getFacilityTraffic&t='+Date.now());const data=await response.json();if(!data.success)throw Error(data.message||'Cannot refresh');cachedHeadcounts=data.headcountsToday||[];renderPendingHeadcounts()}catch(e){renderPendingHeadcounts();console.warn(e)}}
+async function refreshTraffic(){if(!headcountAuthorized||$('countPanel').hidden)return;try{const response=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'getFacilityTrafficSecure',token:headcountToken})});const data=await response.json();if(!data.success)throw Error(data.message||'Cannot refresh');cachedHeadcounts=data.headcountsToday||[];renderPendingHeadcounts()}catch(e){renderPendingHeadcounts();console.warn(e)}}
 $('refreshTraffic').onclick=refreshTraffic;
 
 // Anonymized aggregate data only. The API does not return patron names.
@@ -223,16 +257,16 @@ function renderDashboard(data){
  if(cell){const strength=cell.average/maxAvg;td.style.background=`rgba(42,111,155,${(0.12+strength*.73).toFixed(2)})`;td.style.color=strength>.52?'white':'#17334a';td.title=cell.average.toFixed(1)+' avg · '+cell.days+' measured day(s)';}
  else{td.style.background='#f1f5f8';td.style.color='#8996a5'}tr.append(td)});tbody.append(tr)});table.append(tbody);wrap.append(table);
 }
-async function refreshDashboard(){if(dashboardBusy)return;dashboardBusy=true;status($('dashStatus'),'Loading historical headcounts…');$('dashRefresh').disabled=true;
- try{const days=Number($('dashDays').value);const response=await fetch(API_URL+'?action=getTrafficAnalytics&days='+days+'&t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(!data.success)throw Error(data.message||'Unable to load analytics');renderDashboard(data);status($('dashStatus'),'Updated from Facility Manager Database.','good')}
+async function refreshDashboard(){if(!headcountAuthorized||$('countPanel').hidden||dashboardBusy)return;dashboardBusy=true;status($('dashStatus'),'Loading historical headcounts…');$('dashRefresh').disabled=true;
+ try{const days=Number($('dashDays').value);const response=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'getTrafficAnalyticsSecure',days,token:headcountToken})});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(!data.success)throw Error(data.message||'Unable to load analytics');renderDashboard(data);status($('dashStatus'),'Updated from Facility Manager Database.','good')}
  catch(e){status($('dashStatus'),'Could not retrieve analytics: '+e.message,'error')}
  finally{dashboardBusy=false;$('dashRefresh').disabled=false}
 }
 $('dashDays').onchange=refreshDashboard;$('dashRefresh').onclick=refreshDashboard;
 
-window.addEventListener('online',()=>{syncPending();refreshTraffic();if(!$('countPanel').hidden)refreshDashboard()});
-window.addEventListener('storage',()=>{try{const v=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');if(Array.isArray(v))pending=v}catch(e){}displaySync()});
-setInterval(()=>{syncPending();if(!$('countPanel').hidden)refreshTraffic()},30000);
+window.addEventListener('online',()=>{if(!$('countPanel').hidden)showTab('count');else syncPending()});
+window.addEventListener('storage',e=>{try{const v=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');if(Array.isArray(v))pending=v}catch(err){}if(e.key===STAFF_KEY){headcountAuthorized=false;headcountToken='';$('countPanel').hidden=true;if($('countTab').classList.contains('active'))showTab('count');}displaySync()});
+setInterval(()=>{syncPending();if(!$('countPanel').hidden)showTab('count')},30000);
 setCount(count);displaySync();syncPending();
 </script>
 </body>
