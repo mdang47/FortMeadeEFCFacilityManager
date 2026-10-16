@@ -572,7 +572,12 @@ h1 {
 </head>
 
 
-<body>
+<body class="efc-locked"><style>
+body.efc-locked>:not(#efcGate){display:none!important}
+#efcGate{position:fixed;inset:0;background:#eef4f8;z-index:100000;display:grid;place-items:center;padding:20px;font:16px system-ui}
+#efcGate>div{background:#fff;border-radius:12px;padding:28px;max-width:420px}
+#efcGate a{color:#064b75}
+</style><div id="efcGate"><div><h2>EFC staff sign-in required</h2><p id="efcGateMessage">Checking your staff session…</p><a href="../../../Staff/staff-login.html">Open Staff Login</a> · <a href="../../../index.html">Return Home</a></div></div>
 <nav class="efc-return-home-bar" aria-label="Home navigation"><a href="../../../index.html">← Return Home</a></nav>
 
 
@@ -941,6 +946,31 @@ const API_URL =
 /* =========================
    STORAGE KEYS
 ========================= */
+
+const EFC_STAFF_TOKEN_KEY="efc-staff-token-v1";
+let efcInventoryAuthorized=false;
+let efcInventoryToken="";
+async function efcVerifyInventorySession(){
+  const token=localStorage.getItem(EFC_STAFF_TOKEN_KEY)||"";
+  const msg=document.getElementById("efcGateMessage");
+  if(!token){msg.textContent="Please sign in with an EFC or administrator account.";return;}
+  try{
+    const response=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"authValidate",token})});
+    if(!response.ok)throw Error("Unable to check session.");
+    const data=await response.json();
+    if(!data.success)throw Error(data.message||"Session expired.");
+    if(!data.staff||data.staff.forceReset||!Array.isArray(data.staff.roles)||!data.staff.roles.some(r=>r==="EFC"||r==="ADMIN"))throw Error("EFC or administrator access required.");
+    efcInventoryToken=token;
+    efcInventoryAuthorized=true;
+    document.body.classList.remove("efc-locked");
+    document.getElementById("efcGate").remove();
+    loadLocalData();
+    displayInventory();
+    updateStatus();
+    await loadServerInventory();
+    await syncPending();
+  }catch(error){msg.textContent="Access denied or unavailable: "+error.message;}
+}
 
 const INVENTORY_CACHE_KEY =
 "facilityInventoryShared";
@@ -2275,6 +2305,9 @@ action
     }
 
 
+    if(!efcInventoryAuthorized)throw Error("EFC staff sign-in required.");
+    payload.token=efcInventoryToken;
+
     const response =
     await fetch(
 
@@ -2328,6 +2361,7 @@ action
 
 async function syncPending() {
 
+    if(!efcInventoryAuthorized)return;
     if (currentlySyncing) {
         return;
     }
@@ -2425,13 +2459,11 @@ async function loadServerInventory() {
 
     try {
 
-        const response =
-        await fetch(
-
-            API_URL +
-            "?action=getInventory"
-
-        );
+        if(!efcInventoryAuthorized)return;
+        const response = await fetch(API_URL,{
+            method:"POST",
+            body:JSON.stringify({action:"getInventorySecure",token:efcInventoryToken})
+        });
 
 
         if (!response.ok) {
@@ -2676,6 +2708,7 @@ function applyPendingLocally() {
 
 async function syncEverything() {
 
+    if(!efcInventoryAuthorized)return;
     showMessage(
         "Checking for updates..."
     );
@@ -2767,6 +2800,7 @@ setInterval(
 
     async () => {
 
+        if(!efcInventoryAuthorized)return;
         await syncPending();
 
         await loadServerInventory();
@@ -2783,9 +2817,7 @@ window.addEventListener(
     "online",
 
     () => {
-
-        syncEverything();
-
+        if(efcInventoryAuthorized)syncEverything();
     }
 
 );
@@ -2796,17 +2828,7 @@ window.addEventListener(
    START
 ========================= */
 
-loadLocalData();
-
-displayInventory();
-
-updateStatus();
-
-loadServerInventory()
-.then(
-    () =>
-    syncPending()
-);
+efcVerifyInventorySession();
 
 
 </script>
