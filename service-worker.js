@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v9";
+const CACHE_NAME = "efc-tools-v10";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -96,9 +96,6 @@ if (url.protocol !== "http:" && url.protocol !== "https:") {
   if (event.request.method !== "GET") {
     return;
   }
-
-
-  const url = new URL(event.request.url);
 
 
   // -------------------------------------------------
