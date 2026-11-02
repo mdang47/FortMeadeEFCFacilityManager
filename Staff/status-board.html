@@ -1,0 +1,196 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#001522"><title>EFC Staff Status Board</title><style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#142b40;background:#eef4f8}*{box-sizing:border-box}body{margin:0;padding:18px}main{max-width:900px;margin:0 auto}
+body.efc-locked>:not(#efcGate){display:none!important}#efcGate{position:fixed;top:0;left:0;right:0;bottom:0;background:#eef4f8;z-index:100000;display:flex;align-items:center;justify-content:center;font:16px system-ui,-apple-system,sans-serif;padding:20px}#efcGate.hide{display:none}#efcGate>div{background:white;border-radius:12px;padding:28px;max-width:420px}#efcGate a{color:#064b75}
+h1{margin:0 0 4px;font-size:1.6rem}h2{font-size:1.1rem;margin:0 0 10px}.muted{color:#536b7e}.hide{display:none!important}
+.top{overflow:hidden;margin-bottom:12px}.top .links{float:right}.link{display:inline-block;background:#e1ebf3;color:#193650;padding:9px 14px;border-radius:8px;font-weight:650;text-decoration:none;margin:0 0 6px 6px}
+.panel{background:white;border:1px solid #c5d7e3;box-shadow:0 5px 22px #17314b12;padding:16px;border-radius:14px;margin-bottom:12px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between}.bar>*{margin:4px 0}
+button{font:inherit;font-weight:650;border:0;border-radius:8px;padding:11px 16px;cursor:pointer;background:#0b3656;color:white;min-height:44px}button.secondary{background:#e1ebf3;color:#193650}button:disabled{opacity:.45;cursor:default}
+.msg{min-height:20px;margin:6px 0 0;color:#8d2c28;font-weight:600}.msg.good{color:#17623d}
+.notice{border-radius:10px;padding:10px 12px;margin-bottom:12px;font-weight:600;background:#fff4d6;color:#5a3d00;border:2px solid #e0b040}.notice.err{background:#fde8e6;color:#7a1f17;border-color:#d9776c}
+.dot{display:inline-block;width:18px;height:18px;border-radius:50%;vertical-align:middle;flex:0 0 auto;border:2px solid #9aa7b3;background:transparent}
+.dot.lit{border-color:rgba(0,0,0,.25);box-shadow:0 0 0 3px rgba(255,255,255,.9),0 0 10px 2px var(--c)}
+.s-IN{--c:#1f9d55}.s-OUT{--c:#7b8794}.s-LUNCH{--c:#f2b01e}.s-JBA{--c:#2563eb}.s-GAFFNEY{--c:#7c3aed}.s-APPT{--c:#ea6c0a}.s-LATE{--c:#d1293d}.s-OTHER{--c:#0e9fa6}
+.dot.lit{background:#888;background:var(--c)}
+.picker{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;margin:0 -4px}
+.picker button{display:-webkit-flex;display:flex;align-items:center;background:white;color:#142b40;border:2px solid #c5d7e3;margin:4px;padding:9px 12px;-webkit-flex:1 1 140px;flex:1 1 140px;text-align:left}
+.picker button .dot{margin-right:8px}.picker button.sel{border-color:#0b3656;background:#e8f0f7;box-shadow:inset 0 0 0 1px #0b3656}
+.other{margin-top:8px}.other label{display:block;font-weight:650;margin:6px 0 4px}.other input{width:100%;padding:11px;border:1px solid #a7bacb;border-radius:8px;font:inherit;font-size:16px}.other .row{display:flex;margin-top:8px}.other .row button{margin-right:8px}
+.mine{display:flex;align-items:center;margin-bottom:10px;font-size:1.05rem}.mine .dot{width:22px;height:22px;margin-right:10px}
+.legend{display:flex;flex-wrap:wrap;margin:0 -6px;font-size:.92rem}.legend span.item{display:inline-flex;align-items:center;margin:4px 8px}.legend .dot{width:14px;height:14px;margin-right:6px}
+.counts{font-size:.92rem;margin-top:6px}
+.board{list-style:none;margin:0;padding:0}.board li{display:flex;align-items:center;padding:12px 4px;border-top:1px solid #dde7ed}.board li:first-child{border-top:0}
+.board .dot{width:26px;height:26px;margin-right:14px}.board .who{-webkit-flex:1 1 auto;flex:1 1 auto;min-width:0}.board .name{font-weight:700;overflow-wrap:break-word;word-wrap:break-word}
+.badge{display:inline-block;font-weight:800;font-size:.82rem;letter-spacing:.03em;padding:3px 8px;border-radius:999px;border:2px solid #9aa7b3;border:2px solid var(--c);color:#142b40;background:#fff;margin:3px 6px 0 0}
+.badge.none{border-color:#c5d7e3;color:#536b7e;font-weight:600}.loc{font-weight:600}.when{font-size:.85rem;color:#536b7e;margin-top:2px}.stale{color:#8d5a00}
+.board li.me{background:#f5f9fc}.board .act{margin-left:10px}.board .act button{padding:8px 12px;min-height:40px}
+#editor{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,25,40,.55);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;-webkit-overflow-scrolling:touch}
+#editor>div{background:white;border-radius:14px;padding:18px;max-width:560px;width:100%;margin-top:4vh}
+@media (max-width:560px){body{padding:10px}.top .links{float:none}.link{margin:0 6px 6px 0}.picker button{flex-basis:45%;-webkit-flex-basis:45%}}
+</style></head><body class="efc-locked">
+<div id="efcGate"><div><h2>Staff sign-in required</h2><p id="efcGateMessage">Checking your staff session…</p><a href="staff-login.html">Open Staff Login</a> · <a href="../index.html">Return Home</a></div></div>
+<main>
+<div class="top"><div class="links"><a class="link" href="../index.html">← Return Home</a><a class="link" href="staff-login.html">Staff Login</a></div><h1>Staff Status Board</h1><div class="muted" id="signedIn"></div></div>
+<div id="notice" class="notice hide" role="status"></div>
+<section class="panel" id="minePanel"><h2>My status</h2><div class="mine" id="mine"></div><div id="minePicker"></div><p class="msg" id="mineMsg" role="status"></p></section>
+<section class="panel"><div class="bar"><h2 style="margin:0">Board</h2><div><span class="muted" id="refreshed"></span> <button class="secondary" id="refresh" type="button">Refresh</button></div></div>
+<div class="legend" id="legend" aria-label="Status color legend"></div><div class="counts muted" id="counts"></div><p class="msg" id="boardMsg" role="status"></p><ul class="board" id="board"></ul></section>
+<p class="muted" style="font-size:.85rem">Auto-refreshes every 60 seconds while this page is open. Everyone signed in can view; you can change your own status, and administrators can change anyone's. Every change is logged.</p>
+</main>
+<div id="editor" class="hide" role="dialog" aria-modal="true" aria-labelledby="editorTitle"><div><h2 id="editorTitle">Change status</h2><div id="editorPicker"></div><p class="msg" id="editorMsg" role="status"></p><div style="margin-top:10px"><button class="secondary" type="button" id="editorClose">Close</button></div></div></div>
+<script src="efc-staff-session.js"></script>
+<script>
+'use strict';
+var API_URL='https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec';
+var LAST_KEY='efc-status-board-last-v1';   // last board the SERVER returned (shown only, clearly labeled, when offline)
+var REFRESH_MS=60000;
+var STATUSES=[
+ {v:'IN',label:'IN',k:'IN'},{v:'OUT',label:'OUT',k:'OUT'},{v:'LUNCH',label:'LUNCH',k:'LUNCH'},
+ {v:'JBA TRACK',label:'JBA TRACK',k:'JBA'},{v:'GAFFNEY TRACK',label:'GAFFNEY TRACK',k:'GAFFNEY'},
+ {v:'ON APPT',label:'ON APPT',k:'APPT'},{v:'IN LATE',label:'IN LATE',k:'LATE'},{v:'OTHER',label:'Other',k:'OTHER'}];
+var token='',me=null,staff=[],online=false,loading=false,seq=0,editingId=null,timer=0;
+function $(id){return document.getElementById(id);}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function info(v){for(var i=0;i<STATUSES.length;i++)if(STATUSES[i].v===v)return STATUSES[i];return null;}
+function dot(v){var s=info(v),d=el('span','dot'+(s?' lit s-'+s.k:''));d.setAttribute('aria-hidden','true');return d;}
+function msg(id,text,good){$(id).textContent=text||'';$(id).className='msg'+(good?' good':'');}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function fmt(iso){if(!iso)return '';var d=new Date(iso);if(isNaN(d.getTime()))return '';var t=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});return sameDay(d,new Date())?t:d.toLocaleDateString([],{month:'short',day:'numeric'})+', '+t;}
+function notice(text,err){var n=$('notice');n.textContent=text||'';n.className='notice'+(err?' err':'')+(text?'':' hide');}
+function post(body){
+ body.token=token;
+ return fetch(API_URL,{method:'POST',body:JSON.stringify(body),redirect:'follow'}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json();});
+}
+function lockOut(message){
+ EFCStaffSession.forget();clearInterval(timer);closeEditor();try{localStorage.removeItem(LAST_KEY);}catch(e){}
+ document.body.classList.add('efc-locked');$('efcGate').classList.remove('hide');$('efcGateMessage').textContent=message||'Session expired. Please sign in again.';
+}
+function renderLegend(){
+ var root=$('legend');root.replaceChildren();
+ STATUSES.forEach(function(s){var i=el('span','item');i.appendChild(dot(s.v));i.appendChild(document.createTextNode(s.label+(s.v==='OTHER'?' (with location)':'')));root.appendChild(i);});
+ var n=el('span','item');n.appendChild(dot(''));n.appendChild(document.createTextNode('Not set'));root.appendChild(n);
+}
+function canEdit(id){return online&&me&&(id===me.id||me.admin);}
+// Status picker: tapping a status saves it; Other asks for a location first.
+// While someone is typing an Other location or a save is in flight, auto-refresh must not rebuild the picker.
+function buildPicker(root,target,msgId){
+ if(root.getAttribute('data-busy')==='1'&&root.getAttribute('data-target')===target)return;
+ root.removeAttribute('data-busy');root.setAttribute('data-target',target);
+ root.replaceChildren();
+ var person=find(target),cur=person?person.status:'';
+ var grid=el('div','picker'),other=el('div','other hide'),input=el('input'),save=el('button',null,'Save Other'),cancel=el('button','secondary','Cancel');
+ var lab=el('label',null,target===me.id?'Where are you? (required for Other)':'Location (required for Other)');var inputId='loc-'+(root.id||'p');input.id=inputId;lab.setAttribute('for',inputId);
+ input.maxLength=60;input.placeholder='e.g. Bldg 6530 front desk';input.autocomplete='off';input.value=person&&person.status==='OTHER'?person.location:'';
+ var row=el('div','row');row.appendChild(save);row.appendChild(cancel);other.appendChild(lab);other.appendChild(input);other.appendChild(row);
+ var buttons=[];
+ STATUSES.forEach(function(s){
+  var b=el('button');b.type='button';b.appendChild(dot(s.v));b.appendChild(document.createTextNode(s.label));b.setAttribute('data-status',s.v);
+  if(s.v===cur){b.className='sel';b.setAttribute('aria-pressed','true');}else b.setAttribute('aria-pressed','false');
+  b.disabled=!canEdit(target);
+  b.onclick=function(){
+   if(s.v==='OTHER'){root.setAttribute('data-busy','1');other.classList.remove('hide');input.focus();msg(msgId,'');return;}
+   other.classList.add('hide');setStatus(root,target,s.v,'',msgId,buttons.concat([save]));
+  };
+  buttons.push(b);grid.appendChild(b);
+ });
+ save.type='button';cancel.type='button';
+ save.onclick=function(){var loc=input.value.replace(/\s+/g,' ').trim();if(!loc){msg(msgId,'Enter a location for Other.');input.focus();return;}setStatus(root,target,'OTHER',loc,msgId,buttons.concat([save]));};
+ cancel.onclick=function(){root.removeAttribute('data-busy');other.classList.add('hide');msg(msgId,'');};
+ input.onkeydown=function(e){if(e.keyCode===13)save.onclick();};
+ root.appendChild(grid);root.appendChild(other);
+}
+function find(id){for(var i=0;i<staff.length;i++)if(staff[i].id===id)return staff[i];return null;}
+function setStatus(root,target,status,location,msgId,controls){
+ if(!online){msg(msgId,'Offline: status changes need internet.');return;}
+ root.setAttribute('data-busy','1');controls.forEach(function(b){b.disabled=true;});msg(msgId,'Saving…',true);
+ var body={action:'statusSet',status:status,location:location};if(target!==me.id)body.staffId=target;
+ post(body).then(function(j){
+  if(j.authFailed){lockOut(j.message);return;}
+  if(!j.success)throw Error(j.message||'Could not save.');
+  var p=find(target);if(p&&j.entry){p.status=j.entry.status;p.location=j.entry.location;p.updatedAt=j.entry.updatedAt;p.updatedById=j.entry.updatedById;p.updatedByName=j.entry.updatedByName;}
+  root.removeAttribute('data-busy');render();msg(msgId,j.unchanged?'No change — already '+label(status)+'.':'Saved: '+(p?p.name+' is ':'')+label(status)+(location?' — '+location:''),true);
+  load(true);
+ }).catch(function(e){
+  msg(msgId,(navigator.onLine===false||e instanceof TypeError)?'No internet connection. Status not saved.':e.message);
+  controls.forEach(function(b){b.disabled=!canEdit(target);});
+  var o=root.querySelector('.other');if(!o||o.classList.contains('hide'))root.removeAttribute('data-busy');
+ });
+}
+function label(v){var s=info(v);return s?s.label:'Not set';}
+function render(){
+ $('signedIn').textContent=me?'Signed in as '+me.name+(me.admin?' (Administrator)':''):'';
+ var mine=find(me&&me.id);var m=$('mine');m.replaceChildren();
+ m.appendChild(dot(mine?mine.status:''));
+ m.appendChild(document.createTextNode(mine&&mine.status?label(mine.status)+(mine.status==='OTHER'&&mine.location?' — '+mine.location:''):'Not set yet'));
+ buildPicker($('minePicker'),me.id,'mineMsg');
+ $('minePanel').classList.toggle('hide',!mine);
+ var root=$('board');root.replaceChildren();var counts={},now=new Date();
+ staff.forEach(function(p){
+  counts[p.status||'']=(counts[p.status||'']||0)+1;
+  var li=el('li',p.id===me.id?'me':null);li.setAttribute('data-staff-id',p.id);li.appendChild(dot(p.status));
+  var who=el('div','who');who.appendChild(el('div','name',p.name+(p.id===me.id?' (you)':'')));
+  var s=info(p.status),line=el('div');var badge=el('span','badge'+(s?' s-'+s.k:' none'),s?s.label:'Not set');line.appendChild(badge);
+  if(p.status==='OTHER'&&p.location)line.appendChild(el('span','loc',p.location));
+  who.appendChild(line);
+  if(p.updatedAt){
+   var w=el('div','when','Updated '+fmt(p.updatedAt)+(p.updatedById&&p.updatedById!==p.id?' by '+(p.updatedByName||'administrator'):''));
+   if(!sameDay(new Date(p.updatedAt),now))w.appendChild(el('span','stale',' · not updated today'));
+   who.appendChild(w);
+  }
+  li.appendChild(who);
+  if(me.admin&&p.id!==me.id){var a=el('div','act'),b=el('button','secondary','Change');b.type='button';b.disabled=!online;b.setAttribute('aria-label','Change status for '+p.name);b.onclick=function(){openEditor(p.id);};a.appendChild(b);li.appendChild(a);}
+  root.appendChild(li);
+ });
+ if(!staff.length)root.appendChild(el('li','muted','No active staff accounts.'));
+ var parts=[];STATUSES.forEach(function(s){if(counts[s.v])parts.push(s.label+' '+counts[s.v]);});if(counts[''])parts.push('Not set '+counts['']);
+ $('counts').textContent=parts.join(' · ');
+ if(editingId)buildEditor();
+}
+function openEditor(id){editingId=id;msg('editorMsg','');buildEditor();$('editor').classList.remove('hide');}
+function buildEditor(){var p=find(editingId);if(!p){closeEditor();return;}$('editorTitle').textContent='Change status for '+p.name;var keep=$('editorMsg').textContent;buildPicker($('editorPicker'),p.id,'editorMsg');$('editorMsg').textContent=keep;}
+function closeEditor(){editingId=null;$('editor').classList.add('hide');$('editorPicker').removeAttribute('data-busy');}
+$('editorClose').onclick=closeEditor;
+$('editor').onclick=function(e){if(e.target===$('editor'))closeEditor();};
+function showLastKnown(reason){
+ var last=null;try{last=JSON.parse(localStorage.getItem(LAST_KEY)||'null');}catch(e){}
+ online=false;
+ if(last&&last.by===me.id&&Array.isArray(last.staff)){
+  staff=last.staff;render();
+  notice('Offline — showing the LAST KNOWN board from '+fmt(last.at)+'. It may be out of date. Status changes are disabled until internet returns.');
+  $('refreshed').textContent='Last known: '+fmt(last.at);
+ }else{
+  staff=[];render();$('minePanel').classList.add('hide');
+  notice('Can\'t load the status board'+(reason?': '+reason:'.')+' Nothing is shown because no recent board is saved on this device.',true);
+  $('refreshed').textContent='';
+ }
+}
+function load(quiet){
+ if(loading&&quiet)return;
+ var my=++seq;loading=true;if(!quiet)msg('boardMsg','Loading…',true);$('refresh').disabled=true;
+ if(navigator.onLine===false){loading=false;$('refresh').disabled=false;msg('boardMsg','');showLastKnown('no internet connection.');return;}
+ post({action:'statusBoard'}).then(function(j){
+  if(my!==seq)return;
+  if(j.authFailed){lockOut(j.message);return;}
+  if(!j.success)throw Error(j.message||'Could not load the board.');
+  online=true;staff=j.staff||[];if(j.me){me.id=j.me.id;me.name=j.me.name;me.admin=j.me.admin===true;}
+  try{localStorage.setItem(LAST_KEY,JSON.stringify({at:new Date().toISOString(),by:me.id,staff:staff}));}catch(e){}
+  notice('');EFCStaffSession.banner(null);render();msg('boardMsg','');$('refreshed').textContent='Updated '+fmt(new Date().toISOString());
+ }).catch(function(e){
+  if(my!==seq)return;msg('boardMsg','');
+  if(navigator.onLine===false||e instanceof TypeError||/^HTTP /.test(e.message))showLastKnown('the facility server could not be reached.');
+  else{notice('Can\'t load the status board: '+e.message,true);}
+ }).then(function(){if(my===seq){loading=false;$('refresh').disabled=false;}});
+}
+$('refresh').onclick=function(){load(false);};
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&me)load(true);});
+window.addEventListener('online',function(){if(me)load(true);});
+window.addEventListener('offline',function(){if(me)showLastKnown('no internet connection.');});
+renderLegend();
+EFCStaffSession.validate(API_URL).then(function(s){
+ if(!s.staff||s.staff.forceReset)throw Error('Temporary PIN must be changed first. Open Staff Login to change it.');
+ token=s.token;me={id:String(s.staff.id),name:String(s.staff.name),admin:(s.staff.roles||[]).indexOf('ADMIN')>=0};
+ document.body.classList.remove('efc-locked');$('efcGate').classList.add('hide');
+ if(s.offline){EFCStaffSession.banner(s);showLastKnown('no internet connection.');}else load(false);
+ timer=setInterval(function(){if(!document.hidden)load(true);},REFRESH_MS);
+}).catch(function(e){$('efcGateMessage').textContent='Session unavailable: '+e.message;});
+</script></body></html>
