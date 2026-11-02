@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v10";
+const CACHE_NAME = "efc-tools-v11";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -16,6 +16,7 @@ const CORE_FILES = [
   "./Facility%20Manager/Apps/Icons/Visitor.png",
 
   // FAC
+  "./Facility%20Manager/FAC/",
   "./Facility%20Manager/FAC/index.html",
   "./Facility%20Manager/FAC/pfra_calculator.html",
 
@@ -33,7 +34,13 @@ const CORE_FILES = [
   "./Facility%20Manager/Apps/Leave%20Tracker/Leave.html",
 
   // Visitor Counter
+  "./Facility%20Manager/Apps/Visitor%20Counter/",
   "./Facility%20Manager/Apps/Visitor%20Counter/index.html",
+
+  // Staff sign-in + offline session helper (no PINs or tokens are cached;
+  // only the static page/script files)
+  "./Staff/staff-login.html",
+  "./Staff/efc-staff-session.js",
 ];
 
 

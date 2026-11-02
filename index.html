@@ -490,20 +490,26 @@
   }
 </script>
   <!-- Refresh GitHub Pages deployment -->
+<script src="./Staff/efc-staff-session.js"></script>
 <script>
 // Display FAC-only shortcuts after server confirmation; hiding buttons is UI only.
 (async function(){
   const token=localStorage.getItem("efc-staff-token-v1")||"";
   if(!token)return;
+  const showFac=roles=>{if(Array.isArray(roles)&&roles.some(r=>r==="FAC"||r==="ADMIN"))document.querySelectorAll("[data-fac-only]").forEach(el=>{el.hidden=false;el.style.display="";});};
   try{
     const response=await fetch("https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec",{
       method:"POST",body:JSON.stringify({action:"authValidate",token})
     });
     const data=await response.json();
-    if(data.success===true && Array.isArray(data.staff?.roles) && data.staff.roles.some(r=>r==="FAC"||r==="ADMIN")){
-      document.querySelectorAll("[data-fac-only]").forEach(el=>{el.hidden=false;el.style.display="";});
-    }
-  }catch(e){ console.warn("Staff shortcut validation unavailable"); }
+    if(data.success===true&&data.staff){window.EFCStaffSession&&EFCStaffSession.remember(token,data.staff,data.expiresAt);showFac(data.staff.roles);}
+    else if(window.EFCStaffSession)EFCStaffSession.forget();
+  }catch(e){
+    // Offline: use the recently verified session cached on this device (UI only).
+    const off=window.EFCStaffSession&&EFCStaffSession.offlineSession(token);
+    if(off)showFac(off.staff.roles);
+    console.warn("Staff shortcut validation unavailable");
+  }
 })();
 </script>
 </body>
