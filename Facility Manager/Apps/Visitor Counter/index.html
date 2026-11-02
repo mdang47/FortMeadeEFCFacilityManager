@@ -125,12 +125,13 @@ input{width:100%;border:1px solid #aebfd1;border-radius:10px;padding:15px;font-s
 
 <footer class="foot">707 FSS Fitness Assessment Cell <span id="syncLabel">• Checking sync status...</span></footer>
 </main>
+<script src="../../../Staff/efc-staff-session.js"></script>
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec';
 const PENDING_KEY='efcVisitorTrackingV2Pending';
 const DRAFT_KEY='efcVisitorHeadcountDraft';
 const STAFF_KEY='efc-staff-token-v1';
-let headcountAuthorized=false;let headcountToken='';let verifyingHeadcount=null;
+let headcountAuthorized=false;let headcountToken='';let verifyingHeadcount=null;let headcountOffline=false;
 const branches=['Air Force','Army','Space Force','Navy','Marines','Coast Guard','Civilian','Other'];
 const $=id=>document.getElementById(id);
 let pending=[];let syncing=false;let count=0;let submitting=false;
@@ -144,14 +145,12 @@ function setCount(n){count=Math.max(0,Math.floor(n));$('countValue').textContent
 async function verifyHeadcount(){
  if(verifyingHeadcount)return verifyingHeadcount;
  verifyingHeadcount=(async()=>{
-  const token=localStorage.getItem(STAFF_KEY)||'';
-  headcountAuthorized=false;headcountToken='';
-  if(!token)throw Error('Sign in with an EFC or administrator account to use Headcount.');
-  const response=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'authValidate',token})});
-  if(!response.ok)throw Error('Session check unavailable. Try again when online.');
-  const data=await response.json();
-  if(!data.success||!data.staff||data.staff.forceReset||!Array.isArray(data.staff.roles)||!data.staff.roles.some(r=>r==='EFC'||r==='ADMIN'))throw Error('EFC or administrator access required.');
-  headcountAuthorized=true;headcountToken=token;
+  headcountAuthorized=false;headcountToken='';headcountOffline=false;
+  // Network failure + recent verified session = offline mode; server rejection always denies.
+  let s;try{s=await EFCStaffSession.validate(API_URL);}catch(e){if(!localStorage.getItem(STAFF_KEY))throw Error('Sign in with an EFC or administrator account to use Headcount.');throw e;}
+  if(!s.staff||s.staff.forceReset||!Array.isArray(s.staff.roles)||!s.staff.roles.some(r=>r==='EFC'||r==='ADMIN'))throw Error('EFC or administrator access required.');
+  headcountAuthorized=true;headcountToken=s.token;headcountOffline=s.offline;
+  EFCStaffSession.banner(s);
   return true;
  })();
  try{return await verifyingHeadcount}finally{verifyingHeadcount=null}
@@ -160,10 +159,10 @@ async function showTab(which){
  const head=which==='count';$('signinPanel').hidden=head;
  $('signinTab').classList.toggle('active',!head);$('countTab').classList.toggle('active',head);
  $('countPanel').hidden=true;$('headcountGate').hidden=true;
- if(!head)return;
+ if(!head){EFCStaffSession.banner(null);return;}
  $('headcountGate').hidden=false;$('headcountGateMessage').textContent='Checking your staff session…';
- try{await verifyHeadcount();$('headcountGate').hidden=true;$('countPanel').hidden=false;renderPendingHeadcounts();await Promise.all([refreshTraffic(),refreshDashboard()]);syncPending();}
- catch(e){$('headcountGateMessage').textContent=e.message;}
+ try{await verifyHeadcount();$('headcountGate').hidden=true;$('countPanel').hidden=false;renderPendingHeadcounts();if(headcountOffline){status($('dashStatus'),'Offline: history and analytics load when internet returns. Headcounts are kept on this device until then.');}else{await Promise.all([refreshTraffic(),refreshDashboard()]);syncPending();}}
+ catch(e){EFCStaffSession.banner(null);$('headcountGateMessage').textContent=e.message;}
 }
 $('headcountRetry').onclick=()=>showTab('count');
 $('signinTab').onclick=()=>showTab('signin');$('countTab').onclick=()=>showTab('count');

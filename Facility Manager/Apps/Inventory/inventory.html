@@ -931,6 +931,7 @@ Save Item
 
 
 
+<script src="../../../Staff/efc-staff-session.js"></script>
 <script>
 
 
@@ -950,26 +951,33 @@ const API_URL =
 const EFC_STAFF_TOKEN_KEY="efc-staff-token-v1";
 let efcInventoryAuthorized=false;
 let efcInventoryToken="";
+let efcInventoryOffline=false;
+// Network failure + recent verified session = offline mode (local data only).
+// A server rejection always locks the page. The server still checks the token on every save.
 async function efcVerifyInventorySession(){
-  const token=localStorage.getItem(EFC_STAFF_TOKEN_KEY)||"";
+  const gate=document.getElementById("efcGate");
   const msg=document.getElementById("efcGateMessage");
-  if(!token){msg.textContent="Please sign in with an EFC or administrator account.";return;}
   try{
-    const response=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"authValidate",token})});
-    if(!response.ok)throw Error("Unable to check session.");
-    const data=await response.json();
-    if(!data.success)throw Error(data.message||"Session expired.");
-    if(!data.staff||data.staff.forceReset||!Array.isArray(data.staff.roles)||!data.staff.roles.some(r=>r==="EFC"||r==="ADMIN"))throw Error("EFC or administrator access required.");
-    efcInventoryToken=token;
+    const s=await EFCStaffSession.validate(API_URL);
+    if(!s.staff||s.staff.forceReset||!Array.isArray(s.staff.roles)||!s.staff.roles.some(r=>r==="EFC"||r==="ADMIN"))throw Error("EFC or administrator access required.");
+    efcInventoryToken=s.token;
     efcInventoryAuthorized=true;
-    document.body.classList.remove("efc-locked");
-    document.getElementById("efcGate").remove();
-    loadLocalData();
-    displayInventory();
-    updateStatus();
+    efcInventoryOffline=s.offline;
+    EFCStaffSession.banner(s);
+    if(gate){
+      document.body.classList.remove("efc-locked");
+      gate.remove();
+      loadLocalData();
+      displayInventory();
+      updateStatus();
+    }
+    if(s.offline)return;
     await loadServerInventory();
     await syncPending();
-  }catch(error){msg.textContent="Access denied or unavailable: "+error.message;}
+  }catch(error){
+    if(!gate){location.reload();return;}
+    if(msg&&msg.isConnected)msg.textContent="Access denied or unavailable: "+error.message;else console.error(error);
+  }
 }
 
 const INVENTORY_CACHE_KEY =
@@ -2801,6 +2809,7 @@ setInterval(
     async () => {
 
         if(!efcInventoryAuthorized)return;
+        if(efcInventoryOffline){await efcVerifyInventorySession();return;}
         await syncPending();
 
         await loadServerInventory();
@@ -2817,7 +2826,8 @@ window.addEventListener(
     "online",
 
     () => {
-        if(efcInventoryAuthorized)syncEverything();
+        if(efcInventoryOffline)efcVerifyInventorySession();
+        else if(efcInventoryAuthorized)syncEverything();
     }
 
 );
