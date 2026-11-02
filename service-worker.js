@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v12";
+const CACHE_NAME = "efc-tools-v13";
 
 const CORE_FILES = [
   // Main EFC landing page
