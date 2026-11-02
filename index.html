@@ -259,7 +259,7 @@
       }
     }
   </style>
-<style>[data-fac-only][hidden]{display:none!important}</style>
+<style>[data-fac-only][hidden],[data-staff-only][hidden]{display:none!important}</style>
 <style>.hero .staff-login{display:inline-block;margin-top:14px;padding:6px 14px;border:1px solid rgba(255,255,255,.55);border-radius:999px;color:#fff;font-size:13px;font-weight:700;text-decoration:none;background:rgba(255,255,255,.08)}.hero .staff-login:hover,.hero .staff-login:focus{background:rgba(255,255,255,.2)}</style>
 </head>
 
@@ -449,6 +449,11 @@
         </span>
 
       </a>
+<a class="card" data-staff-only hidden href="./Staff/status-board.html">
+  <h2>Staff Status Board</h2>
+  <p>See who is in, out, at lunch, at the track, or elsewhere, and update your own status.</p>
+  <span class="tag">Open Status Board</span>
+</a>
 <a
   class="card"
   href="./Facility%20Manager/Apps/Fitness%20Access/fitness-access.html"
@@ -497,11 +502,11 @@
   <!-- Refresh GitHub Pages deployment -->
 <script src="./Staff/efc-staff-session.js"></script>
 <script>
-// Display FAC-only shortcuts after server confirmation; hiding buttons is UI only.
+// Display staff-only / FAC-only shortcuts after server confirmation; hiding buttons is UI only.
 (async function(){
   const token=localStorage.getItem("efc-staff-token-v1")||"";
   if(!token)return;
-  const showFac=roles=>{if(Array.isArray(roles)&&roles.some(r=>r==="FAC"||r==="ADMIN"))document.querySelectorAll("[data-fac-only]").forEach(el=>{el.hidden=false;el.style.display="";});};
+  const showFac=roles=>{if(Array.isArray(roles))document.querySelectorAll("[data-staff-only]").forEach(el=>{el.hidden=false;el.style.display="";});if(Array.isArray(roles)&&roles.some(r=>r==="FAC"||r==="ADMIN"))document.querySelectorAll("[data-fac-only]").forEach(el=>{el.hidden=false;el.style.display="";});};
   try{
     const response=await fetch("https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec",{
       method:"POST",body:JSON.stringify({action:"authValidate",token})

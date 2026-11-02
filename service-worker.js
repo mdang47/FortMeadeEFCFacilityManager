@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v13";
+const CACHE_NAME = "efc-tools-v14";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -41,6 +41,9 @@ const CORE_FILES = [
   // only the static page/script files)
   "./Staff/staff-login.html",
   "./Staff/efc-staff-session.js",
+  // Staff status board: page shell only. Statuses always come from the
+  // server (POST, never cached here); offline the page says so.
+  "./Staff/status-board.html",
 ];
 
 
