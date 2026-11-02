@@ -1,3 +1,15 @@
+/* Compatibility for older iPads (Safari before 14): these pages use
+ * Element.replaceChildren and String.replaceAll, which older Safari lacks. */
+(function(){
+  function rc(){while(this.lastChild)this.removeChild(this.lastChild);for(var i=0;i<arguments.length;i++){var n=arguments[i];this.appendChild(typeof n==='string'?document.createTextNode(n):n);}}
+  if(window.Element&&!Element.prototype.replaceChildren)Element.prototype.replaceChildren=rc;
+  if(window.DocumentFragment&&!DocumentFragment.prototype.replaceChildren)DocumentFragment.prototype.replaceChildren=rc;
+  if(!String.prototype.replaceAll)String.prototype.replaceAll=function(find,rep){
+    if(find instanceof RegExp)return this.replace(find,rep);
+    var re=new RegExp(String(find).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g');
+    return this.replace(re,typeof rep==='function'?rep:String(rep).replace(/\$/g,'$$$$'));
+  };
+})();
 /* EFC STAFF SESSION - OFFLINE GRACE (UI ONLY)
  * Lets a session that the server verified recently open staff pages while the
  * gym has no internet. This is a convenience, not a security boundary:
