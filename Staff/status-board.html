@@ -35,44 +35,88 @@ button{font:inherit;font-weight:650;border:0;border-radius:8px;padding:11px 16px
 <section class="panel" id="minePanel"><h2>My status</h2><div class="mine" id="mine"></div><div id="minePicker"></div><p class="msg" id="mineMsg" role="status"></p></section>
 <section class="panel"><div class="bar"><h2 style="margin:0">Board</h2><div><span class="muted" id="refreshed"></span> <button class="secondary" id="refresh" type="button">Refresh</button></div></div>
 <div class="legend" id="legend" aria-label="Status color legend"></div><div class="counts muted" id="counts"></div><p class="msg" id="boardMsg" role="status"></p><ul class="board" id="board"></ul></section>
-<p class="muted" style="font-size:.85rem">Auto-refreshes every 60 seconds while this page is open. Everyone signed in can view; you can change your own status, and administrators can change anyone's. Every change is logged.</p>
+<p class="muted" style="font-size:.85rem">Auto-refreshes every 60 seconds while this page is open. Everyone signed in can view; you can change your own status, and administrators can change anyone's. Every change is logged. Each Eastern day starts as Unknown; a status from a previous day is not shown as current.</p>
 </main>
 <div id="editor" class="hide" role="dialog" aria-modal="true" aria-labelledby="editorTitle"><div><h2 id="editorTitle">Change status</h2><div id="editorPicker"></div><p class="msg" id="editorMsg" role="status"></p><div style="margin-top:10px"><button class="secondary" type="button" id="editorClose">Close</button></div></div></div>
 <script src="efc-staff-session.js"></script>
 <script>
 'use strict';
 var API_URL='https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec';
-var LAST_KEY='efc-status-board-last-v1';   // last board the SERVER returned (shown only, clearly labeled, when offline)
+var LAST_KEY='efc-status-board-last-v1';   // last board the server returned; only shown offline when its dayKey is today's Eastern day
 var REFRESH_MS=60000;
 var STATUSES=[
  {v:'IN',label:'IN',k:'IN'},{v:'OUT',label:'OUT',k:'OUT'},{v:'LEAVE',label:'LEAVE',k:'LEAVE'},{v:'LUNCH',label:'LUNCH',k:'LUNCH'},
  {v:'JBA TRACK',label:'JBA TRACK',k:'JBA'},{v:'GAFFNEY TRACK',label:'GAFFNEY TRACK',k:'GAFFNEY'},
  {v:'ON APPT',label:'ON APPT',k:'APPT'},{v:'IN LATE',label:'IN LATE',k:'LATE'},{v:'OTHER',label:'Other',k:'OTHER'}];
-var token='',me=null,staff=[],online=false,loading=false,seq=0,editingId=null,timer=0;
+var token='',me=null,staff=[],online=false,loading=false,seq=0,editingId=null,timer=0,dayWatch=0,midnightTimer=0;
+var loadedDayKey='',serverSkew=0,lastServerMs=0,rolloverPainted='',offlineNoticeDay='',lastEnsureFetch=0;
 function $(id){return document.getElementById(id);}
 function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
 function info(v){for(var i=0;i<STATUSES.length;i++)if(STATUSES[i].v===v)return STATUSES[i];return null;}
 function dot(v){var s=info(v),d=el('span','dot'+(s?' lit s-'+s.k:''));d.setAttribute('aria-hidden','true');return d;}
 function msg(id,text,good){$(id).textContent=text||'';$(id).className='msg'+(good?' good':'');}
-function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
-function fmt(iso){if(!iso)return '';var d=new Date(iso);if(isNaN(d.getTime()))return '';var t=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});return sameDay(d,new Date())?t:d.toLocaleDateString([],{month:'short',day:'numeric'})+', '+t;}
+/* eastern-day:start
+ * America/New_York calendar day. Post-2007 US DST: second Sunday in March
+ * 02:00 EST (07:00 UTC) through first Sunday in November 02:00 EDT (06:00 UTC).
+ * Manual on purpose so an old iPad does not depend on Intl time zones.
+ */
+function pad2(n){return (n<10?'0':'')+n;}
+function easternNthSunday(year, monthIndex, n){
+ var dow=new Date(Date.UTC(year, monthIndex, 1)).getUTCDay();
+ return 1+(dow===0?0:7-dow)+(n-1)*7;
+}
+function easternOffsetHours(utcMs){
+ var y=new Date(utcMs).getUTCFullYear();
+ var start=Date.UTC(y, 2, easternNthSunday(y, 2, 2), 7, 0, 0);
+ var end=Date.UTC(y, 10, easternNthSunday(y, 10, 1), 6, 0, 0);
+ if(utcMs>=start&&utcMs<end)return 4;
+ return 5;
+}
+function easternDayKey(when){
+ var ms=when instanceof Date?when.getTime():new Date(when).getTime();
+ if(isNaN(ms))return '';
+ var shifted=new Date(ms-easternOffsetHours(ms)*3600000);
+ return shifted.getUTCFullYear()+'-'+pad2(shifted.getUTCMonth()+1)+'-'+pad2(shifted.getUTCDate());
+}
+function msUntilEasternMidnightFrom(startMs){
+ var key=easternDayKey(new Date(startMs));
+ if(!key)return 3600000;
+ var lo=startMs, hi=startMs+36*3600000;
+ if(easternDayKey(new Date(hi))===key)return 36*3600000;
+ while(hi-lo>20){
+  var mid=Math.floor((lo+hi)/2);
+  if(easternDayKey(new Date(mid))===key)lo=mid;else hi=mid;
+ }
+ return hi-startMs;
+}
+/* eastern-day:end */
+function estimatedNow(){return new Date(Date.now()+serverSkew);}
+function todayKey(){return easternDayKey(estimatedNow());}
+function msUntilEasternMidnight(){return msUntilEasternMidnightFrom(estimatedNow().getTime());}
+function fmt(iso){
+ if(!iso)return '';
+ var d=new Date(iso);
+ if(isNaN(d.getTime()))return '';
+ var t=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+ if(easternDayKey(d)===todayKey())return t;
+ return d.toLocaleDateString([],{month:'short',day:'numeric'})+', '+t;
+}
 function notice(text,err){var n=$('notice');n.textContent=text||'';n.className='notice'+(err?' err':'')+(text?'':' hide');}
 function post(body){
  body.token=token;
  return fetch(API_URL,{method:'POST',body:JSON.stringify(body),redirect:'follow'}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json();});
 }
 function lockOut(message){
- EFCStaffSession.forget();clearInterval(timer);closeEditor();try{localStorage.removeItem(LAST_KEY);}catch(e){}
+ EFCStaffSession.forget();clearInterval(timer);clearInterval(dayWatch);clearTimeout(midnightTimer);closeEditor();try{localStorage.removeItem(LAST_KEY);}catch(e){}
  document.body.classList.add('efc-locked');$('efcGate').classList.remove('hide');$('efcGateMessage').textContent=message||'Session expired. Please sign in again.';
 }
 function renderLegend(){
  var root=$('legend');root.replaceChildren();
+ var n=el('span','item');n.appendChild(dot(''));n.appendChild(document.createTextNode('Unknown'));root.appendChild(n);
  STATUSES.forEach(function(s){var i=el('span','item');i.appendChild(dot(s.v));i.appendChild(document.createTextNode(s.label+(s.v==='OTHER'?' (with location)':'')));root.appendChild(i);});
- var n=el('span','item');n.appendChild(dot(''));n.appendChild(document.createTextNode('Not set'));root.appendChild(n);
 }
 function canEdit(id){return online&&me&&(id===me.id||me.admin);}
-// Status picker: tapping a status saves it; Other asks for a location first.
-// While someone is typing an Other location or a save is in flight, auto-refresh must not rebuild the picker.
+// Unknown is an empty status (the daily reset). It is not one of the nine settable buttons.
 function buildPicker(root,target,msgId){
  if(root.getAttribute('data-busy')==='1'&&root.getAttribute('data-target')===target)return;
  root.removeAttribute('data-busy');root.setAttribute('data-target',target);
@@ -100,6 +144,60 @@ function buildPicker(root,target,msgId){
  root.appendChild(grid);root.appendChild(other);
 }
 function find(id){for(var i=0;i<staff.length;i++)if(staff[i].id===id)return staff[i];return null;}
+// Accept a server clock sample only when it does not move the board backward.
+function noteClock(j){
+ var serverMs=0;
+ if(j&&j.serverTime){
+  var parsed=new Date(j.serverTime).getTime();
+  if(!isNaN(parsed))serverMs=parsed;
+ }
+ if(serverMs&&serverMs>=lastServerMs){lastServerMs=serverMs;serverSkew=serverMs-Date.now();}
+ var incoming='';
+ if(j&&j.dayKey)incoming=String(j.dayKey);
+ else if(serverMs&&serverMs>=lastServerMs)incoming=easternDayKey(new Date(serverMs));
+ else incoming=todayKey();
+ if(loadedDayKey&&incoming<loadedDayKey)return false;
+ loadedDayKey=incoming;
+ return true;
+}
+// Empty status, a missing stamp, or a stamp from another Eastern day is Unknown.
+// Location is kept only for today's OTHER. No invented "updated at midnight".
+function presentPerson(p, dayKey){
+ var day=dayKey||todayKey();
+ var status=p&&p.status?String(p.status):'';
+ var location=p&&p.location?String(p.location):'';
+ var updatedAt=p&&p.updatedAt?String(p.updatedAt):'';
+ var updatedById=p&&p.updatedById?String(p.updatedById):'';
+ var updatedByName=p&&p.updatedByName?String(p.updatedByName):'';
+ var stamp=updatedAt?easternDayKey(new Date(updatedAt)):'';
+ if(!status||stamp!==day){status='';location='';updatedAt='';updatedById='';updatedByName='';}
+ else if(status!=='OTHER')location='';
+ return {id:String(p&&p.id||''),name:String(p&&p.name||''),status:status,location:location,updatedAt:updatedAt,updatedById:updatedById,updatedByName:updatedByName};
+}
+function copyPresented(p, shown){
+ p.status=shown.status;p.location=shown.location;p.updatedAt=shown.updatedAt;p.updatedById=shown.updatedById;p.updatedByName=shown.updatedByName;
+}
+function staffNeedsRefilter(){
+ var day=todayKey();
+ for(var i=0;i<staff.length;i++){
+  var cur=staff[i], shown=presentPerson(cur, day);
+  if(shown.status!==(cur.status||'')||shown.location!==(cur.location||'')||shown.updatedAt!==(cur.updatedAt||'')||shown.updatedById!==(cur.updatedById||'')||shown.updatedByName!==(cur.updatedByName||''))return true;
+ }
+ return false;
+}
+function refilterStaff(){
+ var day=todayKey();
+ for(var i=0;i<staff.length;i++)copyPresented(staff[i], presentPerson(staff[i], day));
+ var mineRoot=$('minePicker'), editRoot=$('editorPicker');
+ if(mineRoot)mineRoot.removeAttribute('data-busy');
+ if(editRoot)editRoot.removeAttribute('data-busy');
+ render();
+}
+function rememberBoard(){
+ if(!me||!loadedDayKey||loadedDayKey!==todayKey())return;
+ try{localStorage.setItem(LAST_KEY, JSON.stringify({at:new Date(lastServerMs||Date.now()).toISOString(),by:me.id,dayKey:loadedDayKey,staff:staff}));}catch(e){}
+}
+function readCache(){try{return JSON.parse(localStorage.getItem(LAST_KEY)||'null');}catch(e){return null;}}
 function setStatus(root,target,status,location,msgId,controls){
  if(!online){msg(msgId,'Offline: status changes need internet.');return;}
  root.setAttribute('data-busy','1');controls.forEach(function(b){b.disabled=true;});msg(msgId,'Saving…',true);
@@ -107,42 +205,60 @@ function setStatus(root,target,status,location,msgId,controls){
  post(body).then(function(j){
   if(j.authFailed){lockOut(j.message);return;}
   if(!j.success)throw Error(j.message||'Could not save.');
-  var p=find(target);if(p&&j.entry){p.status=j.entry.status;p.location=j.entry.location;p.updatedAt=j.entry.updatedAt;p.updatedById=j.entry.updatedById;p.updatedByName=j.entry.updatedByName;}
-  root.removeAttribute('data-busy');render();msg(msgId,j.unchanged?'No change — already '+label(status)+'.':'Saved: '+(p?p.name+' is ':'')+label(status)+(location?' — '+location:''),true);
-  load(true);
+  var accepted=noteClock(j);
+  var p=find(target);
+  if(accepted&&p&&j.entry){
+   copyPresented(p, presentPerson({id:p.id,name:p.name,status:j.entry.status,location:j.entry.location,updatedAt:j.entry.updatedAt,updatedById:j.entry.updatedById,updatedByName:j.entry.updatedByName}, todayKey()));
+  }
+  root.removeAttribute('data-busy');
+  render();
+  if(accepted)rememberBoard();
+  var shown=p&&p.status?p.status:'';
+  msg(msgId,j.unchanged&&shown===status?'No change — already '+label(shown)+'.':'Saved: '+(p?p.name+' is ':'')+label(shown)+(p&&p.location?' — '+p.location:''),true);
+  armMidnight();
+  load(true,true);
  }).catch(function(e){
   msg(msgId,(navigator.onLine===false||e instanceof TypeError)?'No internet connection. Status not saved.':e.message);
   controls.forEach(function(b){b.disabled=!canEdit(target);});
   var o=root.querySelector('.other');if(!o||o.classList.contains('hide'))root.removeAttribute('data-busy');
  });
 }
-function label(v){var s=info(v);return s?s.label:'Not set';}
+function label(v){var s=info(v);return s?s.label:'Unknown';}
 function render(){
+ // Any paint after Eastern midnight drops yesterday, including a stamp that arrived late.
+ if(!render.filtering&&staffNeedsRefilter()){
+  render.filtering=true;
+  try{refilterStaff();}finally{render.filtering=false;}
+  return;
+ }
  $('signedIn').textContent=me?'Signed in as '+me.name+(me.admin?' (Administrator)':''):'';
  var mine=find(me&&me.id);var m=$('mine');m.replaceChildren();
  m.appendChild(dot(mine?mine.status:''));
- m.appendChild(document.createTextNode(mine&&mine.status?label(mine.status)+(mine.status==='OTHER'&&mine.location?' — '+mine.location:''):'Not set yet'));
+ var mineText='Unknown';
+ if(mine&&mine.status)mineText=label(mine.status)+(mine.status==='OTHER'&&mine.location?' — '+mine.location:'');
+ m.appendChild(document.createTextNode(mineText));
  buildPicker($('minePicker'),me.id,'mineMsg');
  $('minePanel').classList.toggle('hide',!mine);
- var root=$('board');root.replaceChildren();var counts={},now=new Date();
- staff.forEach(function(p){
+ var root=$('board');root.replaceChildren();var counts={},i;
+ for(i=0;i<staff.length;i++){
+  var p=staff[i];
   counts[p.status||'']=(counts[p.status||'']||0)+1;
   var li=el('li',p.id===me.id?'me':null);li.setAttribute('data-staff-id',p.id);li.appendChild(dot(p.status));
   var who=el('div','who');who.appendChild(el('div','name',p.name+(p.id===me.id?' (you)':'')));
-  var s=info(p.status),line=el('div');var badge=el('span','badge'+(s?' s-'+s.k:' none'),s?s.label:'Not set');line.appendChild(badge);
+  var s=info(p.status),line=el('div');var badge=el('span','badge'+(s?' s-'+s.k:' none'),s?s.label:'Unknown');line.appendChild(badge);
   if(p.status==='OTHER'&&p.location)line.appendChild(el('span','loc',p.location));
   who.appendChild(line);
   if(p.updatedAt){
    var w=el('div','when','Updated '+fmt(p.updatedAt)+(p.updatedById&&p.updatedById!==p.id?' by '+(p.updatedByName||'administrator'):''));
-   if(!sameDay(new Date(p.updatedAt),now))w.appendChild(el('span','stale',' · not updated today'));
+   if(easternDayKey(new Date(p.updatedAt))!==todayKey())w.appendChild(el('span','stale',' · not updated today'));
    who.appendChild(w);
   }
   li.appendChild(who);
-  if(me.admin&&p.id!==me.id){var a=el('div','act'),b=el('button','secondary','Change');b.type='button';b.disabled=!online;b.setAttribute('aria-label','Change status for '+p.name);b.onclick=function(){openEditor(p.id);};a.appendChild(b);li.appendChild(a);}
+  if(me.admin&&p.id!==me.id){var a=el('div','act'),b=el('button','secondary','Change');b.type='button';b.disabled=!online;b.setAttribute('aria-label','Change status for '+p.name);b.onclick=function(person){return function(){openEditor(person.id);};}(p);a.appendChild(b);li.appendChild(a);}
   root.appendChild(li);
- });
+ }
  if(!staff.length)root.appendChild(el('li','muted','No active staff accounts.'));
- var parts=[];STATUSES.forEach(function(s){if(counts[s.v])parts.push(s.label+' '+counts[s.v]);});if(counts[''])parts.push('Not set '+counts['']);
+ var parts=[];STATUSES.forEach(function(s){if(counts[s.v])parts.push(s.label+' '+counts[s.v]);});if(counts[''])parts.push('Unknown '+counts['']);
  $('counts').textContent=parts.join(' · ');
  if(editingId)buildEditor();
 }
@@ -152,45 +268,109 @@ function closeEditor(){editingId=null;$('editor').classList.add('hide');$('edito
 $('editorClose').onclick=closeEditor;
 $('editor').onclick=function(e){if(e.target===$('editor'))closeEditor();};
 function showLastKnown(reason){
- var last=null;try{last=JSON.parse(localStorage.getItem(LAST_KEY)||'null');}catch(e){}
+ var last=readCache();
  online=false;
- if(last&&last.by===me.id&&Array.isArray(last.staff)){
-  staff=last.staff;render();
-  notice('Offline — showing the LAST KNOWN board from '+fmt(last.at)+'. It may be out of date. Status changes are disabled until internet returns.');
+ var today=todayKey();
+ var usable=!!(last&&me&&last.by===me.id&&last.dayKey&&last.dayKey===today&&Array.isArray(last.staff));
+ if(last&&me&&last.by===me.id&&!usable){try{localStorage.removeItem(LAST_KEY);}catch(e){}}
+ if(usable){
+  loadedDayKey=today;rolloverPainted=today;staff=[];
+  for(var i=0;i<last.staff.length;i++)staff.push(presentPerson(last.staff[i], today));
+  render();
+  notice('Offline — showing the LAST KNOWN board from '+fmt(last.at)+' (today, Eastern). It may be out of date. Status changes are disabled until internet returns.');
   $('refreshed').textContent='Last known: '+fmt(last.at);
- }else{
-  staff=[];render();$('minePanel').classList.add('hide');
-  notice('Can\'t load the status board'+(reason?': '+reason:'.')+' Nothing is shown because no recent board is saved on this device.',true);
-  $('refreshed').textContent='';
+  armMidnight();
+  return;
  }
+ staff=[];render();$('minePanel').classList.add('hide');
+ notice('Can\'t load today\'s status board'+(reason?': '+reason:'')+'. Prior-day statuses are not shown as current.', true);
+ $('refreshed').textContent='';
 }
-function load(quiet){
- if(loading&&quiet)return;
+// Drop yesterday as soon as the Eastern day changes, then reload today.
+// A stamp from today is kept so a 12:01 a.m. update survives a late refresh.
+function ensureToday(){
+ if(!me||!loadedDayKey)return false;
+ var today=todayKey();
+ if(loadedDayKey===today)return false;
+ if(rolloverPainted!==today){
+  rolloverPainted=today;
+  seq++;
+  loading=false;
+  if(navigator.onLine!==false){
+   refilterStaff();
+   $('refreshed').textContent='';
+   notice('New day (Eastern). Loading today\'s board. Yesterday\'s statuses are not shown as current.');
+  }
+ }
+ if(navigator.onLine===false){
+  if(offlineNoticeDay!==today){offlineNoticeDay=today;showLastKnown('no internet connection');}
+  return true;
+ }
+ if(document.hidden)return true;
+ if(loading)return true;
+ var nowMs=Date.now();
+ if(lastEnsureFetch&&nowMs-lastEnsureFetch<15000)return true;
+ lastEnsureFetch=nowMs;
+ load(true);
+ return true;
+}
+function armMidnight(){
+ clearTimeout(midnightTimer);
+ var wait=msUntilEasternMidnight()+50;
+ if(wait<100)wait=100;
+ if(wait>2147000000)wait=2147000000;
+ midnightTimer=setTimeout(function(){ensureToday();armMidnight();}, wait);
+}
+function load(quiet, force){
+ if(loading&&quiet&&!force)return;
  var my=++seq;loading=true;if(!quiet)msg('boardMsg','Loading…',true);$('refresh').disabled=true;
- if(navigator.onLine===false){loading=false;$('refresh').disabled=false;msg('boardMsg','');showLastKnown('no internet connection.');return;}
+ if(navigator.onLine===false){loading=false;$('refresh').disabled=false;msg('boardMsg','');showLastKnown('no internet connection');return;}
  post({action:'statusBoard'}).then(function(j){
   if(my!==seq)return;
   if(j.authFailed){lockOut(j.message);return;}
   if(!j.success)throw Error(j.message||'Could not load the board.');
-  online=true;staff=j.staff||[];if(j.me){me.id=j.me.id;me.name=j.me.name;me.admin=j.me.admin===true;}
-  try{localStorage.setItem(LAST_KEY,JSON.stringify({at:new Date().toISOString(),by:me.id,staff:staff}));}catch(e){}
-  notice('');EFCStaffSession.banner(null);render();msg('boardMsg','');$('refreshed').textContent='Updated '+fmt(new Date().toISOString());
+  if(!noteClock(j)){if(staffNeedsRefilter())render();return;}
+  // dayKey is an older Eastern day than the clock on this response. Do not paint it.
+  if(j.dayKey&&String(j.dayKey)!==todayKey()){render();return;}
+  var day=todayKey();
+  var rows=j.staff||[], next=[], i;
+  for(i=0;i<rows.length;i++)next.push(presentPerson(rows[i], day));
+  online=true;staff=next;
+  if(j.me){me.id=String(j.me.id);me.name=String(j.me.name);me.admin=j.me.admin===true;}
+  loadedDayKey=day;rolloverPainted=day;
+  rememberBoard();
+  notice('');EFCStaffSession.banner(null);render();msg('boardMsg','');$('refreshed').textContent='Updated '+fmt(new Date(lastServerMs||Date.now()).toISOString());
+  armMidnight();
  }).catch(function(e){
   if(my!==seq)return;msg('boardMsg','');
-  if(navigator.onLine===false||e instanceof TypeError||/^HTTP /.test(e.message))showLastKnown('the facility server could not be reached.');
-  else{notice('Can\'t load the status board: '+e.message,true);}
+  if(navigator.onLine===false||e instanceof TypeError||/^HTTP /.test(e.message))showLastKnown('the facility server could not be reached');
+  else notice('Can\'t load the status board: '+e.message,true);
  }).then(function(){if(my===seq){loading=false;$('refresh').disabled=false;}});
 }
-$('refresh').onclick=function(){load(false);};
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&me)load(true);});
-window.addEventListener('online',function(){if(me)load(true);});
-window.addEventListener('offline',function(){if(me)showLastKnown('no internet connection.');});
+$('refresh').onclick=function(){if(!ensureToday())load(false);};
+document.addEventListener('visibilitychange',function(){
+ if(document.hidden||!me)return;
+ lastEnsureFetch=0;
+ if(!ensureToday())load(true);
+});
+window.addEventListener('online',function(){
+ if(!me)return;
+ offlineNoticeDay='';
+ lastEnsureFetch=0;
+ if(!ensureToday())load(true);
+});
+window.addEventListener('offline',function(){
+ if(!me)return;
+ if(!ensureToday())showLastKnown('no internet connection');
+});
 renderLegend();
 EFCStaffSession.validate(API_URL).then(function(s){
  if(!s.staff||s.staff.forceReset)throw Error('Temporary PIN must be changed first. Open Staff Login to change it.');
  token=s.token;me={id:String(s.staff.id),name:String(s.staff.name),admin:(s.staff.roles||[]).indexOf('ADMIN')>=0};
  document.body.classList.remove('efc-locked');$('efcGate').classList.add('hide');
- if(s.offline){EFCStaffSession.banner(s);showLastKnown('no internet connection.');}else load(false);
- timer=setInterval(function(){if(!document.hidden)load(true);},REFRESH_MS);
+ if(s.offline){EFCStaffSession.banner(s);showLastKnown('no internet connection');}else load(false);
+ armMidnight();
+ timer=setInterval(function(){if(!me||document.hidden)return;if(!ensureToday())load(true);}, REFRESH_MS);
+ dayWatch=setInterval(function(){if(me)ensureToday();}, 1000);
 }).catch(function(e){$('efcGateMessage').textContent='Session unavailable: '+e.message;});
 </script></body></html>
