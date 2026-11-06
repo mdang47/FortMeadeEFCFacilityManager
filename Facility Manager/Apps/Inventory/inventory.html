@@ -180,6 +180,10 @@ h1 {
     background: #d5d5d5;
 }
 
+.tab-warnings {
+    background: #f3b4b4;
+}
+
 .tab.active {
     border-color: #333;
     box-shadow: 0 2px 5px rgba(0,0,0,.25);
@@ -281,6 +285,44 @@ h1 {
 
 .low-stock {
     color: #c43d3d;
+}
+
+.out-stock {
+    color: #8a1f1f;
+}
+
+.at-minimum {
+    color: #8a5a00;
+}
+
+.stock-note {
+    color: #444;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 4px;
+}
+
+.summary-detail {
+    color: #555;
+    font-size: 13px;
+    line-height: 1.35;
+    margin-top: 6px;
+}
+
+.warning-banner {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto 14px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.warning-banner.visible {
+    display: block;
 }
 
 
@@ -632,6 +674,12 @@ id="lowStock">
 Low Stock
 </div>
 
+<div
+class="summary-detail"
+id="lowStockDetail">
+Out 0 · Low 0
+</div>
+
 </div>
 
 </div>
@@ -690,6 +738,12 @@ All
 </button>
 
 <button
+class="tab tab-warnings"
+onclick="selectWarnings(this)">
+Low &amp; Out
+</button>
+
+<button
 class="tab tab-safety"
 onclick="selectCategory('Safety', this)">
 Safety
@@ -731,6 +785,13 @@ onclick="selectCategory('Other', this)">
 Other
 </button>
 
+</div>
+
+
+<div
+class="warning-banner"
+id="warningBanner">
+Out means quantity is 0. Low means quantity is above 0 and at or below that item's minimum. A gap of 0 means the item is already at its minimum. These figures are not order quantities.
 </div>
 
 
@@ -1000,6 +1061,8 @@ let pendingActions = [];
 
 let selectedCategory = "All";
 
+let warningView = false;
+
 let editingId = null;
 
 let currentlySyncing = false;
@@ -1267,10 +1330,39 @@ function showMessage(text) {
    SELECT CATEGORY
 ========================= */
 
+function selectWarnings(button) {
+
+    warningView = true;
+
+
+    document
+    .querySelectorAll(".tab")
+    .forEach(tab => {
+
+        tab.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    button
+    .classList
+    .add("active");
+
+
+    displayInventory();
+
+}
+
+
+
 function selectCategory(
 category,
 button
 ) {
+
+    warningView = false;
 
     selectedCategory =
     category;
@@ -1301,6 +1393,246 @@ button
 /* =========================
    DISPLAY
 ========================= */
+
+function stockState(item) {
+
+    const quantity =
+    Number(item.quantity);
+
+    const minimum =
+    Number(item.minimum);
+
+    const comparable =
+    isFinite(quantity) &&
+    isFinite(minimum);
+
+    let level = "ok";
+
+
+    /*
+    Out is quantity at zero. Low is only above zero
+    and at or below a minimum above zero. A minimum
+    of zero is not a low threshold.
+    */
+
+    if (
+        comparable &&
+        quantity <= 0
+    ) {
+
+        level = "out";
+
+    }
+
+    else if (
+        comparable &&
+        minimum > 0 &&
+        quantity <= minimum
+    ) {
+
+        if (quantity === minimum) {
+
+            level = "at";
+
+        }
+
+        else {
+
+            level = "low";
+
+        }
+
+    }
+
+
+    return {
+
+        quantity: quantity,
+
+        minimum: minimum,
+
+        gap: comparable
+            ? minimum - quantity
+            : null,
+
+        level: level
+
+    };
+
+}
+
+
+
+function stockStatusClass(level) {
+
+    if (level === "out") {
+
+        return "out-stock";
+
+    }
+
+    if (level === "at") {
+
+        return "at-minimum";
+
+    }
+
+    if (level === "low") {
+
+        return "low-stock";
+
+    }
+
+    return "in-stock";
+
+}
+
+
+
+function stockStatusText(level) {
+
+    if (level === "out") {
+
+        return "⚠ OUT OF STOCK";
+
+    }
+
+    if (level === "at") {
+
+        return "⚠ AT MINIMUM";
+
+    }
+
+    if (level === "low") {
+
+        return "⚠ LOW STOCK";
+
+    }
+
+    return "✓ IN STOCK";
+
+}
+
+
+
+function stockGapText(state, unit) {
+
+    if (
+        state.level === "ok" ||
+        state.gap === null ||
+        state.gap < 0
+    ) {
+
+        return "";
+
+    }
+
+
+    if (state.gap === 0) {
+
+        return "At the minimum. Gap 0. Not an order quantity.";
+
+    }
+
+
+    const unitLabel =
+    unit
+    ? " " + unit
+    : "";
+
+
+    return "Below the minimum by " +
+        state.gap +
+        unitLabel +
+        ". Not an order quantity.";
+
+}
+
+
+
+function countStockLevels(items) {
+
+    let outCount = 0;
+
+    let lowCount = 0;
+
+    let atCount = 0;
+
+
+    items.forEach(item => {
+
+        const level =
+        stockState(item).level;
+
+
+        if (level === "out") {
+
+            outCount++;
+
+        }
+
+        else if (level === "low") {
+
+            lowCount++;
+
+        }
+
+        else if (level === "at") {
+
+            atCount++;
+
+        }
+
+    });
+
+
+    return {
+
+        out: outCount,
+
+        low: lowCount + atCount,
+
+        at: atCount,
+
+        warnings: outCount + lowCount + atCount
+
+    };
+
+}
+
+
+
+function warningCountText(counts) {
+
+    let text =
+    "Out " +
+    counts.out +
+    " · Low " +
+    counts.low;
+
+
+    if (counts.at === 1) {
+
+        text +=
+        ", including 1 at minimum (gap 0)";
+
+    }
+
+    else if (counts.at > 1) {
+
+        text +=
+        ", including " +
+        counts.at +
+        " at minimum (gap 0)";
+
+    }
+
+
+    return text;
+
+}
+
+
 
 function displayInventory() {
 
@@ -1386,7 +1718,25 @@ sortedInventory.forEach(
     item => {
 
 
-            if (
+            const state =
+            stockState(item);
+
+
+            if (warningView) {
+
+                if (
+                    state.level !== "out" &&
+                    state.level !== "low" &&
+                    state.level !== "at"
+                ) {
+
+                    return;
+
+                }
+
+            }
+
+            else if (
 
                 selectedCategory !== "All"
 
@@ -1422,12 +1772,6 @@ sortedInventory.forEach(
 
 
             visibleItems++;
-
-
-            const isLow =
-            Number(item.quantity)
-            <=
-            Number(item.minimum);
 
 
             const colorClass =
@@ -1474,22 +1818,17 @@ sortedInventory.forEach(
             </div>
 
 
-            <div class="
-            status
-            ${
-                isLow
-                ? "low-stock"
-                : "in-stock"
-            }
-            ">
+            <div class="status ${stockStatusClass(state.level)}">
 
-            ${
-                isLow
-                ? "⚠ LOW STOCK"
-                : "✓ IN STOCK"
-            }
+            ${stockStatusText(state.level)}
 
             </div>
+
+            ${
+                stockGapText(state, item.unit)
+                ? `<div class="stock-note">${escapeHtml(stockGapText(state, item.unit))}</div>`
+                : ""
+            }
 
 
             <div class="quantity-area">
@@ -1584,15 +1923,45 @@ sortedInventory.forEach(
         visibleItems === 0
     ) {
 
+        let emptyText =
+        "No inventory items found.";
+
+
+        if (warningView) {
+
+            emptyText =
+            search
+            ? "No low or out of stock items match this search."
+            : "No low or out of stock items.";
+
+        }
+
+
         list.innerHTML = `
 
         <div class="empty-message">
 
-        No inventory items found.
+        ${emptyText}
 
         </div>
 
         `;
+
+    }
+
+
+    const warningBanner =
+    document.getElementById(
+        "warningBanner"
+    );
+
+
+    if (warningBanner) {
+
+        warningBanner.className =
+        warningView
+        ? "warning-banner visible"
+        : "warning-banner";
 
     }
 
@@ -1605,20 +1974,28 @@ sortedInventory.forEach(
     inventory.length;
 
 
+    const stockCounts =
+    countStockLevels(
+        inventory
+    );
+
+
     document
     .getElementById(
         "lowStock"
     )
     .textContent =
+    stockCounts.warnings;
 
-    inventory.filter(
 
-        item =>
-        Number(item.quantity)
-        <=
-        Number(item.minimum)
-
-    ).length;
+    document
+    .getElementById(
+        "lowStockDetail"
+    )
+    .textContent =
+    warningCountText(
+        stockCounts
+    );
 
 
     saveInventoryCache();
