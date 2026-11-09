@@ -60,7 +60,7 @@
 
       grid-template-columns:
         minmax(0, 1fr)
-        210px;
+        270px;
 
       gap: 24px;
 
@@ -108,7 +108,7 @@
     .logo img {
       width: 100%;
 
-      max-width: 180px;
+      max-width: 240px;
 
       height: auto;
 
@@ -222,6 +222,10 @@
       margin: 24px 0 6px;
     }
 
+    .card-mark {
+      display: none;
+    }
+
     @media (max-width: 700px) {
 
       .wrap {
@@ -237,7 +241,7 @@
       }
 
       .logo {
-        max-width: 180px;
+        max-width: 240px;
 
         margin: 0 auto;
       }
@@ -258,12 +262,150 @@
           18px;
       }
     }
+
+    /* Public home: three large tiles, no section headings.
+       Signed-in removes .public-view and uses the rules above. */
+    .public-view .section-title {
+      display: none !important;
+    }
+
+    .public-view .grid {
+      display: contents;
+    }
+
+    .public-view .wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 20px;
+    }
+
+    .public-view .hero,
+    .public-view footer {
+      grid-column: 1 / -1;
+    }
+
+    .public-view .hero {
+      margin-bottom: 8px;
+    }
+
+    .public-view .card {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      padding: 28px 24px 22px;
+      border-radius: 18px;
+      border-top-width: 6px;
+      box-shadow: 0 10px 28px rgba(15, 38, 59, .08);
+    }
+
+    .public-view .card-fac {
+      border-top-color: #2a6f9b;
+    }
+
+    .public-view .card-pfra {
+      border-top-color: #0b1f33;
+    }
+
+    .public-view .card-fit {
+      border-top-color: #163b61;
+    }
+
+    .public-view .card-mark {
+      display: block;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+
+    .public-view .card-mark svg {
+      display: block;
+      width: 48px;
+      height: 48px;
+    }
+
+    .public-view .card h2 {
+      font-size: 26px;
+      line-height: 1.15;
+      margin: 0 0 10px;
+    }
+
+    .public-view .card p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .public-view .card .tag {
+      display: block;
+      margin-top: auto;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #0b1f33;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: .04em;
+      text-align: center;
+    }
+
+    .public-view .card:hover .tag,
+    .public-view .card:focus .tag {
+      background: #163b61;
+    }
+
+    @media (max-width: 900px) {
+      .public-view .wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .public-view .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .public-view .logo {
+        max-width: 240px;
+        margin: 12px auto 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .logo,
+      .public-view .logo {
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .logo img {
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .public-view .wrap {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .public-view .hero {
+        margin-left: -16px;
+        margin-right: -16px;
+      }
+
+      .public-view footer {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
   </style>
 <style>[data-fac-only][hidden],[data-staff-only][hidden]{display:none!important}</style>
 <style>.hero .staff-login{display:inline-block;margin-top:14px;padding:6px 14px;border:1px solid rgba(255,255,255,.55);border-radius:999px;color:#fff;font-size:13px;font-weight:700;text-decoration:none;background:rgba(255,255,255,.08)}.hero .staff-login:hover,.hero .staff-login:focus{background:rgba(255,255,255,.2)}</style>
 </head>
 
-<body>
+<body class="public-view">
 
   <div class="wrap">
 
@@ -311,17 +453,20 @@
     <div class="grid">
 
       <a
-        class="card"
+        class="card card-fac"
         href="./Facility%20Manager/FAC/"
       >
+
+        <span class="card-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#edf5fb"/><path fill="#0b1f33" d="M14 34V20l10-7 10 7v14h-6v-8h-8v8h-6z"/></svg></span>
 
         <h2>
           FAC Portal
         </h2>
 
         <p>
-          Fitness Assessment Cell information,
-          resources, and quick-access tools.
+          Fort Meade 707 FSS/Fitness Assessment Cell
+          information, test times, resources, and
+          quick-access tools.
         </p>
 
         <span class="tag">
@@ -332,9 +477,11 @@
 
 
       <a
-        class="card"
+        class="card card-pfra"
         href="./Facility%20Manager/FAC/pfra_calculator.html"
       >
+
+        <span class="card-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#edf5fb"/><path fill="#0b1f33" d="M16 14h16v20H16V14zm3 3v4h10v-4H19zm0 7v2h4v-2h-4zm6 0v2h4v-2h-4zm-6 4v2h4v-2h-4zm6 0v2h4v-2h-4z"/></svg></span>
 
         <h2>
           PFRA Calculator
@@ -404,6 +551,8 @@
 
       <a
         class="card"
+        data-staff-only
+        hidden
         href="./Facility%20Manager/Apps/Inventory/inventory.html"
       >
 
@@ -425,6 +574,8 @@
 
       <a
         class="card"
+        data-staff-only
+        hidden
         href="./Facility%20Manager/Apps/Checkout/checkout.html"
       >
 
@@ -444,7 +595,7 @@
       </a>
 
 
-<a class="card" href="./Facility%20Manager/Apps/Visitor%20Counter/">
+<a class="card" data-staff-only hidden href="./Facility%20Manager/Apps/Visitor%20Counter/">
   <h2>Visitor Tracking</h2>
   <p>Visitor sign-in, hourly headcounts, and facility traffic tracking.</p>
   <span class="tag">Open Visitor Tracking</span>
@@ -453,6 +604,8 @@
 
       <a
         class="card"
+        data-staff-only
+        hidden
         href="./Facility%20Manager/Apps/Leave%20Tracker/Leave.html"
       >
 
@@ -476,18 +629,18 @@
   <span class="tag">Open Status Board</span>
 </a>
 <a
-  class="card"
+  class="card card-fit"
   href="./Facility%20Manager/Apps/Fitness%20Access/fitness-access.html"
 >
+
+  <span class="card-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#edf5fb"/><path fill="#0b1f33" d="M12 20h4v8h-4v-8zm20 0h4v8h-4v-8zM16 22h16v4H16v-4z"/></svg></span>
 
   <h2>
     Fitness Access
   </h2>
 
   <p>
-    Complete and submit the Fitness Access
-    Statement of Understanding &amp;
-    Assumption of Risk Form.
+    Complete the Fitness Access form for 24/7 access to Eagle Fitness Center.
   </p>
 
   <span class="tag">
@@ -525,9 +678,39 @@
 <script>
 // Display staff-only / FAC-only shortcuts after server confirmation; hiding buttons is UI only.
 (async function(){
+  function reveal(selector){
+    var nodes=document.querySelectorAll(selector);
+    var i;
+    for(i=0;i<nodes.length;i++){nodes[i].hidden=false;nodes[i].style.display="";}
+  }
+  function updateSections(){
+    var titles=document.querySelectorAll(".section-title");
+    var i,j,grid,cards,any;
+    for(i=0;i<titles.length;i++){
+      grid=titles[i].nextElementSibling;
+      any=false;
+      if(grid){
+        cards=grid.querySelectorAll("a.card");
+        for(j=0;j<cards.length;j++){if(!cards[j].hidden)any=true;}
+      }
+      titles[i].hidden=!any;
+      titles[i].style.display=any?"":"none";
+    }
+  }
+  function showFac(roles){
+    if(Array.isArray(roles)){
+      reveal("[data-staff-only]");
+      var fac=false;
+      var i;
+      for(i=0;i<roles.length;i++){if(roles[i]==="FAC"||roles[i]==="ADMIN")fac=true;}
+      if(fac)reveal("[data-fac-only]");
+      if(document.body.classList)document.body.classList.remove("public-view");
+    }
+    updateSections();
+  }
+  updateSections();
   const token=localStorage.getItem("efc-staff-token-v1")||"";
   if(!token)return;
-  const showFac=roles=>{if(Array.isArray(roles))document.querySelectorAll("[data-staff-only]").forEach(el=>{el.hidden=false;el.style.display="";});if(Array.isArray(roles)&&roles.some(r=>r==="FAC"||r==="ADMIN"))document.querySelectorAll("[data-fac-only]").forEach(el=>{el.hidden=false;el.style.display="";});};
   try{
     const response=await fetch("https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec",{
       method:"POST",body:JSON.stringify({action:"authValidate",token})
