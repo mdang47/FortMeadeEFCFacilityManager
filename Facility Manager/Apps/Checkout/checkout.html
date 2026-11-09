@@ -180,7 +180,12 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <div class="form-group" id="checkoutPatronWrap" style="display:none">
 <label for="checkoutPatronName">Patron name</label>
 <input type="text" id="checkoutPatronName" autocomplete="off" maxlength="80" placeholder="Name">
+<label for="checkoutPatronPhone">Patron phone</label>
+<input type="tel" id="checkoutPatronPhone" autocomplete="off" maxlength="20" placeholder="(301) 555-1234" required>
+<label for="checkoutIssuer">Issued by</label>
+<select id="checkoutIssuer"></select>
 <label class="checkout-check" for="checkoutIdHeld"><input type="checkbox" id="checkoutIdHeld"> ID card held at desk</label>
+<p class="checkout-meta">Due back within 24 hours.</p>
 </div>
 <div class="form-group" id="checkoutUniformWrap">
 <label for="checkoutUniform">Uniform</label>
@@ -203,7 +208,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <p class="checkout-meta" id="checkoutDay"></p>
 </div>
 <h2 class="checkout-heading">Open checkouts</h2>
-<p class="checkout-note">Return some or all of what is still out. Returning a uniform does not change inventory. Equipment stock changes only after the server accepts the return.</p>
+<p class="checkout-note">Return some or all of what is still out. Returning a uniform does not change inventory. Patron equipment is overdue if it is still out 24 hours after checkout. Equipment stock changes only after the server accepts the return.</p>
 <div id="checkoutOpen"></div>
 <h2 class="checkout-heading">Recently returned</h2>
 <div id="checkoutReturned"></div>
@@ -222,6 +227,7 @@ var checkoutOpenRows = [];
 var checkoutReturnedRows = [];
 var checkoutItems = [];
 var checkoutStaff = [];
+var checkoutMe = null;
 var checkoutDayKey = "";
 var checkoutBusy = false;
 var checkoutMidnightTimer = 0;
@@ -448,6 +454,19 @@ function fillCheckoutStaff() {
         rows.push({ value: checkoutStaff[i].id, label: checkoutStaff[i].name || "Staff member" });
     }
     fillSelect(select, "Select a staff member", rows, select.value);
+    fillIssuerSelect();
+}
+function fillIssuerSelect() {
+    var select = document.getElementById("checkoutIssuer");
+    if (!select) return;
+    var rows = [];
+    var i;
+    for (i = 0; i < checkoutStaff.length; i++) {
+        rows.push({ value: checkoutStaff[i].id, label: checkoutStaff[i].name || "Staff member" });
+    }
+    var prefer = select.value;
+    if (!prefer && checkoutMe && checkoutMe.id) prefer = String(checkoutMe.id);
+    fillSelect(select, "Choose staff", rows, prefer);
 }
 function fillCheckoutItems() {
     var select = document.getElementById("checkoutItem");
@@ -472,11 +491,24 @@ function formatWhen(iso) {
 function rowOverdue(row) {
     if (!row || row.kind !== "PATRON") return false;
     if (row.status && row.status !== "OPEN") return false;
-    if (row.overdue === true) return true;
-    var created = easternDayKey(row.createdAt);
-    var today = easternDayKey(new Date());
-    if (created && today && created < today) return true;
-    return false;
+    return row.overdue === true;
+}
+function phoneDigits(value) {
+    return String(value || "").replace(/[^0-9]/g, "");
+}
+function issuerLabel(row) {
+    if (row.issuerName) return row.issuerName;
+    var i;
+    for (i = 0; i < checkoutStaff.length; i++) {
+        if (String(checkoutStaff[i].id) === String(row.issuerStaffId)) return checkoutStaff[i].name || "Staff member";
+    }
+    return "";
+}
+function dueAtValue(row) {
+    if (row.dueAt) return row.dueAt;
+    var ms = new Date(row.createdAt).getTime();
+    if (isNaN(ms)) return "";
+    return new Date(ms + 24 * 60 * 60 * 1000).toISOString();
 }
 function personLabel(row) {
     if (row.kind === "STAFF") return row.staffName || "Staff member";
@@ -502,6 +534,16 @@ function renderOpenCheckout(row) {
     who.textContent = (row.kind === "STAFF" ? "Staff uniform" : "Patron equipment") + " · " + personLabel(row);
     if (row.kind === "PATRON") who.textContent += row.idCardHeld ? " · ID card at desk" : " · ID card not held";
     card.appendChild(who);
+    if (row.kind === "PATRON") {
+        var phoneLine = document.createElement("div");
+        phoneLine.className = "checkout-meta";
+        phoneLine.textContent = "Phone " + (row.patronPhone || "");
+        card.appendChild(phoneLine);
+        var issuedLine = document.createElement("div");
+        issuedLine.className = "checkout-meta";
+        issuedLine.textContent = "Issued by " + (issuerLabel(row) || "Staff member");
+        card.appendChild(issuedLine);
+    }
     if (row.sizeNote) {
         var note = document.createElement("div");
         note.className = "checkout-meta";
@@ -512,6 +554,12 @@ function renderOpenCheckout(row) {
     when.className = "checkout-meta";
     when.textContent = "Checked out " + formatWhen(row.createdAt);
     card.appendChild(when);
+    if (row.kind === "PATRON") {
+        var dueLine = document.createElement("div");
+        dueLine.className = "checkout-meta";
+        dueLine.textContent = "Due " + formatWhen(dueAtValue(row));
+        card.appendChild(dueLine);
+    }
     var remaining = wholeQty(row.qtyRemaining);
     if (remaining == null) remaining = wholeQty(row.qtyOut);
     if (remaining && remaining > 0) {
@@ -606,6 +654,7 @@ function loadCheckoutList() {
         checkoutReturnedRows = data.returned || [];
         checkoutItems = data.items || [];
         checkoutStaff = data.staff || [];
+        checkoutMe = data.me || null;
         checkoutDayKey = data.dayKey || "";
         fillCheckoutStaff();
         fillCheckoutItems();
@@ -637,9 +686,13 @@ function submitCheckout() {
     } else {
         payload.itemId = document.getElementById("checkoutItem").value;
         payload.patronName = trimText(document.getElementById("checkoutPatronName").value);
+        payload.patronPhone = trimText(document.getElementById("checkoutPatronPhone").value);
+        payload.issuerStaffId = document.getElementById("checkoutIssuer").value;
         payload.idCardHeld = document.getElementById("checkoutIdHeld").checked === true;
         if (!payload.patronName) { setCheckoutMessage("Enter the patron's name. Do not enter an ID number."); return; }
         if (looksLikeIdNumber(payload.patronName)) { setCheckoutMessage("Do not enter an ID number. Enter the name only."); return; }
+        if (phoneDigits(payload.patronPhone).length < 7) { setCheckoutMessage("Enter the patron's phone number."); return; }
+        if (!payload.issuerStaffId) { setCheckoutMessage("Choose who issued this."); return; }
         if (!payload.itemId) { setCheckoutMessage("Select an item."); return; }
         var item = findListedItem(payload.itemId);
         if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
@@ -658,6 +711,8 @@ function submitCheckout() {
         document.getElementById("checkoutQty").value = "1";
         document.getElementById("checkoutNote").value = "";
         document.getElementById("checkoutUniform").value = "";
+        document.getElementById("checkoutPatronPhone").value = "";
+        document.getElementById("checkoutIssuer").value = "";
         setCheckoutMessage("Checked out.", true);
         return loadCheckoutList();
     }).catch(function(error) {
