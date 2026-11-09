@@ -182,7 +182,11 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <input type="text" id="checkoutPatronName" autocomplete="off" maxlength="80" placeholder="Name">
 <label class="checkout-check" for="checkoutIdHeld"><input type="checkbox" id="checkoutIdHeld"> ID card held at desk</label>
 </div>
-<div class="form-group">
+<div class="form-group" id="checkoutUniformWrap">
+<label for="checkoutUniform">Uniform</label>
+<input type="text" id="checkoutUniform" autocomplete="off" maxlength="80" placeholder="e.g. PT shirt, size M">
+</div>
+<div class="form-group" id="checkoutItemWrap" style="display:none">
 <label for="checkoutItem">Item</label>
 <select id="checkoutItem"><option value="">Select an item</option></select>
 </div>
@@ -191,7 +195,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <input type="number" id="checkoutQty" min="1" step="1" value="1">
 </div>
 <div class="form-group">
-<label for="checkoutNote" id="checkoutNoteLabel">Size or note (optional)</label>
+<label for="checkoutNote" id="checkoutNoteLabel">Note (optional)</label>
 <input type="text" id="checkoutNote" autocomplete="off" maxlength="120">
 </div>
 <button type="button" class="add-button" id="checkoutSubmit" onclick="submitCheckout()">Check out</button>
@@ -199,7 +203,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <p class="checkout-meta" id="checkoutDay"></p>
 </div>
 <h2 class="checkout-heading">Open checkouts</h2>
-<p class="checkout-note">Return some or all of what is still out. Stock changes only after the server accepts the return. Amounts below come from the server.</p>
+<p class="checkout-note">Return some or all of what is still out. Returning a uniform does not change inventory. Equipment stock changes only after the server accepts the return.</p>
 <div id="checkoutOpen"></div>
 <h2 class="checkout-heading">Recently returned</h2>
 <div id="checkoutReturned"></div>
@@ -355,7 +359,9 @@ function setCheckoutMode(mode, button) {
     checkoutMode = mode === "PATRON" ? "PATRON" : "STAFF";
     document.getElementById("checkoutStaffWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
     document.getElementById("checkoutPatronWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
-    document.getElementById("checkoutNoteLabel").textContent = checkoutMode === "STAFF" ? "Size or note (optional)" : "Note (optional)";
+    document.getElementById("checkoutNoteLabel").textContent = "Note (optional)";
+    document.getElementById("checkoutUniformWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
+    document.getElementById("checkoutItemWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
     var modes = document.querySelectorAll(".checkout-modes .tab");
     var i;
     for (i = 0; i < modes.length; i++) modes[i].classList.remove("active");
@@ -589,26 +595,29 @@ function submitCheckout() {
         setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
         return;
     }
-    var itemId = document.getElementById("checkoutItem").value;
     var qty = wholeQty(document.getElementById("checkoutQty").value);
     var note = trimText(document.getElementById("checkoutNote").value);
-    if (!itemId) { setCheckoutMessage("Select an item."); return; }
     if (qty == null || qty < 1) { setCheckoutMessage("Enter a whole quantity of at least 1."); return; }
     if (looksLikeIdNumber(note)) { setCheckoutMessage("Do not enter an ID number. Use a size or note only."); return; }
-    var item = findListedItem(itemId);
-    if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
-        setCheckoutMessage("Not enough stock. Nothing was saved.");
-        return;
-    }
-    var payload = { action: "checkoutCreate", kind: checkoutMode, itemId: itemId, qty: qty, sizeNote: note };
+    var payload = { action: "checkoutCreate", kind: checkoutMode, qty: qty, sizeNote: note };
     if (checkoutMode === "STAFF") {
         payload.staffId = document.getElementById("checkoutStaff").value;
+        payload.itemName = trimText(document.getElementById("checkoutUniform").value);
         if (!payload.staffId) { setCheckoutMessage("Select a staff member."); return; }
+        if (!payload.itemName) { setCheckoutMessage("Enter the uniform item."); return; }
+        if (looksLikeIdNumber(payload.itemName)) { setCheckoutMessage("Do not enter an ID number. Describe the uniform only."); return; }
     } else {
+        payload.itemId = document.getElementById("checkoutItem").value;
         payload.patronName = trimText(document.getElementById("checkoutPatronName").value);
         payload.idCardHeld = document.getElementById("checkoutIdHeld").checked === true;
         if (!payload.patronName) { setCheckoutMessage("Enter the patron's name. Do not enter an ID number."); return; }
         if (looksLikeIdNumber(payload.patronName)) { setCheckoutMessage("Do not enter an ID number. Enter the name only."); return; }
+        if (!payload.itemId) { setCheckoutMessage("Select an item."); return; }
+        var item = findListedItem(payload.itemId);
+        if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
+            setCheckoutMessage("Not enough stock. Nothing was saved.");
+            return;
+        }
     }
     checkoutBusy = true;
     setCheckoutMessage("Saving...", true);
@@ -620,6 +629,7 @@ function submitCheckout() {
         }
         document.getElementById("checkoutQty").value = "1";
         document.getElementById("checkoutNote").value = "";
+        document.getElementById("checkoutUniform").value = "";
         setCheckoutMessage("Checked out.", true);
         return loadCheckoutList();
     }).catch(function(error) {
