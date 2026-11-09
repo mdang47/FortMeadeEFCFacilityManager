@@ -60,7 +60,7 @@
 
       grid-template-columns:
         minmax(0, 1fr)
-        210px;
+        270px;
 
       gap: 24px;
 
@@ -108,7 +108,7 @@
     .logo img {
       width: 100%;
 
-      max-width: 180px;
+      max-width: 240px;
 
       height: auto;
 
@@ -241,7 +241,7 @@
       }
 
       .logo {
-        max-width: 180px;
+        max-width: 240px;
 
         margin: 0 auto;
       }
@@ -366,8 +366,21 @@
       }
 
       .public-view .logo {
-        max-width: 160px;
+        max-width: 240px;
         margin: 12px auto 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .logo,
+      .public-view .logo {
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .logo img {
+        max-width: 300px;
       }
     }
 
