@@ -185,6 +185,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <label for="checkoutIssuer">Issued by</label>
 <select id="checkoutIssuer"></select>
 <label class="checkout-check" for="checkoutIdHeld"><input type="checkbox" id="checkoutIdHeld"> ID card held at desk</label>
+<p class="checkout-meta">Due back within 24 hours.</p>
 </div>
 <div class="form-group" id="checkoutUniformWrap">
 <label for="checkoutUniform">Uniform</label>
@@ -207,7 +208,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <p class="checkout-meta" id="checkoutDay"></p>
 </div>
 <h2 class="checkout-heading">Open checkouts</h2>
-<p class="checkout-note">Return some or all of what is still out. Returning a uniform does not change inventory. Patron equipment is overdue if it is still out 48 hours after checkout. Equipment stock changes only after the server accepts the return.</p>
+<p class="checkout-note">Return some or all of what is still out. Returning a uniform does not change inventory. Patron equipment is overdue if it is still out 24 hours after checkout. Equipment stock changes only after the server accepts the return.</p>
 <div id="checkoutOpen"></div>
 <h2 class="checkout-heading">Recently returned</h2>
 <div id="checkoutReturned"></div>
@@ -507,7 +508,7 @@ function dueAtValue(row) {
     if (row.dueAt) return row.dueAt;
     var ms = new Date(row.createdAt).getTime();
     if (isNaN(ms)) return "";
-    return new Date(ms + 48 * 60 * 60 * 1000).toISOString();
+    return new Date(ms + 24 * 60 * 60 * 1000).toISOString();
 }
 function personLabel(row) {
     if (row.kind === "STAFF") return row.staffName || "Staff member";
