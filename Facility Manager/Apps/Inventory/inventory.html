@@ -602,138 +602,6 @@ h1 {
 
 }
 
-.tab-checkout {
-    background: #c5d4ea;
-}
-
-.checkout-panel {
-    display: none;
-    max-width: 800px;
-    margin: 0 auto 20px;
-}
-
-.checkout-panel.visible {
-    display: block;
-}
-
-.checkout-hidden {
-    display: none !important;
-}
-
-.checkout-hint {
-    background: #fff8e8;
-    border: 1px solid #e0c36a;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #5a3d00;
-}
-
-.checkout-modes {
-    margin: 12px 0;
-}
-
-.checkout-modes .tab {
-    margin: 0 8px 8px 0;
-}
-
-.checkout-form,
-.checkout-card {
-    background: white;
-    border-radius: 15px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.checkout-card {
-    margin-bottom: 10px;
-}
-
-.checkout-card.overdue {
-    border: 2px solid #c43d3d;
-}
-
-.checkout-check {
-    display: block;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.checkout-check input {
-    width: auto;
-    margin-right: 8px;
-}
-
-.checkout-form .add-button {
-    width: 100%;
-    margin-top: 8px;
-}
-
-.checkout-message {
-    min-height: 20px;
-    margin: 10px 0 0;
-    font-size: 14px;
-    font-weight: bold;
-    color: #8a1f1f;
-}
-
-.checkout-message.good {
-    color: #26834a;
-}
-
-.checkout-heading {
-    font-size: 18px;
-    margin: 18px 0 8px;
-}
-
-.checkout-note {
-    color: #555;
-    font-size: 14px;
-    margin: 0 0 8px;
-}
-
-.overdue-badge {
-    display: inline-block;
-    background: #c43d3d;
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 999px;
-    padding: 3px 8px;
-    margin-left: 6px;
-}
-
-.checkout-meta {
-    color: #555;
-    font-size: 14px;
-    margin-top: 4px;
-}
-
-.checkout-return {
-    margin-top: 10px;
-}
-
-.checkout-return input {
-    width: 90px;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-
-.checkout-return button {
-    margin-left: 8px;
-    min-height: 44px;
-}
-
-.checkout-empty {
-    background: white;
-    border-radius: 15px;
-    padding: 16px;
-    color: #666;
-}
-
 </style>
 
 
@@ -820,7 +688,7 @@ Out 0 · Low 0
 
 <!-- SEARCH -->
 
-<div class="search-container" id="inventorySearchWrap">
+<div class="search-container">
 
 <input
 type="text"
@@ -830,7 +698,7 @@ oninput="displayInventory()">
 
 </div>
 
-<div class="search-container" id="inventorySortWrap">
+<div class="search-container">
 
     <select id="sortInventory"
             onchange="displayInventory()"
@@ -873,12 +741,6 @@ All
 class="tab tab-warnings"
 onclick="selectWarnings(this)">
 Low &amp; Out
-</button>
-
-<button
-class="tab tab-checkout"
-onclick="selectCheckout(this)">
-Checkout
 </button>
 
 <button
@@ -934,139 +796,6 @@ Out means quantity is 0. Low means quantity is above 0 and at or below that item
 
 
 
-<!-- CHECKOUT -->
-
-<div class="checkout-panel" id="checkoutPanel">
-
-<p class="checkout-hint" id="checkoutHint">
-Do not enter an ID number, CAC number, or Social Security number. A patron checkout stores the name only, and whether the ID card is held at the desk.
-</p>
-
-<div class="checkout-modes">
-
-<button
-type="button"
-class="tab tab-checkout-mode active"
-id="checkoutModeStaff"
-onclick="setCheckoutMode('STAFF', this)">
-Staff uniform
-</button>
-
-<button
-type="button"
-class="tab tab-checkout-mode"
-id="checkoutModePatron"
-onclick="setCheckoutMode('PATRON', this)">
-Patron equipment
-</button>
-
-</div>
-
-<div class="checkout-form">
-
-<div class="form-group" id="checkoutStaffWrap">
-
-<label for="checkoutStaff">
-Staff member
-</label>
-
-<select id="checkoutStaff">
-<option value="">Select a staff member</option>
-</select>
-
-</div>
-
-<div class="form-group" id="checkoutPatronWrap" style="display:none">
-
-<label for="checkoutPatronName">
-Patron name
-</label>
-
-<input
-type="text"
-id="checkoutPatronName"
-autocomplete="off"
-maxlength="80"
-placeholder="Name">
-
-<label class="checkout-check" for="checkoutIdHeld">
-<input type="checkbox" id="checkoutIdHeld">
-ID card held at desk
-</label>
-
-</div>
-
-<div class="form-group">
-
-<label for="checkoutItem">
-Item
-</label>
-
-<select id="checkoutItem">
-<option value="">Select an item</option>
-</select>
-
-</div>
-
-<div class="form-group">
-
-<label for="checkoutQty">
-Quantity
-</label>
-
-<input
-type="number"
-id="checkoutQty"
-min="1"
-step="1"
-value="1">
-
-</div>
-
-<div class="form-group">
-
-<label for="checkoutNote" id="checkoutNoteLabel">
-Size or note (optional)
-</label>
-
-<input
-type="text"
-id="checkoutNote"
-autocomplete="off"
-maxlength="120">
-
-</div>
-
-<button
-type="button"
-class="add-button"
-id="checkoutSubmit"
-onclick="submitCheckout()">
-Check out
-</button>
-
-<p class="checkout-message" id="checkoutMessage" role="status"></p>
-
-<p class="checkout-meta" id="checkoutDay"></p>
-
-</div>
-
-<h2 class="checkout-heading">Open checkouts</h2>
-
-<p class="checkout-note">
-Return some or all of what is still out. Stock changes only after the server accepts the return.
-</p>
-
-<div id="checkoutOpen"></div>
-
-<h2 class="checkout-heading">Recently returned</h2>
-
-<div id="checkoutReturned"></div>
-
-</div>
-
-
-
 <!-- INVENTORY -->
 
 <div
@@ -1076,7 +805,7 @@ id="inventoryList">
 
 
 
-<div class="action-area" id="inventoryActions">
+<div class="action-area">
 
 <button
 class="add-button"
@@ -1333,8 +1062,6 @@ let pendingActions = [];
 let selectedCategory = "All";
 
 let warningView = false;
-
-let checkoutView = false;
 
 let editingId = null;
 
@@ -1605,10 +1332,6 @@ function showMessage(text) {
 
 function selectWarnings(button) {
 
-    checkoutView = false;
-
-    setCheckoutVisible(false);
-
     warningView = true;
 
 
@@ -1638,10 +1361,6 @@ function selectCategory(
 category,
 button
 ) {
-
-    checkoutView = false;
-
-    setCheckoutVisible(false);
 
     warningView = false;
 
@@ -3005,9 +2724,6 @@ action
     await response.json();
 
 
-    rejectIfAuthFailed(data);
-
-
     if (!data.success) {
 
         throw new Error(
@@ -3148,9 +2864,6 @@ async function loadServerInventory() {
         await response.json();
 
 
-        rejectIfAuthFailed(data);
-
-
         if (!data.success) {
 
             throw new Error(
@@ -3197,10 +2910,6 @@ async function loadServerInventory() {
     }
 
     catch (error) {
-
-        if (error && error.authFailed) {
-            return;
-        }
 
         console.error(
             "Inventory server unavailable:",
@@ -3482,10 +3191,6 @@ setInterval(
 
         await loadServerInventory();
 
-        if (checkoutView) {
-            loadCheckoutList();
-        }
-
     },
 
     30000
@@ -3507,591 +3212,9 @@ window.addEventListener(
 
 
 /* =========================
-   CHECKOUT
-   Writes stay on the server.
-   Nothing here is added to the
-   offline inventory queue.
-========================= */
-
-var checkoutMode = "STAFF";
-var checkoutOpenRows = [];
-var checkoutReturnedRows = [];
-var checkoutItems = [];
-var checkoutStaff = [];
-var checkoutDayKey = "";
-var checkoutBusy = false;
-var checkoutMidnightTimer = 0;
-
-function inventoryAuthFailed(message) {
-    efcInventoryAuthorized = false;
-    efcInventoryToken = "";
-    efcInventoryOffline = false;
-    try {
-        localStorage.removeItem(EFC_STAFF_TOKEN_KEY);
-    } catch (ignore) {}
-    if (window.EFCStaffSession && EFCStaffSession.forget) {
-        EFCStaffSession.forget();
-    }
-    var existing = document.getElementById("efcOfflineBanner");
-    if (existing && existing.parentNode) {
-        existing.parentNode.removeChild(existing);
-    }
-    document.body.classList.add("efc-locked");
-    var gate = document.getElementById("efcGate");
-    if (!gate) {
-        gate = document.createElement("div");
-        gate.id = "efcGate";
-        var box = document.createElement("div");
-        var title = document.createElement("h2");
-        title.textContent = "EFC staff sign-in required";
-        var msg = document.createElement("p");
-        msg.id = "efcGateMessage";
-        var login = document.createElement("a");
-        login.href = "../../../Staff/staff-login.html";
-        login.textContent = "Open Staff Login";
-        var home = document.createElement("a");
-        home.href = "../../../index.html";
-        home.textContent = "Return Home";
-        box.appendChild(title);
-        box.appendChild(msg);
-        box.appendChild(login);
-        box.appendChild(document.createTextNode(" · "));
-        box.appendChild(home);
-        gate.appendChild(box);
-        document.body.insertBefore(gate, document.body.firstChild);
-    }
-    var messageNode = document.getElementById("efcGateMessage");
-    if (messageNode) {
-        messageNode.textContent = message || "Session expired. Please sign in again.";
-    }
-}
-
-function rejectIfAuthFailed(data) {
-    if (data && data.authFailed) {
-        var error = new Error(data.message || "Session expired. Please sign in again.");
-        error.authFailed = true;
-        inventoryAuthFailed(error.message);
-        throw error;
-    }
-}
-
-function pad2(n) {
-    return (n < 10 ? "0" : "") + n;
-}
-
-function easternNthSunday(year, monthIndex, n) {
-    var dow = new Date(Date.UTC(year, monthIndex, 1)).getUTCDay();
-    return 1 + (dow === 0 ? 0 : 7 - dow) + (n - 1) * 7;
-}
-
-function easternOffsetHours(utcMs) {
-    var year = new Date(utcMs).getUTCFullYear();
-    var start = Date.UTC(year, 2, easternNthSunday(year, 2, 2), 7, 0, 0);
-    var end = Date.UTC(year, 10, easternNthSunday(year, 10, 1), 6, 0, 0);
-    if (utcMs >= start && utcMs < end) return 4;
-    return 5;
-}
-
-function easternDayKey(when) {
-    var ms = when instanceof Date ? when.getTime() : new Date(when).getTime();
-    if (isNaN(ms)) return "";
-    var shifted = new Date(ms - easternOffsetHours(ms) * 3600000);
-    return shifted.getUTCFullYear() + "-" + pad2(shifted.getUTCMonth() + 1) + "-" + pad2(shifted.getUTCDate());
-}
-
-function msUntilEasternMidnight(startMs) {
-    var key = easternDayKey(new Date(startMs));
-    if (!key) return 3600000;
-    var lo = startMs;
-    var hi = startMs + 36 * 3600000;
-    if (easternDayKey(new Date(hi)) === key) return 36 * 3600000;
-    while (hi - lo > 20) {
-        var mid = Math.floor((lo + hi) / 2);
-        if (easternDayKey(new Date(mid)) === key) lo = mid;
-        else hi = mid;
-    }
-    return hi - startMs;
-}
-
-function checkoutOffline() {
-    return efcInventoryOffline || navigator.onLine === false;
-}
-
-function setCheckoutMessage(text, good) {
-    var node = document.getElementById("checkoutMessage");
-    if (!node) return;
-    node.textContent = text || "";
-    node.className = good ? "checkout-message good" : "checkout-message";
-}
-
-function setCheckoutVisible(show) {
-    var panel = document.getElementById("checkoutPanel");
-    if (panel) {
-        panel.className = show ? "checkout-panel visible" : "checkout-panel";
-    }
-    var ids = ["inventorySearchWrap", "inventorySortWrap", "inventoryList", "inventoryActions"];
-    var i;
-    for (i = 0; i < ids.length; i++) {
-        var node = document.getElementById(ids[i]);
-        if (!node) continue;
-        if (show) node.classList.add("checkout-hidden");
-        else node.classList.remove("checkout-hidden");
-    }
-}
-
-function selectCheckout(button) {
-    checkoutView = true;
-    warningView = false;
-    document.querySelectorAll(".tab").forEach(function(tab) {
-        if (tab.className.indexOf("tab-checkout-mode") !== -1) return;
-        tab.classList.remove("active");
-    });
-    button.classList.add("active");
-    setCheckoutVisible(true);
-    displayInventory();
-    loadCheckoutList();
-}
-
-function setCheckoutMode(mode, button) {
-    checkoutMode = mode === "PATRON" ? "PATRON" : "STAFF";
-    var staffWrap = document.getElementById("checkoutStaffWrap");
-    var patronWrap = document.getElementById("checkoutPatronWrap");
-    var noteLabel = document.getElementById("checkoutNoteLabel");
-    if (staffWrap) staffWrap.style.display = checkoutMode === "STAFF" ? "block" : "none";
-    if (patronWrap) patronWrap.style.display = checkoutMode === "PATRON" ? "block" : "none";
-    if (noteLabel) {
-        noteLabel.textContent = checkoutMode === "STAFF"
-            ? "Size or note (optional)"
-            : "Note (optional)";
-    }
-    var modes = document.querySelectorAll(".checkout-modes .tab");
-    var i;
-    for (i = 0; i < modes.length; i++) modes[i].classList.remove("active");
-    if (button) button.classList.add("active");
-}
-
-function clearChildren(node) {
-    if (!node) return;
-    while (node.firstChild) node.removeChild(node.firstChild);
-}
-
-function wholeQty(value) {
-    var text = String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
-    if (!/^[0-9]+$/.test(text)) return null;
-    var number = parseInt(text, 10);
-    if (!isFinite(number)) return null;
-    return number;
-}
-
-function looksLikeIdNumber(text) {
-    var value = String(text || "");
-    if (/[0-9]{6,}/.test(value)) return true;
-    if (/[0-9]{3}-[0-9]{2}-[0-9]{4}/.test(value)) return true;
-    return false;
-}
-
-function applyCheckoutItemQuantities(items) {
-    if (!items || !items.length || pendingActions.length) return;
-    var i;
-    var j;
-    var changed = false;
-    for (i = 0; i < items.length; i++) {
-        var incoming = items[i];
-        if (!incoming || incoming.id == null || !isFinite(Number(incoming.quantity))) continue;
-        for (j = 0; j < inventory.length; j++) {
-            if (String(inventory[j].id) === String(incoming.id)) {
-                inventory[j].quantity = Number(incoming.quantity);
-                changed = true;
-            }
-        }
-    }
-    if (!changed) return;
-    saveInventoryCache();
-    displayInventory();
-}
-
-function findListedItem(id) {
-    var source = inventory.length ? inventory : checkoutItems;
-    var i;
-    for (i = 0; i < source.length; i++) {
-        if (String(source[i].id) === String(id)) return source[i];
-    }
-    return null;
-}
-
-function fillSelect(select, placeholder, rows, keepValue) {
-    var keep = keepValue != null ? String(keepValue) : (select.value || "");
-    clearChildren(select);
-    var first = document.createElement("option");
-    first.value = "";
-    first.textContent = placeholder;
-    select.appendChild(first);
-    var i;
-    for (i = 0; i < rows.length; i++) {
-        var option = document.createElement("option");
-        option.value = String(rows[i].value);
-        option.textContent = rows[i].label;
-        select.appendChild(option);
-    }
-    select.value = keep;
-    if (select.value !== keep) select.value = "";
-}
-
-function fillCheckoutStaff() {
-    var select = document.getElementById("checkoutStaff");
-    if (!select) return;
-    var rows = [];
-    var i;
-    for (i = 0; i < checkoutStaff.length; i++) {
-        rows.push({
-            value: checkoutStaff[i].id,
-            label: checkoutStaff[i].name || "Staff member"
-        });
-    }
-    fillSelect(select, "Select a staff member", rows, select.value);
-}
-
-function fillCheckoutItems() {
-    var select = document.getElementById("checkoutItem");
-    if (!select) return;
-    var source = inventory.length ? inventory : checkoutItems;
-    var rows = [];
-    var i;
-    for (i = 0; i < source.length; i++) {
-        var item = source[i];
-        rows.push({
-            value: item.id,
-            label: item.name + " — " + Number(item.quantity) + " " + (item.unit || "")
-        });
-    }
-    fillSelect(select, "Select an item", rows, select.value);
-}
-
-function formatWhen(iso) {
-    if (!iso) return "";
-    var date = new Date(iso);
-    if (isNaN(date.getTime())) return "";
-    return date.toLocaleString();
-}
-
-function rowOverdue(row) {
-    if (!row || row.kind !== "PATRON") return false;
-    if (row.status && row.status !== "OPEN") return false;
-    if (row.overdue === true) return true;
-    var created = easternDayKey(row.createdAt);
-    var today = easternDayKey(new Date());
-    if (created && today && created < today) return true;
-    return false;
-}
-
-function personLabel(row) {
-    if (row.kind === "STAFF") return row.staffName || "Staff member";
-    return row.patronName || "Patron";
-}
-
-function renderCheckoutLists() {
-    var openBox = document.getElementById("checkoutOpen");
-    var returnedBox = document.getElementById("checkoutReturned");
-    var day = document.getElementById("checkoutDay");
-    if (day) {
-        day.textContent = checkoutDayKey ? ("Server day " + checkoutDayKey + " (Eastern).") : "";
-    }
-    clearChildren(openBox);
-    clearChildren(returnedBox);
-    if (!checkoutOpenRows.length) {
-        var emptyOpen = document.createElement("div");
-        emptyOpen.className = "checkout-empty";
-        emptyOpen.textContent = "No open checkouts.";
-        openBox.appendChild(emptyOpen);
-    }
-    var i;
-    for (i = 0; i < checkoutOpenRows.length; i++) {
-        openBox.appendChild(renderOpenCheckout(checkoutOpenRows[i]));
-    }
-    if (!checkoutReturnedRows.length) {
-        var emptyReturned = document.createElement("div");
-        emptyReturned.className = "checkout-empty";
-        emptyReturned.textContent = "No recent returns.";
-        returnedBox.appendChild(emptyReturned);
-    }
-    for (i = 0; i < checkoutReturnedRows.length; i++) {
-        returnedBox.appendChild(renderReturnedCheckout(checkoutReturnedRows[i]));
-    }
-}
-
-function renderOpenCheckout(row) {
-    var card = document.createElement("div");
-    var overdue = rowOverdue(row);
-    card.className = overdue ? "checkout-card overdue" : "checkout-card";
-    var title = document.createElement("div");
-    title.className = "item-name";
-    title.textContent = (row.itemName || "Item") + " · " + (row.qtyRemaining != null ? row.qtyRemaining : row.qtyOut) + " still out";
-    if (overdue) {
-        var badge = document.createElement("span");
-        badge.className = "overdue-badge";
-        badge.textContent = "Overdue";
-        title.appendChild(badge);
-    }
-    card.appendChild(title);
-    var who = document.createElement("div");
-    who.className = "checkout-meta";
-    var kindText = row.kind === "STAFF" ? "Staff uniform" : "Patron equipment";
-    who.textContent = kindText + " · " + personLabel(row);
-    if (row.kind === "PATRON") {
-        who.textContent += row.idCardHeld ? " · ID card at desk" : " · ID card not held";
-    }
-    card.appendChild(who);
-    if (row.sizeNote) {
-        var note = document.createElement("div");
-        note.className = "checkout-meta";
-        note.textContent = row.sizeNote;
-        card.appendChild(note);
-    }
-    var when = document.createElement("div");
-    when.className = "checkout-meta";
-    when.textContent = "Checked out " + formatWhen(row.createdAt);
-    card.appendChild(when);
-    var remaining = wholeQty(row.qtyRemaining);
-    if (remaining == null) remaining = wholeQty(row.qtyOut);
-    if (remaining && remaining > 0) {
-        var controls = document.createElement("div");
-        controls.className = "checkout-return";
-        var input = document.createElement("input");
-        input.type = "number";
-        input.min = "1";
-        input.max = String(remaining);
-        input.step = "1";
-        input.value = String(remaining);
-        input.setAttribute("aria-label", "Quantity to return");
-        input.setAttribute("data-return-for", row.id);
-        var button = document.createElement("button");
-        button.type = "button";
-        button.className = "small-button edit-button";
-        button.textContent = "Return";
-        button.setAttribute("data-return-for", row.id);
-        button.onclick = function() {
-            submitReturn(this.getAttribute("data-return-for"));
-        };
-        controls.appendChild(input);
-        controls.appendChild(button);
-        card.appendChild(controls);
-    }
-    return card;
-}
-
-function renderReturnedCheckout(row) {
-    var card = document.createElement("div");
-    card.className = "checkout-card";
-    var title = document.createElement("div");
-    title.className = "item-name";
-    title.textContent = (row.itemName || "Item") + " · returned " + (row.qtyReturned != null ? row.qtyReturned : "");
-    card.appendChild(title);
-    var who = document.createElement("div");
-    who.className = "checkout-meta";
-    who.textContent = (row.kind === "STAFF" ? "Staff uniform" : "Patron equipment") + " · " + personLabel(row);
-    card.appendChild(who);
-    var when = document.createElement("div");
-    when.className = "checkout-meta";
-    when.textContent = "Returned " + formatWhen(row.closedAt || row.createdAt);
-    card.appendChild(when);
-    return card;
-}
-
-function postCheckout(payload) {
-    if (!efcInventoryAuthorized) {
-        return Promise.reject(new Error("EFC staff sign-in required."));
-    }
-    payload.token = efcInventoryToken;
-    return fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-    }).then(function(response) {
-        if (!response.ok) throw new Error("Server error.");
-        return response.json();
-    }).then(function(data) {
-        rejectIfAuthFailed(data);
-        return data;
-    });
-}
-
-function loadCheckoutList() {
-    if (!efcInventoryAuthorized) return Promise.resolve();
-    if (checkoutOffline()) {
-        setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
-        renderCheckoutLists();
-        return Promise.resolve();
-    }
-    return postCheckout({ action: "checkoutList" }).then(function(data) {
-        if (!data || !data.success) {
-            setCheckoutMessage((data && data.message) || "Could not load checkouts.");
-            return;
-        }
-        checkoutOpenRows = data.open || [];
-        checkoutReturnedRows = data.returned || [];
-        checkoutItems = data.items || [];
-        checkoutStaff = data.staff || [];
-        checkoutDayKey = data.dayKey || "";
-        if (!pendingActions.length) {
-            applyCheckoutItemQuantities(checkoutItems);
-        }
-        fillCheckoutStaff();
-        fillCheckoutItems();
-        renderCheckoutLists();
-        armCheckoutMidnight();
-    }).catch(function(error) {
-        if (error && error.authFailed) return;
-        setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
-    });
-}
-
-function refreshStockAfterCheckout() {
-    return loadCheckoutList().then(function() {
-        return loadServerInventory();
-    }).then(function() {
-        fillCheckoutItems();
-        if (checkoutView) displayInventory();
-    });
-}
-
-function submitCheckout() {
-    if (checkoutBusy) return;
-    if (!efcInventoryAuthorized) return;
-    if (checkoutOffline()) {
-        setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
-        return;
-    }
-    var itemId = document.getElementById("checkoutItem").value;
-    var qty = wholeQty(document.getElementById("checkoutQty").value);
-    var note = document.getElementById("checkoutNote").value.replace(/^\s+|\s+$/g, "");
-    if (!itemId) {
-        setCheckoutMessage("Select an item.");
-        return;
-    }
-    if (qty == null || qty < 1) {
-        setCheckoutMessage("Enter a whole quantity of at least 1.");
-        return;
-    }
-    if (looksLikeIdNumber(note)) {
-        setCheckoutMessage("Do not enter an ID number. Use a size or note only.");
-        return;
-    }
-    var item = findListedItem(itemId);
-    if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
-        setCheckoutMessage("Not enough stock. Nothing was saved.");
-        return;
-    }
-    var payload = {
-        action: "checkoutCreate",
-        kind: checkoutMode,
-        itemId: itemId,
-        qty: qty,
-        sizeNote: note
-    };
-    if (checkoutMode === "STAFF") {
-        payload.staffId = document.getElementById("checkoutStaff").value;
-        if (!payload.staffId) {
-            setCheckoutMessage("Select a staff member.");
-            return;
-        }
-    } else {
-        payload.patronName = document.getElementById("checkoutPatronName").value.replace(/^\s+|\s+$/g, "");
-        payload.idCardHeld = document.getElementById("checkoutIdHeld").checked === true;
-        if (!payload.patronName) {
-            setCheckoutMessage("Enter the patron's name. Do not enter an ID number.");
-            return;
-        }
-        if (looksLikeIdNumber(payload.patronName)) {
-            setCheckoutMessage("Do not enter an ID number. Enter the name only.");
-            return;
-        }
-    }
-    checkoutBusy = true;
-    setCheckoutMessage("Saving…", true);
-    postCheckout(payload).then(function(data) {
-        checkoutBusy = false;
-        if (!data || !data.success) {
-            setCheckoutMessage((data && data.message) || "Could not save checkout.");
-            return;
-        }
-        document.getElementById("checkoutQty").value = "1";
-        document.getElementById("checkoutNote").value = "";
-        setCheckoutMessage("Checked out. Stock will match the server after refresh.", true);
-        return refreshStockAfterCheckout();
-    }).catch(function(error) {
-        checkoutBusy = false;
-        if (error && error.authFailed) return;
-        setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
-    });
-}
-
-function submitReturn(checkoutId) {
-    if (checkoutBusy) return;
-    if (!efcInventoryAuthorized) return;
-    if (checkoutOffline()) {
-        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
-        return;
-    }
-    var inputs = document.querySelectorAll("[data-return-for]");
-    var qty = null;
-    var i;
-    for (i = 0; i < inputs.length; i++) {
-        if (inputs[i].getAttribute("data-return-for") === checkoutId && inputs[i].tagName === "INPUT") {
-            qty = wholeQty(inputs[i].value);
-        }
-    }
-    var row = null;
-    for (i = 0; i < checkoutOpenRows.length; i++) {
-        if (String(checkoutOpenRows[i].id) === String(checkoutId)) row = checkoutOpenRows[i];
-    }
-    if (!row) return;
-    var remaining = wholeQty(row.qtyRemaining);
-    if (remaining == null) remaining = wholeQty(row.qtyOut);
-    if (qty == null || qty < 1) {
-        setCheckoutMessage("Enter a whole quantity to return.");
-        return;
-    }
-    if (remaining != null && qty > remaining) {
-        setCheckoutMessage("You can return at most " + remaining + ".");
-        return;
-    }
-    checkoutBusy = true;
-    setCheckoutMessage("Saving return…", true);
-    postCheckout({
-        action: "checkoutReturn",
-        checkoutId: checkoutId,
-        qty: qty
-    }).then(function(data) {
-        checkoutBusy = false;
-        if (!data || !data.success) {
-            setCheckoutMessage((data && data.message) || "Could not save the return.");
-            return;
-        }
-        setCheckoutMessage(data.fullyReturned ? "Returned. Stock will match the server after refresh." : "Partial return saved. Stock will match the server after refresh.", true);
-        return refreshStockAfterCheckout();
-    }).catch(function(error) {
-        checkoutBusy = false;
-        if (error && error.authFailed) return;
-        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
-    });
-}
-
-function armCheckoutMidnight() {
-    if (checkoutMidnightTimer) clearTimeout(checkoutMidnightTimer);
-    var wait = msUntilEasternMidnight(Date.now());
-    if (wait < 1000) wait = 1000;
-    if (wait > 2147000000) wait = 2147000000;
-    checkoutMidnightTimer = setTimeout(function() {
-        renderCheckoutLists();
-        if (efcInventoryAuthorized && !checkoutOffline()) loadCheckoutList();
-        armCheckoutMidnight();
-    }, wait);
-}
-
-/* =========================
    START
 ========================= */
 
-armCheckoutMidnight();
 efcVerifyInventorySession();
 
 
