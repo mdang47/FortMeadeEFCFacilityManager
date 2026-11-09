@@ -184,7 +184,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 </div>
 <div class="form-group" id="checkoutUniformWrap">
 <label for="checkoutUniform">Uniform</label>
-<input type="text" id="checkoutUniform" autocomplete="off" maxlength="80" placeholder="e.g. PT shirt, size M">
+<select id="checkoutUniform"></select>
 </div>
 <div class="form-group" id="checkoutItemWrap" style="display:none">
 <label for="checkoutItem">Item</label>
@@ -196,7 +196,7 @@ body.efc-locked>:not(#efcGate){display:none!important}
 </div>
 <div class="form-group">
 <label for="checkoutNote" id="checkoutNoteLabel">Note (optional)</label>
-<input type="text" id="checkoutNote" autocomplete="off" maxlength="120">
+<input type="text" id="checkoutNote" autocomplete="off" maxlength="120" placeholder="Size, color, etc. (optional)">
 </div>
 <button type="button" class="add-button" id="checkoutSubmit" onclick="submitCheckout()">Check out</button>
 <p class="checkout-message" id="checkoutMessage" role="status"></p>
@@ -216,6 +216,7 @@ var TOKEN_KEY = "efc-staff-token-v1";
 var checkoutAuthorized = false;
 var checkoutToken = "";
 var checkoutOfflineMode = false;
+var UNIFORM_ITEMS = ["1/4 Zip", "Parka", "Soft Shell Jacket", "Beanie", "Baseball Cap"];
 var checkoutMode = "STAFF";
 var checkoutOpenRows = [];
 var checkoutReturnedRows = [];
@@ -360,6 +361,7 @@ function setCheckoutMode(mode, button) {
     document.getElementById("checkoutStaffWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
     document.getElementById("checkoutPatronWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
     document.getElementById("checkoutNoteLabel").textContent = "Note (optional)";
+    document.getElementById("checkoutNote").placeholder = checkoutMode === "STAFF" ? "Size, color, etc. (optional)" : "";
     document.getElementById("checkoutUniformWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
     document.getElementById("checkoutItemWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
     var modes = document.querySelectorAll(".checkout-modes .tab");
@@ -410,6 +412,33 @@ function fillSelect(select, placeholder, rows, keepValue) {
     }
     select.value = keep;
     if (select.value !== keep) select.value = "";
+}
+function uniformAllowed(name) {
+    var i;
+    for (i = 0; i < UNIFORM_ITEMS.length; i++) {
+        if (UNIFORM_ITEMS[i] === name) return true;
+    }
+    return false;
+}
+function fillUniformSelect() {
+    var select = document.getElementById("checkoutUniform");
+    if (!select || select.getAttribute("data-ready") === "1") return;
+    var keep = select.value || "";
+    clearChildren(select);
+    var first = document.createElement("option");
+    first.value = "";
+    first.textContent = "Choose an item";
+    select.appendChild(first);
+    var i;
+    for (i = 0; i < UNIFORM_ITEMS.length; i++) {
+        var option = document.createElement("option");
+        option.value = UNIFORM_ITEMS[i];
+        option.textContent = UNIFORM_ITEMS[i];
+        select.appendChild(option);
+    }
+    select.value = keep;
+    if (select.value !== keep) select.value = "";
+    select.setAttribute("data-ready", "1");
 }
 function fillCheckoutStaff() {
     var select = document.getElementById("checkoutStaff");
@@ -602,10 +631,9 @@ function submitCheckout() {
     var payload = { action: "checkoutCreate", kind: checkoutMode, qty: qty, sizeNote: note };
     if (checkoutMode === "STAFF") {
         payload.staffId = document.getElementById("checkoutStaff").value;
-        payload.itemName = trimText(document.getElementById("checkoutUniform").value);
+        payload.itemName = document.getElementById("checkoutUniform").value;
         if (!payload.staffId) { setCheckoutMessage("Select a staff member."); return; }
-        if (!payload.itemName) { setCheckoutMessage("Enter the uniform item."); return; }
-        if (looksLikeIdNumber(payload.itemName)) { setCheckoutMessage("Do not enter an ID number. Describe the uniform only."); return; }
+        if (!uniformAllowed(payload.itemName)) { setCheckoutMessage("Choose a uniform item."); return; }
     } else {
         payload.itemId = document.getElementById("checkoutItem").value;
         payload.patronName = trimText(document.getElementById("checkoutPatronName").value);
@@ -693,6 +721,7 @@ document.getElementById("date").textContent = new Date().toLocaleDateString("en-
     day: "numeric",
     year: "numeric"
 });
+fillUniformSelect();
 armCheckoutMidnight();
 efcVerifyCheckoutSession();
 </script>
