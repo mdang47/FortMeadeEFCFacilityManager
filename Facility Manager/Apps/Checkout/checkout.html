@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+.header { text-align: center; }
+h1 { margin-bottom: 5px; }
+.date { color: #666; }
+.sync-status {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: bold;
+}
+.synced { color: #26834a; }
+.syncing { color: #a77e00; }
+.offline { color: #c43d3d; }
+.checkout-wrap {
+    max-width: 800px;
+    margin: 20px auto;
+}
+.checkout-hint {
+    background: #fff8e8;
+    border: 1px solid #e0c36a;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #5a3d00;
+}
+.checkout-modes { margin: 12px 0; }
+.tab {
+    border: 2px solid transparent;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 8px 8px 0;
+}
+.tab-staff { background: #d5c4eb; }
+.tab-patron { background: #b8dff5; }
+.tab.active {
+    border-color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,.25);
+}
+.checkout-form,
+.checkout-card,
+.checkout-empty {
+    background: white;
+    border-radius: 15px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.checkout-card { margin-bottom: 10px; }
+.checkout-card.overdue { border: 2px solid #c43d3d; }
+.checkout-empty { color: #666; margin-bottom: 10px; }
+.form-group { margin-bottom: 15px; }
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+.checkout-check {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.checkout-check input {
+    width: auto;
+    margin-right: 8px;
+}
+.add-button {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 17px;
+    font-size: 18px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+}
+.checkout-message {
+    min-height: 20px;
+    margin: 10px 0 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #8a1f1f;
+}
+.checkout-message.good { color: #26834a; }
+.checkout-heading { font-size: 18px; margin: 18px 0 8px; }
+.checkout-note { color: #555; font-size: 14px; margin: 0 0 8px; }
+.item-name { font-size: 21px; font-weight: bold; }
+.overdue-badge {
+    display: inline-block;
+    background: #c43d3d;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 999px;
+    padding: 3px 8px;
+    margin-left: 6px;
+}
+.checkout-meta { color: #555; font-size: 14px; margin-top: 4px; }
+.checkout-return { margin-top: 10px; }
+.checkout-return input {
+    width: 90px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.return-button {
+    margin-left: 8px;
+    min-height: 44px;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    background: rgba(255,255,255,.8);
+    border: 1px solid #ccc;
+}
+@media (max-width: 500px) {
+    body { padding: 12px; }
+    .tab { padding: 9px 12px; font-size: 13px; }
+}
+</style>
+<style id="efc-return-home-style">
+.efc-return-home-bar { box-sizing: border-box; display: flex; justify-content: flex-start; padding: 9px 16px; background: #0b1f33; position: relative; z-index: 20; }
+.efc-return-home-bar a { display: inline-flex; align-items: center; padding: 9px 14px; color: #fff; background: #163b61; border: 1px solid rgba(255,255,255,.35); border-radius: 8px; font: 600 14px Arial, sans-serif; text-decoration: none; line-height: 1.2; }
+.efc-return-home-bar a:hover, .efc-return-home-bar a:focus-visible { background: #2a6f9b; color: #fff; outline-offset: 2px; }
+@media (max-width: 480px) { .efc-return-home-bar { padding: 7px 10px; } .efc-return-home-bar a { padding: 8px 12px; } }
+</style>
+</head>
+<body class="efc-locked">
+<style>
+body.efc-locked>:not(#efcGate){display:none!important}
+#efcGate{position:fixed;top:0;left:0;right:0;bottom:0;background:#eef4f8;z-index:100000;display:grid;place-items:center;padding:20px;font:16px system-ui}
+#efcGate>div{background:#fff;border-radius:12px;padding:28px;max-width:420px}
+#efcGate a{color:#064b75}
+</style>
+<div id="efcGate"><div><h2>EFC staff sign-in required</h2><p id="efcGateMessage">Checking your staff session…</p><a href="../../../Staff/staff-login.html">Open Staff Login</a> · <a href="../../../index.html">Return Home</a></div></div>
+<nav class="efc-return-home-bar" aria-label="Home navigation"><a href="../../../index.html">← Return Home</a></nav>
+
+<div class="header">
+<h1>Checkout</h1>
+<div class="date" id="date"></div>
+<div class="sync-status syncing" id="syncStatus">Loading...</div>
+</div>
+
+<div class="checkout-wrap">
+<p class="checkout-hint" id="checkoutHint">Do not enter an ID number, CAC number, or Social Security number. A patron checkout stores the name only, and whether the ID card is held at the desk.</p>
+<div class="checkout-modes">
+<button type="button" class="tab tab-staff active" id="checkoutModeStaff" onclick="setCheckoutMode('STAFF', this)">Staff uniform</button>
+<button type="button" class="tab tab-patron" id="checkoutModePatron" onclick="setCheckoutMode('PATRON', this)">Patron equipment</button>
+</div>
+<div class="checkout-form">
+<div class="form-group" id="checkoutStaffWrap">
+<label for="checkoutStaff">Staff member</label>
+<select id="checkoutStaff"><option value="">Select a staff member</option></select>
+</div>
+<div class="form-group" id="checkoutPatronWrap" style="display:none">
+<label for="checkoutPatronName">Patron name</label>
+<input type="text" id="checkoutPatronName" autocomplete="off" maxlength="80" placeholder="Name">
+<label class="checkout-check" for="checkoutIdHeld"><input type="checkbox" id="checkoutIdHeld"> ID card held at desk</label>
+</div>
+<div class="form-group">
+<label for="checkoutItem">Item</label>
+<select id="checkoutItem"><option value="">Select an item</option></select>
+</div>
+<div class="form-group">
+<label for="checkoutQty">Quantity</label>
+<input type="number" id="checkoutQty" min="1" step="1" value="1">
+</div>
+<div class="form-group">
+<label for="checkoutNote" id="checkoutNoteLabel">Size or note (optional)</label>
+<input type="text" id="checkoutNote" autocomplete="off" maxlength="120">
+</div>
+<button type="button" class="add-button" id="checkoutSubmit" onclick="submitCheckout()">Check out</button>
+<p class="checkout-message" id="checkoutMessage" role="status"></p>
+<p class="checkout-meta" id="checkoutDay"></p>
+</div>
+<h2 class="checkout-heading">Open checkouts</h2>
+<p class="checkout-note">Return some or all of what is still out. Stock changes only after the server accepts the return. Amounts below come from the server.</p>
+<div id="checkoutOpen"></div>
+<h2 class="checkout-heading">Recently returned</h2>
+<div id="checkoutReturned"></div>
+</div>
+
+<script src="../../../Staff/efc-staff-session.js"></script>
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbz2ZxwkqDPf4WkjTvBwEZk5f9zFdrdO6kZQgNyDvZjLY3kdQ3R1O90cplsdK-qKly6D7g/exec";
+var TOKEN_KEY = "efc-staff-token-v1";
+var checkoutAuthorized = false;
+var checkoutToken = "";
+var checkoutOfflineMode = false;
+var checkoutMode = "STAFF";
+var checkoutOpenRows = [];
+var checkoutReturnedRows = [];
+var checkoutItems = [];
+var checkoutStaff = [];
+var checkoutDayKey = "";
+var checkoutBusy = false;
+var checkoutMidnightTimer = 0;
+
+function setStatus(className, text) {
+    var status = document.getElementById("syncStatus");
+    status.className = "sync-status " + className;
+    status.textContent = text;
+}
+
+function checkoutAuthFailed(message) {
+    checkoutAuthorized = false;
+    checkoutToken = "";
+    checkoutOfflineMode = false;
+    try { localStorage.removeItem(TOKEN_KEY); } catch (ignore) {}
+    if (window.EFCStaffSession && EFCStaffSession.forget) EFCStaffSession.forget();
+    var banner = document.getElementById("efcOfflineBanner");
+    if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
+    document.body.classList.add("efc-locked");
+    var gate = document.getElementById("efcGate");
+    if (!gate) {
+        gate = document.createElement("div");
+        gate.id = "efcGate";
+        var box = document.createElement("div");
+        var title = document.createElement("h2");
+        title.textContent = "EFC staff sign-in required";
+        var msg = document.createElement("p");
+        msg.id = "efcGateMessage";
+        var login = document.createElement("a");
+        login.href = "../../../Staff/staff-login.html";
+        login.textContent = "Open Staff Login";
+        var home = document.createElement("a");
+        home.href = "../../../index.html";
+        home.textContent = "Return Home";
+        box.appendChild(title);
+        box.appendChild(msg);
+        box.appendChild(login);
+        box.appendChild(document.createTextNode(" · "));
+        box.appendChild(home);
+        gate.appendChild(box);
+        document.body.insertBefore(gate, document.body.firstChild);
+    }
+    var messageNode = document.getElementById("efcGateMessage");
+    if (messageNode) messageNode.textContent = message || "Session expired. Please sign in again.";
+}
+
+function rejectIfAuthFailed(data) {
+    if (data && data.authFailed) {
+        var error = new Error(data.message || "Session expired. Please sign in again.");
+        error.authFailed = true;
+        checkoutAuthFailed(error.message);
+        throw error;
+    }
+}
+
+function roleAllowed(staff) {
+    if (!staff || staff.forceReset || !staff.roles || !staff.roles.length) return false;
+    var i;
+    for (i = 0; i < staff.roles.length; i++) {
+        if (staff.roles[i] === "EFC" || staff.roles[i] === "ADMIN") return true;
+    }
+    return false;
+}
+
+function efcVerifyCheckoutSession() {
+    var gate = document.getElementById("efcGate");
+    var msg = document.getElementById("efcGateMessage");
+    EFCStaffSession.validate(API_URL).then(function(s) {
+        if (!roleAllowed(s.staff)) throw new Error("EFC or administrator access required.");
+        checkoutToken = s.token;
+        checkoutAuthorized = true;
+        checkoutOfflineMode = s.offline;
+        EFCStaffSession.banner(s);
+        if (gate) {
+            document.body.classList.remove("efc-locked");
+            gate.parentNode.removeChild(gate);
+        }
+        if (s.offline) {
+            setStatus("offline", "Offline");
+            setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
+            renderCheckoutLists();
+            return;
+        }
+        setStatus("syncing", "Loading...");
+        loadCheckoutList();
+    }).catch(function(error) {
+        if (!gate || !gate.parentNode) {
+            location.reload();
+            return;
+        }
+        if (msg) msg.textContent = "Access denied or unavailable: " + error.message;
+    });
+}
+
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function easternNthSunday(year, monthIndex, n) {
+    var dow = new Date(Date.UTC(year, monthIndex, 1)).getUTCDay();
+    return 1 + (dow === 0 ? 0 : 7 - dow) + (n - 1) * 7;
+}
+function easternOffsetHours(utcMs) {
+    var year = new Date(utcMs).getUTCFullYear();
+    var start = Date.UTC(year, 2, easternNthSunday(year, 2, 2), 7, 0, 0);
+    var end = Date.UTC(year, 10, easternNthSunday(year, 10, 1), 6, 0, 0);
+    if (utcMs >= start && utcMs < end) return 4;
+    return 5;
+}
+function easternDayKey(when) {
+    var ms = when instanceof Date ? when.getTime() : new Date(when).getTime();
+    if (isNaN(ms)) return "";
+    var shifted = new Date(ms - easternOffsetHours(ms) * 3600000);
+    return shifted.getUTCFullYear() + "-" + pad2(shifted.getUTCMonth() + 1) + "-" + pad2(shifted.getUTCDate());
+}
+function msUntilEasternMidnight(startMs) {
+    var key = easternDayKey(new Date(startMs));
+    if (!key) return 3600000;
+    var lo = startMs;
+    var hi = startMs + 36 * 3600000;
+    if (easternDayKey(new Date(hi)) === key) return 36 * 3600000;
+    while (hi - lo > 20) {
+        var mid = Math.floor((lo + hi) / 2);
+        if (easternDayKey(new Date(mid)) === key) lo = mid;
+        else hi = mid;
+    }
+    return hi - startMs;
+}
+function writesNeedServer() {
+    return checkoutOfflineMode || navigator.onLine === false;
+}
+function setCheckoutMessage(text, good) {
+    var node = document.getElementById("checkoutMessage");
+    if (!node) return;
+    node.textContent = text || "";
+    node.className = good ? "checkout-message good" : "checkout-message";
+}
+function setCheckoutMode(mode, button) {
+    checkoutMode = mode === "PATRON" ? "PATRON" : "STAFF";
+    document.getElementById("checkoutStaffWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
+    document.getElementById("checkoutPatronWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
+    document.getElementById("checkoutNoteLabel").textContent = checkoutMode === "STAFF" ? "Size or note (optional)" : "Note (optional)";
+    var modes = document.querySelectorAll(".checkout-modes .tab");
+    var i;
+    for (i = 0; i < modes.length; i++) modes[i].classList.remove("active");
+    if (button) button.classList.add("active");
+}
+function clearChildren(node) {
+    if (!node) return;
+    while (node.firstChild) node.removeChild(node.firstChild);
+}
+function wholeQty(value) {
+    var text = String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
+    if (!/^[0-9]+$/.test(text)) return null;
+    var number = parseInt(text, 10);
+    if (!isFinite(number)) return null;
+    return number;
+}
+function looksLikeIdNumber(text) {
+    var value = String(text || "");
+    if (/[0-9]{6,}/.test(value)) return true;
+    if (/[0-9]{3}-[0-9]{2}-[0-9]{4}/.test(value)) return true;
+    return false;
+}
+function trimText(value) {
+    return String(value || "").replace(/^\s+|\s+$/g, "");
+}
+function findListedItem(id) {
+    var i;
+    for (i = 0; i < checkoutItems.length; i++) {
+        if (String(checkoutItems[i].id) === String(id)) return checkoutItems[i];
+    }
+    return null;
+}
+function fillSelect(select, placeholder, rows, keepValue) {
+    var keep = keepValue != null ? String(keepValue) : (select.value || "");
+    clearChildren(select);
+    var first = document.createElement("option");
+    first.value = "";
+    first.textContent = placeholder;
+    select.appendChild(first);
+    var i;
+    for (i = 0; i < rows.length; i++) {
+        var option = document.createElement("option");
+        option.value = String(rows[i].value);
+        option.textContent = rows[i].label;
+        select.appendChild(option);
+    }
+    select.value = keep;
+    if (select.value !== keep) select.value = "";
+}
+function fillCheckoutStaff() {
+    var select = document.getElementById("checkoutStaff");
+    var rows = [];
+    var i;
+    for (i = 0; i < checkoutStaff.length; i++) {
+        rows.push({ value: checkoutStaff[i].id, label: checkoutStaff[i].name || "Staff member" });
+    }
+    fillSelect(select, "Select a staff member", rows, select.value);
+}
+function fillCheckoutItems() {
+    var select = document.getElementById("checkoutItem");
+    var rows = [];
+    var i;
+    for (i = 0; i < checkoutItems.length; i++) {
+        var item = checkoutItems[i];
+        var unit = item.unit ? " " + item.unit : "";
+        rows.push({
+            value: item.id,
+            label: item.name + " — " + Number(item.quantity) + unit + " available"
+        });
+    }
+    fillSelect(select, checkoutItems.length ? "Select an item" : "No items from the server", rows, select.value);
+}
+function formatWhen(iso) {
+    if (!iso) return "";
+    var date = new Date(iso);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleString();
+}
+function rowOverdue(row) {
+    if (!row || row.kind !== "PATRON") return false;
+    if (row.status && row.status !== "OPEN") return false;
+    if (row.overdue === true) return true;
+    var created = easternDayKey(row.createdAt);
+    var today = easternDayKey(new Date());
+    if (created && today && created < today) return true;
+    return false;
+}
+function personLabel(row) {
+    if (row.kind === "STAFF") return row.staffName || "Staff member";
+    return row.patronName || "Patron";
+}
+function renderOpenCheckout(row) {
+    var card = document.createElement("div");
+    var overdue = rowOverdue(row);
+    card.className = overdue ? "checkout-card overdue" : "checkout-card";
+    var title = document.createElement("div");
+    title.className = "item-name";
+    var remainingText = row.qtyRemaining != null ? row.qtyRemaining : row.qtyOut;
+    title.textContent = (row.itemName || "Item") + " · " + remainingText + " still out";
+    if (overdue) {
+        var badge = document.createElement("span");
+        badge.className = "overdue-badge";
+        badge.textContent = "Overdue";
+        title.appendChild(badge);
+    }
+    card.appendChild(title);
+    var who = document.createElement("div");
+    who.className = "checkout-meta";
+    who.textContent = (row.kind === "STAFF" ? "Staff uniform" : "Patron equipment") + " · " + personLabel(row);
+    if (row.kind === "PATRON") who.textContent += row.idCardHeld ? " · ID card at desk" : " · ID card not held";
+    card.appendChild(who);
+    if (row.sizeNote) {
+        var note = document.createElement("div");
+        note.className = "checkout-meta";
+        note.textContent = row.sizeNote;
+        card.appendChild(note);
+    }
+    var when = document.createElement("div");
+    when.className = "checkout-meta";
+    when.textContent = "Checked out " + formatWhen(row.createdAt);
+    card.appendChild(when);
+    var remaining = wholeQty(row.qtyRemaining);
+    if (remaining == null) remaining = wholeQty(row.qtyOut);
+    if (remaining && remaining > 0) {
+        var controls = document.createElement("div");
+        controls.className = "checkout-return";
+        var input = document.createElement("input");
+        input.type = "number";
+        input.min = "1";
+        input.max = String(remaining);
+        input.step = "1";
+        input.value = String(remaining);
+        input.setAttribute("aria-label", "Quantity to return");
+        input.setAttribute("data-return-for", row.id);
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "return-button";
+        button.textContent = "Return";
+        button.setAttribute("data-return-for", row.id);
+        button.onclick = function() { submitReturn(this.getAttribute("data-return-for")); };
+        controls.appendChild(input);
+        controls.appendChild(button);
+        card.appendChild(controls);
+    }
+    return card;
+}
+function renderReturnedCheckout(row) {
+    var card = document.createElement("div");
+    card.className = "checkout-card";
+    var title = document.createElement("div");
+    title.className = "item-name";
+    title.textContent = (row.itemName || "Item") + " · returned " + (row.qtyReturned != null ? row.qtyReturned : "");
+    card.appendChild(title);
+    var who = document.createElement("div");
+    who.className = "checkout-meta";
+    who.textContent = (row.kind === "STAFF" ? "Staff uniform" : "Patron equipment") + " · " + personLabel(row);
+    card.appendChild(who);
+    var when = document.createElement("div");
+    when.className = "checkout-meta";
+    when.textContent = "Returned " + formatWhen(row.closedAt || row.createdAt);
+    card.appendChild(when);
+    return card;
+}
+function renderCheckoutLists() {
+    var openBox = document.getElementById("checkoutOpen");
+    var returnedBox = document.getElementById("checkoutReturned");
+    var day = document.getElementById("checkoutDay");
+    day.textContent = checkoutDayKey ? "Server day " + checkoutDayKey + " (Eastern)." : "";
+    clearChildren(openBox);
+    clearChildren(returnedBox);
+    if (!checkoutOpenRows.length) {
+        var emptyOpen = document.createElement("div");
+        emptyOpen.className = "checkout-empty";
+        emptyOpen.textContent = "No open checkouts.";
+        openBox.appendChild(emptyOpen);
+    }
+    var i;
+    for (i = 0; i < checkoutOpenRows.length; i++) openBox.appendChild(renderOpenCheckout(checkoutOpenRows[i]));
+    if (!checkoutReturnedRows.length) {
+        var emptyReturned = document.createElement("div");
+        emptyReturned.className = "checkout-empty";
+        emptyReturned.textContent = "No recent returns.";
+        returnedBox.appendChild(emptyReturned);
+    }
+    for (i = 0; i < checkoutReturnedRows.length; i++) returnedBox.appendChild(renderReturnedCheckout(checkoutReturnedRows[i]));
+}
+function postCheckout(payload) {
+    if (!checkoutAuthorized) return Promise.reject(new Error("EFC staff sign-in required."));
+    payload.token = checkoutToken;
+    return fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(function(response) {
+        if (!response.ok) throw new Error("Server error.");
+        return response.json();
+    }).then(function(data) {
+        rejectIfAuthFailed(data);
+        return data;
+    });
+}
+function loadCheckoutList() {
+    if (!checkoutAuthorized) return Promise.resolve();
+    if (writesNeedServer()) {
+        setStatus("offline", "Offline");
+        setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
+        renderCheckoutLists();
+        return Promise.resolve();
+    }
+    return postCheckout({ action: "checkoutList" }).then(function(data) {
+        if (!data || !data.success) {
+            setStatus("offline", "Not loaded");
+            setCheckoutMessage((data && data.message) || "Could not load checkouts.");
+            return;
+        }
+        checkoutOpenRows = data.open || [];
+        checkoutReturnedRows = data.returned || [];
+        checkoutItems = data.items || [];
+        checkoutStaff = data.staff || [];
+        checkoutDayKey = data.dayKey || "";
+        fillCheckoutStaff();
+        fillCheckoutItems();
+        renderCheckoutLists();
+        setStatus("synced", "Synced");
+        armCheckoutMidnight();
+    }).catch(function(error) {
+        if (error && error.authFailed) return;
+        setStatus("offline", "Offline");
+        setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
+    });
+}
+function submitCheckout() {
+    if (checkoutBusy || !checkoutAuthorized) return;
+    if (writesNeedServer()) {
+        setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+        return;
+    }
+    var itemId = document.getElementById("checkoutItem").value;
+    var qty = wholeQty(document.getElementById("checkoutQty").value);
+    var note = trimText(document.getElementById("checkoutNote").value);
+    if (!itemId) { setCheckoutMessage("Select an item."); return; }
+    if (qty == null || qty < 1) { setCheckoutMessage("Enter a whole quantity of at least 1."); return; }
+    if (looksLikeIdNumber(note)) { setCheckoutMessage("Do not enter an ID number. Use a size or note only."); return; }
+    var item = findListedItem(itemId);
+    if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
+        setCheckoutMessage("Not enough stock. Nothing was saved.");
+        return;
+    }
+    var payload = { action: "checkoutCreate", kind: checkoutMode, itemId: itemId, qty: qty, sizeNote: note };
+    if (checkoutMode === "STAFF") {
+        payload.staffId = document.getElementById("checkoutStaff").value;
+        if (!payload.staffId) { setCheckoutMessage("Select a staff member."); return; }
+    } else {
+        payload.patronName = trimText(document.getElementById("checkoutPatronName").value);
+        payload.idCardHeld = document.getElementById("checkoutIdHeld").checked === true;
+        if (!payload.patronName) { setCheckoutMessage("Enter the patron's name. Do not enter an ID number."); return; }
+        if (looksLikeIdNumber(payload.patronName)) { setCheckoutMessage("Do not enter an ID number. Enter the name only."); return; }
+    }
+    checkoutBusy = true;
+    setCheckoutMessage("Saving...", true);
+    postCheckout(payload).then(function(data) {
+        checkoutBusy = false;
+        if (!data || !data.success) {
+            setCheckoutMessage((data && data.message) || "Could not save checkout.");
+            return;
+        }
+        document.getElementById("checkoutQty").value = "1";
+        document.getElementById("checkoutNote").value = "";
+        setCheckoutMessage("Checked out.", true);
+        return loadCheckoutList();
+    }).catch(function(error) {
+        checkoutBusy = false;
+        if (error && error.authFailed) return;
+        setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+    });
+}
+function submitReturn(checkoutId) {
+    if (checkoutBusy || !checkoutAuthorized) return;
+    if (writesNeedServer()) {
+        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+        return;
+    }
+    var inputs = document.querySelectorAll("[data-return-for]");
+    var qty = null;
+    var i;
+    var row = null;
+    for (i = 0; i < inputs.length; i++) {
+        if (inputs[i].getAttribute("data-return-for") === checkoutId && inputs[i].tagName === "INPUT") qty = wholeQty(inputs[i].value);
+    }
+    for (i = 0; i < checkoutOpenRows.length; i++) {
+        if (String(checkoutOpenRows[i].id) === String(checkoutId)) row = checkoutOpenRows[i];
+    }
+    if (!row) return;
+    var remaining = wholeQty(row.qtyRemaining);
+    if (remaining == null) remaining = wholeQty(row.qtyOut);
+    if (qty == null || qty < 1) { setCheckoutMessage("Enter a whole quantity to return."); return; }
+    if (remaining != null && qty > remaining) { setCheckoutMessage("You can return at most " + remaining + "."); return; }
+    checkoutBusy = true;
+    setCheckoutMessage("Saving return...", true);
+    postCheckout({ action: "checkoutReturn", checkoutId: checkoutId, qty: qty }).then(function(data) {
+        checkoutBusy = false;
+        if (!data || !data.success) {
+            setCheckoutMessage((data && data.message) || "Could not save the return.");
+            return;
+        }
+        setCheckoutMessage(data.fullyReturned ? "Returned." : "Partial return saved.", true);
+        return loadCheckoutList();
+    }).catch(function(error) {
+        checkoutBusy = false;
+        if (error && error.authFailed) return;
+        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+    });
+}
+function armCheckoutMidnight() {
+    if (checkoutMidnightTimer) clearTimeout(checkoutMidnightTimer);
+    var wait = msUntilEasternMidnight(Date.now());
+    if (wait < 1000) wait = 1000;
+    if (wait > 2147000000) wait = 2147000000;
+    checkoutMidnightTimer = setTimeout(function() {
+        renderCheckoutLists();
+        if (checkoutAuthorized && !writesNeedServer()) loadCheckoutList();
+        armCheckoutMidnight();
+    }, wait);
+}
+
+document.getElementById("date").textContent = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+});
+armCheckoutMidnight();
+efcVerifyCheckoutSession();
+</script>
+</body>
+</html>

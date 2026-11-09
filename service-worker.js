@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v16";
+const CACHE_NAME = "efc-tools-v17";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -29,6 +29,9 @@ const CORE_FILES = [
 
   // Inventory
   "./Facility%20Manager/Apps/Inventory/inventory.html",
+
+  // Checkout (separate page; home tile links here)
+  "./Facility%20Manager/Apps/Checkout/checkout.html",
 
   // Leave Tracker
   "./Facility%20Manager/Apps/Leave%20Tracker/Leave.html",
