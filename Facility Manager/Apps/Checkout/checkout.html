@@ -129,14 +129,42 @@ h1 { margin-bottom: 5px; }
 }
 .return-button {
     margin-left: 8px;
+    margin-top: 8px;
     min-height: 44px;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
-    font-size: 13px;
-    background: rgba(255,255,255,.8);
+    font-size: 16px;
+    background: #fff;
+}
+.item-row {
+    border-top: 1px solid #e5e5e5;
+    margin-top: 14px;
+    padding-top: 12px;
+}
+.secondary-button {
+    min-height: 44px;
     border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+    margin-right: 8px;
+}
+.add-button:disabled,
+.secondary-button:disabled,
+.return-button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+.item-line {
+    border-top: 1px solid #eee;
+    margin-top: 12px;
+    padding-top: 10px;
 }
 @media (max-width: 500px) {
     body { padding: 12px; }
@@ -187,22 +215,8 @@ body.efc-locked>:not(#efcGate){display:none!important}
 <label class="checkout-check" for="checkoutIdHeld"><input type="checkbox" id="checkoutIdHeld"> ID card held at desk</label>
 <p class="checkout-meta">Due back within 24 hours.</p>
 </div>
-<div class="form-group" id="checkoutUniformWrap">
-<label for="checkoutUniform">Uniform</label>
-<select id="checkoutUniform"></select>
-</div>
-<div class="form-group" id="checkoutItemWrap" style="display:none">
-<label for="checkoutItem">Item</label>
-<select id="checkoutItem"><option value="">Select an item</option></select>
-</div>
-<div class="form-group">
-<label for="checkoutQty">Quantity</label>
-<input type="number" id="checkoutQty" min="1" step="1" value="1">
-</div>
-<div class="form-group">
-<label for="checkoutNote" id="checkoutNoteLabel">Note (optional)</label>
-<input type="text" id="checkoutNote" autocomplete="off" maxlength="120" placeholder="Size, color, etc. (optional)">
-</div>
+<div id="checkoutRows"></div>
+<button type="button" class="secondary-button" id="checkoutAddItem" onclick="addItemRow()">+ Add item</button>
 <button type="button" class="add-button" id="checkoutSubmit" onclick="submitCheckout()">Check out</button>
 <p class="checkout-message" id="checkoutMessage" role="status"></p>
 <p class="checkout-meta" id="checkoutDay"></p>
@@ -226,8 +240,11 @@ var checkoutMode = "STAFF";
 var checkoutOpenRows = [];
 var checkoutReturnedRows = [];
 var checkoutItems = [];
+var checkoutUniforms = [];
 var checkoutStaff = [];
 var checkoutMe = null;
+var checkoutGroups = [];
+var itemRowSerial = 0;
 var checkoutDayKey = "";
 var checkoutBusy = false;
 var checkoutMidnightTimer = 0;
@@ -366,14 +383,11 @@ function setCheckoutMode(mode, button) {
     checkoutMode = mode === "PATRON" ? "PATRON" : "STAFF";
     document.getElementById("checkoutStaffWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
     document.getElementById("checkoutPatronWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
-    document.getElementById("checkoutNoteLabel").textContent = "Note (optional)";
-    document.getElementById("checkoutNote").placeholder = checkoutMode === "STAFF" ? "Size, color, etc. (optional)" : "";
-    document.getElementById("checkoutUniformWrap").style.display = checkoutMode === "STAFF" ? "block" : "none";
-    document.getElementById("checkoutItemWrap").style.display = checkoutMode === "PATRON" ? "block" : "none";
     var modes = document.querySelectorAll(".checkout-modes .tab");
     var i;
     for (i = 0; i < modes.length; i++) modes[i].classList.remove("active");
     if (button) button.classList.add("active");
+    resetItemRows();
 }
 function clearChildren(node) {
     if (!node) return;
@@ -419,32 +433,124 @@ function fillSelect(select, placeholder, rows, keepValue) {
     select.value = keep;
     if (select.value !== keep) select.value = "";
 }
-function uniformAllowed(name) {
+function currentUniformNames() {
+    var source = checkoutUniforms && checkoutUniforms.length ? checkoutUniforms : UNIFORM_ITEMS;
+    var names = [];
     var i;
-    for (i = 0; i < UNIFORM_ITEMS.length; i++) {
-        if (UNIFORM_ITEMS[i] === name) return true;
+    for (i = 0; i < source.length; i++) {
+        var entry = source[i];
+        var name = entry && entry.name ? String(entry.name) : String(entry || "");
+        if (name) names.push(name);
     }
+    return names;
+}
+function uniformAllowed(name) {
+    var names = currentUniformNames();
+    var i;
+    for (i = 0; i < names.length; i++) if (names[i] === name) return true;
     return false;
 }
-function fillUniformSelect() {
-    var select = document.getElementById("checkoutUniform");
-    if (!select || select.getAttribute("data-ready") === "1") return;
-    var keep = select.value || "";
-    clearChildren(select);
-    var first = document.createElement("option");
-    first.value = "";
-    first.textContent = "Choose an item";
-    select.appendChild(first);
+function itemRows() {
+    return document.getElementById("checkoutRows").getElementsByClassName("item-row");
+}
+function refreshRemoveButtons() {
+    var rows = itemRows();
     var i;
-    for (i = 0; i < UNIFORM_ITEMS.length; i++) {
-        var option = document.createElement("option");
-        option.value = UNIFORM_ITEMS[i];
-        option.textContent = UNIFORM_ITEMS[i];
-        select.appendChild(option);
+    for (i = 0; i < rows.length; i++) {
+        var button = rows[i].getElementsByClassName("remove-row")[0];
+        if (button) button.style.display = rows.length > 1 ? "inline-block" : "none";
     }
-    select.value = keep;
-    if (select.value !== keep) select.value = "";
-    select.setAttribute("data-ready", "1");
+}
+function fillRowSelect(select, placeholder, rows) {
+    var keep = select.value || "";
+    fillSelect(select, placeholder, rows, keep);
+}
+function uniformChoices() {
+    var names = currentUniformNames();
+    var rows = [];
+    var i;
+    for (i = 0; i < names.length; i++) rows.push({ value: names[i], label: names[i] });
+    return rows;
+}
+function equipmentChoices() {
+    var rows = [];
+    var i;
+    for (i = 0; i < checkoutItems.length; i++) {
+        var item = checkoutItems[i];
+        var unit = item.unit ? " " + item.unit : "";
+        rows.push({ value: item.id, label: item.name + " — " + Number(item.quantity) + unit + " available" });
+    }
+    return rows;
+}
+function refreshItemChoices() {
+    var rows = itemRows();
+    var i;
+    for (i = 0; i < rows.length; i++) {
+        var select = rows[i].getElementsByClassName("row-item")[0];
+        if (!select) continue;
+        if (checkoutMode === "STAFF") fillRowSelect(select, "Choose an item", uniformChoices());
+        else fillRowSelect(select, checkoutItems.length ? "Select an item" : "No items from the server", equipmentChoices());
+    }
+}
+function addItemRow() {
+    itemRowSerial = itemRowSerial + 1;
+    var row = document.createElement("div");
+    row.className = "item-row";
+    var itemGroup = document.createElement("div");
+    itemGroup.className = "form-group";
+    var itemLabel = document.createElement("label");
+    itemLabel.textContent = checkoutMode === "STAFF" ? "Uniform" : "Item";
+    var select = document.createElement("select");
+    select.className = "row-item";
+    itemGroup.appendChild(itemLabel);
+    itemGroup.appendChild(select);
+    row.appendChild(itemGroup);
+    var qtyGroup = document.createElement("div");
+    qtyGroup.className = "form-group";
+    var qtyLabel = document.createElement("label");
+    qtyLabel.textContent = "Quantity";
+    var qty = document.createElement("input");
+    qty.type = "number";
+    qty.min = "1";
+    qty.step = "1";
+    qty.value = "1";
+    qty.className = "row-qty";
+    qtyGroup.appendChild(qtyLabel);
+    qtyGroup.appendChild(qty);
+    row.appendChild(qtyGroup);
+    if (checkoutMode === "STAFF") {
+        var noteGroup = document.createElement("div");
+        noteGroup.className = "form-group";
+        var noteLabel = document.createElement("label");
+        noteLabel.textContent = "Note (optional)";
+        var note = document.createElement("input");
+        note.type = "text";
+        note.className = "row-note";
+        note.maxLength = 120;
+        note.placeholder = "Size, color, etc. (optional)";
+        note.setAttribute("autocomplete", "off");
+        noteGroup.appendChild(noteLabel);
+        noteGroup.appendChild(note);
+        row.appendChild(noteGroup);
+    }
+    var remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "secondary-button remove-row";
+    remove.textContent = "Remove";
+    remove.onclick = function() {
+        if (itemRows().length <= 1) return;
+        if (row.parentNode) row.parentNode.removeChild(row);
+        refreshRemoveButtons();
+    };
+    row.appendChild(remove);
+    document.getElementById("checkoutRows").appendChild(row);
+    if (checkoutMode === "STAFF") fillRowSelect(select, "Choose an item", uniformChoices());
+    else fillRowSelect(select, checkoutItems.length ? "Select an item" : "No items from the server", equipmentChoices());
+    refreshRemoveButtons();
+}
+function resetItemRows() {
+    clearChildren(document.getElementById("checkoutRows"));
+    addItemRow();
 }
 function fillCheckoutStaff() {
     var select = document.getElementById("checkoutStaff");
@@ -467,20 +573,6 @@ function fillIssuerSelect() {
     var prefer = select.value;
     if (!prefer && checkoutMe && checkoutMe.id) prefer = String(checkoutMe.id);
     fillSelect(select, "Choose staff", rows, prefer);
-}
-function fillCheckoutItems() {
-    var select = document.getElementById("checkoutItem");
-    var rows = [];
-    var i;
-    for (i = 0; i < checkoutItems.length; i++) {
-        var item = checkoutItems[i];
-        var unit = item.unit ? " " + item.unit : "";
-        rows.push({
-            value: item.id,
-            label: item.name + " — " + Number(item.quantity) + unit + " available"
-        });
-    }
-    fillSelect(select, checkoutItems.length ? "Select an item" : "No items from the server", rows, select.value);
 }
 function formatWhen(iso) {
     if (!iso) return "";
@@ -514,14 +606,119 @@ function personLabel(row) {
     if (row.kind === "STAFF") return row.staffName || "Staff member";
     return row.patronName || "Patron";
 }
-function renderOpenCheckout(row) {
+function phoneKey(value) {
+    var digits = phoneDigits(value);
+    if (digits.length === 11 && digits.charAt(0) === "1") digits = digits.substring(1);
+    return digits;
+}
+function phoneOk(value) {
+    var digits = phoneDigits(value);
+    if (digits.length === 10) return true;
+    if (digits.length === 11 && digits.charAt(0) === "1") return true;
+    return false;
+}
+function groupOpenRows(rows) {
+    var groups = [];
+    var map = {};
+    var i;
+    for (i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        if (row.status && row.status !== "OPEN") continue;
+        var key;
+        if (row.kind === "STAFF") key = "STAFF|" + String(row.staffId || "");
+        else key = "PATRON|" + phoneKey(row.patronPhone) + "|" + trimText(row.patronName).toLowerCase();
+        if (!map[key]) {
+            map[key] = {
+                kind: row.kind === "STAFF" ? "STAFF" : "PATRON",
+                groupKey: key,
+                staffId: row.staffId || "",
+                staffName: row.staffName || "",
+                patronName: row.patronName || "",
+                patronPhone: row.patronPhone || "",
+                idCardHeld: row.idCardHeld === true,
+                issuerId: row.issuerId || row.issuerStaffId || "",
+                issuerName: row.issuerName || "",
+                overdue: false,
+                dueAt: "",
+                hoursOut: 0,
+                items: []
+            };
+            groups.push(map[key]);
+        }
+        var group = map[key];
+        group.items.push(row);
+        if (group.kind === "PATRON" && row.overdue === true) group.overdue = true;
+        if (row.dueAt && (!group.dueAt || String(row.dueAt) < String(group.dueAt))) group.dueAt = row.dueAt;
+        var hours = Number(row.hoursOut);
+        if (isFinite(hours) && hours > Number(group.hoursOut || 0)) group.hoursOut = hours;
+    }
+    for (i = 0; i < groups.length; i++) {
+        var sum = 0;
+        var j;
+        for (j = 0; j < groups[i].items.length; j++) {
+            var qty = Number(groups[i].items[j].qtyRemaining);
+            if (!isFinite(qty)) qty = Number(groups[i].items[j].qtyOut) || 0;
+            sum = sum + qty;
+        }
+        groups[i].qtyRemaining = sum;
+        groups[i].itemCount = groups[i].items.length;
+    }
+    groups.sort(function(a, b) {
+        var aOver = a.kind === "PATRON" && a.overdue === true ? 0 : 1;
+        var bOver = b.kind === "PATRON" && b.overdue === true ? 0 : 1;
+        if (aOver !== bOver) return aOver - bOver;
+        var aName = (a.kind === "STAFF" ? a.staffName : a.patronName) || "";
+        var bName = (b.kind === "STAFF" ? b.staffName : b.patronName) || "";
+        aName = aName.toLowerCase();
+        bName = bName.toLowerCase();
+        if (aName < bName) return -1;
+        if (aName > bName) return 1;
+        return 0;
+    });
+    return groups;
+}
+function findGroup(key) {
+    var i;
+    for (i = 0; i < checkoutGroups.length; i++) {
+        if (String(checkoutGroups[i].groupKey) === String(key)) return checkoutGroups[i];
+    }
+    return null;
+}
+function findOpenItem(id) {
+    var i;
+    var j;
+    for (i = 0; i < checkoutGroups.length; i++) {
+        var items = checkoutGroups[i].items || [];
+        for (j = 0; j < items.length; j++) {
+            if (String(items[j].id) === String(id)) return items[j];
+        }
+    }
+    return null;
+}
+function groupPersonName(group) {
+    if (group.kind === "STAFF") return group.staffName || "Staff member";
+    return group.patronName || "Patron";
+}
+function setCardBusy(card, busy) {
+    if (!card) return;
+    var buttons = card.getElementsByTagName("button");
+    var inputs = card.getElementsByTagName("input");
+    var i;
+    for (i = 0; i < buttons.length; i++) buttons[i].disabled = busy;
+    for (i = 0; i < inputs.length; i++) inputs[i].disabled = busy;
+}
+function cardFrom(node) {
+    while (node && (!node.className || String(node.className).indexOf("checkout-card") === -1)) node = node.parentNode;
+    return node;
+}
+function renderGroup(group) {
     var card = document.createElement("div");
-    var overdue = rowOverdue(row);
+    var overdue = group.kind === "PATRON" && group.overdue === true;
     card.className = overdue ? "checkout-card overdue" : "checkout-card";
+    card.setAttribute("data-group-key", group.groupKey || "");
     var title = document.createElement("div");
     title.className = "item-name";
-    var remainingText = row.qtyRemaining != null ? row.qtyRemaining : row.qtyOut;
-    title.textContent = (row.itemName || "Item") + " · " + remainingText + " still out";
+    title.textContent = groupPersonName(group);
     if (overdue) {
         var badge = document.createElement("span");
         badge.className = "overdue-badge";
@@ -529,61 +726,80 @@ function renderOpenCheckout(row) {
         title.appendChild(badge);
     }
     card.appendChild(title);
-    var who = document.createElement("div");
-    who.className = "checkout-meta";
-    who.textContent = (row.kind === "STAFF" ? "Staff uniform" : "Patron equipment") + " · " + personLabel(row);
-    if (row.kind === "PATRON") who.textContent += row.idCardHeld ? " · ID card at desk" : " · ID card not held";
-    card.appendChild(who);
-    if (row.kind === "PATRON") {
+    if (group.kind === "PATRON") {
         var phoneLine = document.createElement("div");
         phoneLine.className = "checkout-meta";
-        phoneLine.textContent = "Phone " + (row.patronPhone || "");
+        phoneLine.textContent = group.patronPhone || "";
         card.appendChild(phoneLine);
-        var issuedLine = document.createElement("div");
-        issuedLine.className = "checkout-meta";
-        issuedLine.textContent = "Issued by " + (issuerLabel(row) || "Staff member");
-        card.appendChild(issuedLine);
+        var issued = document.createElement("div");
+        issued.className = "checkout-meta";
+        issued.textContent = "Issued by " + (group.issuerName || issuerLabel(group) || "Staff member");
+        card.appendChild(issued);
+        if (overdue && (group.dueAt || dueAtValue(group))) {
+            var due = document.createElement("div");
+            due.className = "checkout-meta";
+            due.textContent = "Due " + formatWhen(group.dueAt || dueAtValue(group));
+            card.appendChild(due);
+        }
     }
+    var items = group.items || [];
+    var i;
+    for (i = 0; i < items.length; i++) card.appendChild(renderGroupItem(items[i]));
+    var all = document.createElement("button");
+    all.type = "button";
+    all.className = "secondary-button";
+    all.textContent = "Return all";
+    all.setAttribute("data-group-key", group.groupKey || "");
+    all.onclick = function() { returnAll(this.getAttribute("data-group-key"), cardFrom(this)); };
+    card.appendChild(all);
+    return card;
+}
+function renderGroupItem(row) {
+    var line = document.createElement("div");
+    line.className = "item-line";
+    var remaining = Number(row.qtyRemaining);
+    if (!isFinite(remaining)) remaining = Number(row.qtyOut) || 0;
+    var checkedOut = Number(row.qtyOut);
+    var title = document.createElement("div");
+    title.className = "item-name";
+    var text = (row.itemName || "Item") + " · " + remaining + " still out";
+    if (isFinite(checkedOut) && checkedOut !== remaining) text = text + " (" + checkedOut + " checked out)";
+    title.textContent = text;
+    line.appendChild(title);
     if (row.sizeNote) {
         var note = document.createElement("div");
         note.className = "checkout-meta";
         note.textContent = row.sizeNote;
-        card.appendChild(note);
+        line.appendChild(note);
     }
     var when = document.createElement("div");
     when.className = "checkout-meta";
     when.textContent = "Checked out " + formatWhen(row.createdAt);
-    card.appendChild(when);
-    if (row.kind === "PATRON") {
-        var dueLine = document.createElement("div");
-        dueLine.className = "checkout-meta";
-        dueLine.textContent = "Due " + formatWhen(dueAtValue(row));
-        card.appendChild(dueLine);
-    }
-    var remaining = wholeQty(row.qtyRemaining);
-    if (remaining == null) remaining = wholeQty(row.qtyOut);
-    if (remaining && remaining > 0) {
+    line.appendChild(when);
+    if (remaining > 0) {
         var controls = document.createElement("div");
         controls.className = "checkout-return";
-        var input = document.createElement("input");
-        input.type = "number";
-        input.min = "1";
-        input.max = String(remaining);
-        input.step = "1";
-        input.value = String(remaining);
-        input.setAttribute("aria-label", "Quantity to return");
-        input.setAttribute("data-return-for", row.id);
+        if (remaining > 1) {
+            var input = document.createElement("input");
+            input.type = "number";
+            input.min = "1";
+            input.max = String(remaining);
+            input.step = "1";
+            input.value = String(remaining);
+            input.setAttribute("aria-label", "Quantity to return");
+            input.setAttribute("data-return-for", row.id);
+            controls.appendChild(input);
+        }
         var button = document.createElement("button");
         button.type = "button";
         button.className = "return-button";
         button.textContent = "Return";
         button.setAttribute("data-return-for", row.id);
-        button.onclick = function() { submitReturn(this.getAttribute("data-return-for")); };
-        controls.appendChild(input);
+        button.onclick = function() { submitReturn(this.getAttribute("data-return-for"), cardFrom(this)); };
         controls.appendChild(button);
-        card.appendChild(controls);
+        line.appendChild(controls);
     }
-    return card;
+    return line;
 }
 function renderReturnedCheckout(row) {
     var card = document.createElement("div");
@@ -609,14 +825,14 @@ function renderCheckoutLists() {
     day.textContent = checkoutDayKey ? "Server day " + checkoutDayKey + " (Eastern)." : "";
     clearChildren(openBox);
     clearChildren(returnedBox);
-    if (!checkoutOpenRows.length) {
+    if (!checkoutGroups.length) {
         var emptyOpen = document.createElement("div");
         emptyOpen.className = "checkout-empty";
         emptyOpen.textContent = "No open checkouts.";
         openBox.appendChild(emptyOpen);
     }
     var i;
-    for (i = 0; i < checkoutOpenRows.length; i++) openBox.appendChild(renderOpenCheckout(checkoutOpenRows[i]));
+    for (i = 0; i < checkoutGroups.length; i++) openBox.appendChild(renderGroup(checkoutGroups[i]));
     if (!checkoutReturnedRows.length) {
         var emptyReturned = document.createElement("div");
         emptyReturned.className = "checkout-empty";
@@ -653,11 +869,14 @@ function loadCheckoutList() {
         checkoutOpenRows = data.open || [];
         checkoutReturnedRows = data.returned || [];
         checkoutItems = data.items || [];
+        checkoutUniforms = data.uniforms || [];
         checkoutStaff = data.staff || [];
         checkoutMe = data.me || null;
         checkoutDayKey = data.dayKey || "";
+        if (data.groups != null) checkoutGroups = data.groups;
+        else checkoutGroups = groupOpenRows(checkoutOpenRows);
         fillCheckoutStaff();
-        fillCheckoutItems();
+        refreshItemChoices();
         renderCheckoutLists();
         setStatus("synced", "Synced");
         armCheckoutMidnight();
@@ -667,93 +886,144 @@ function loadCheckoutList() {
         setCheckoutMessage("Checkout needs an internet connection. Nothing is queued, and stock on this device is not changed.");
     });
 }
+function setSubmitBusy(busy) {
+    checkoutBusy = busy;
+    var button = document.getElementById("checkoutSubmit");
+    var add = document.getElementById("checkoutAddItem");
+    if (button) button.disabled = busy;
+    if (add) add.disabled = busy;
+}
+function checkoutPersonName() {
+    if (checkoutMode === "STAFF") {
+        var select = document.getElementById("checkoutStaff");
+        if (select && select.selectedIndex > 0) return select.options[select.selectedIndex].text;
+        return "staff";
+    }
+    return trimText(document.getElementById("checkoutPatronName").value) || "patron";
+}
+function collectItems() {
+    var rows = itemRows();
+    var items = [];
+    var i;
+    for (i = 0; i < rows.length; i++) {
+        var choice = rows[i].getElementsByClassName("row-item")[0].value;
+        var qty = wholeQty(rows[i].getElementsByClassName("row-qty")[0].value);
+        var noteNode = rows[i].getElementsByClassName("row-note")[0];
+        var note = noteNode ? trimText(noteNode.value) : "";
+        if (!choice || qty == null || qty < 1) return null;
+        if (note && looksLikeIdNumber(note)) return { error: "Do not enter an ID number. Use a size or note only." };
+        if (checkoutMode === "STAFF") {
+            if (!uniformAllowed(choice)) return { error: "Choose a uniform item." };
+            items.push({ itemName: choice, qty: qty, sizeNote: note });
+        } else {
+            items.push({ itemId: choice, qty: qty });
+        }
+    }
+    return items;
+}
 function submitCheckout() {
     if (checkoutBusy || !checkoutAuthorized) return;
     if (writesNeedServer()) {
         setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
         return;
     }
-    var qty = wholeQty(document.getElementById("checkoutQty").value);
-    var note = trimText(document.getElementById("checkoutNote").value);
-    if (qty == null || qty < 1) { setCheckoutMessage("Enter a whole quantity of at least 1."); return; }
-    if (looksLikeIdNumber(note)) { setCheckoutMessage("Do not enter an ID number. Use a size or note only."); return; }
-    var payload = { action: "checkoutCreate", kind: checkoutMode, qty: qty, sizeNote: note };
+    var items = collectItems();
+    if (items && items.error) { setCheckoutMessage(items.error); return; }
+    if (!items || !items.length) { setCheckoutMessage("Each item needs a choice and a quantity of at least 1."); return; }
+    var payload = { action: "checkoutCreate", kind: checkoutMode, items: items };
+    var name = "";
     if (checkoutMode === "STAFF") {
         payload.staffId = document.getElementById("checkoutStaff").value;
-        payload.itemName = document.getElementById("checkoutUniform").value;
         if (!payload.staffId) { setCheckoutMessage("Select a staff member."); return; }
-        if (!uniformAllowed(payload.itemName)) { setCheckoutMessage("Choose a uniform item."); return; }
+        name = checkoutPersonName();
     } else {
-        payload.itemId = document.getElementById("checkoutItem").value;
         payload.patronName = trimText(document.getElementById("checkoutPatronName").value);
         payload.patronPhone = trimText(document.getElementById("checkoutPatronPhone").value);
         payload.issuerStaffId = document.getElementById("checkoutIssuer").value;
         payload.idCardHeld = document.getElementById("checkoutIdHeld").checked === true;
         if (!payload.patronName) { setCheckoutMessage("Enter the patron's name. Do not enter an ID number."); return; }
         if (looksLikeIdNumber(payload.patronName)) { setCheckoutMessage("Do not enter an ID number. Enter the name only."); return; }
-        if (phoneDigits(payload.patronPhone).length < 7) { setCheckoutMessage("Enter the patron's phone number."); return; }
+        if (!phoneOk(payload.patronPhone)) { setCheckoutMessage("Enter a 10-digit phone number."); return; }
         if (!payload.issuerStaffId) { setCheckoutMessage("Choose who issued this."); return; }
-        if (!payload.itemId) { setCheckoutMessage("Select an item."); return; }
-        var item = findListedItem(payload.itemId);
-        if (item && isFinite(Number(item.quantity)) && qty > Number(item.quantity)) {
-            setCheckoutMessage("Not enough stock. Nothing was saved.");
-            return;
-        }
+        name = payload.patronName;
     }
-    checkoutBusy = true;
+    setSubmitBusy(true);
     setCheckoutMessage("Saving...", true);
     postCheckout(payload).then(function(data) {
-        checkoutBusy = false;
+        setSubmitBusy(false);
         if (!data || !data.success) {
             setCheckoutMessage((data && data.message) || "Could not save checkout.");
             return;
         }
-        document.getElementById("checkoutQty").value = "1";
-        document.getElementById("checkoutNote").value = "";
-        document.getElementById("checkoutUniform").value = "";
-        document.getElementById("checkoutPatronPhone").value = "";
-        document.getElementById("checkoutIssuer").value = "";
-        setCheckoutMessage("Checked out.", true);
+        var count = data.checkouts && data.checkouts.length ? data.checkouts.length : items.length;
+        resetItemRows();
+        setCheckoutMessage("Checked out " + count + " items to " + name, true);
         return loadCheckoutList();
     }).catch(function(error) {
-        checkoutBusy = false;
+        setSubmitBusy(false);
         if (error && error.authFailed) return;
         setCheckoutMessage("Checkout needs an internet connection. Nothing was saved, and stock on this device was not changed.");
     });
 }
-function submitReturn(checkoutId) {
-    if (checkoutBusy || !checkoutAuthorized) return;
+function submitReturn(checkoutId, card) {
+    if (!checkoutAuthorized) return;
     if (writesNeedServer()) {
         setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
         return;
     }
-    var inputs = document.querySelectorAll("[data-return-for]");
-    var qty = null;
-    var i;
-    var row = null;
-    for (i = 0; i < inputs.length; i++) {
-        if (inputs[i].getAttribute("data-return-for") === checkoutId && inputs[i].tagName === "INPUT") qty = wholeQty(inputs[i].value);
-    }
-    for (i = 0; i < checkoutOpenRows.length; i++) {
-        if (String(checkoutOpenRows[i].id) === String(checkoutId)) row = checkoutOpenRows[i];
-    }
+    var row = findOpenItem(checkoutId);
     if (!row) return;
     var remaining = wholeQty(row.qtyRemaining);
     if (remaining == null) remaining = wholeQty(row.qtyOut);
+    var qty = remaining;
+    var inputs = document.querySelectorAll("[data-return-for]");
+    var i;
+    for (i = 0; i < inputs.length; i++) {
+        if (inputs[i].getAttribute("data-return-for") === checkoutId && inputs[i].tagName === "INPUT") qty = wholeQty(inputs[i].value);
+    }
     if (qty == null || qty < 1) { setCheckoutMessage("Enter a whole quantity to return."); return; }
     if (remaining != null && qty > remaining) { setCheckoutMessage("You can return at most " + remaining + "."); return; }
-    checkoutBusy = true;
+    setCardBusy(card, true);
     setCheckoutMessage("Saving return...", true);
     postCheckout({ action: "checkoutReturn", checkoutId: checkoutId, qty: qty }).then(function(data) {
-        checkoutBusy = false;
         if (!data || !data.success) {
+            setCardBusy(card, false);
             setCheckoutMessage((data && data.message) || "Could not save the return.");
             return;
         }
         setCheckoutMessage(data.fullyReturned ? "Returned." : "Partial return saved.", true);
         return loadCheckoutList();
     }).catch(function(error) {
-        checkoutBusy = false;
+        setCardBusy(card, false);
+        if (error && error.authFailed) return;
+        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+    });
+}
+function returnAll(groupKey, card) {
+    if (!checkoutAuthorized) return;
+    if (writesNeedServer()) {
+        setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
+        return;
+    }
+    var group = findGroup(groupKey);
+    if (!group || !group.items || !group.items.length) return;
+    var name = groupPersonName(group);
+    if (!confirm("Return all " + group.items.length + " items for " + name + "?")) return;
+    var ids = [];
+    var i;
+    for (i = 0; i < group.items.length; i++) ids.push(group.items[i].id);
+    setCardBusy(card, true);
+    setCheckoutMessage("Saving return...", true);
+    postCheckout({ action: "checkoutReturn", checkoutIds: ids }).then(function(data) {
+        if (!data || !data.success) {
+            setCardBusy(card, false);
+            setCheckoutMessage((data && data.message) || "Could not save the return.");
+            return;
+        }
+        setCheckoutMessage("Returned.", true);
+        return loadCheckoutList();
+    }).catch(function(error) {
+        setCardBusy(card, false);
         if (error && error.authFailed) return;
         setCheckoutMessage("A return needs an internet connection. Nothing was saved, and stock on this device was not changed.");
     });
@@ -776,7 +1046,7 @@ document.getElementById("date").textContent = new Date().toLocaleDateString("en-
     day: "numeric",
     year: "numeric"
 });
-fillUniformSelect();
+resetItemRows();
 armCheckoutMidnight();
 efcVerifyCheckoutSession();
 </script>
