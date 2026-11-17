@@ -31,6 +31,22 @@ $('logout').onclick=async()=>{try{await acting({action:'authLogout'});}catch(e){
 $('showChange').onclick=()=>$('changePanel').classList.toggle('hide');
 $('changePin').onclick=async()=>{try{await acting({action:'authChangePin',oldPin:$('oldPin').value,newPin:$('newPin').value});localStorage.removeItem(KEY);EFCStaffSession.forget();alert('PIN changed. All devices have been signed out. Please sign in again.');location.reload();}catch(e){message('accountMsg',e.message);}};
 async function loadStaff(){try{const j=await acting({action:'authListStaff'});const root=$('accounts');root.replaceChildren();for(const s of j.staff){const row=document.createElement('div');row.className='staffrow';const header=document.createElement('strong');header.textContent=s.name+' — '+s.roles.join(', ')+(s.active?'':' (INACTIVE)');row.append(header);const controls=document.createElement('div');controls.className='buttons';for(const [label,action] of [['Reset PIN',async()=>{const pin=prompt('Enter a NEW temporary six-digit PIN for '+s.name+'. Share it privately.');if(pin===null)return;await acting({action:'authResetPin',staffId:s.id,temporaryPin:pin});}],['Issue Device Code',async()=>{const j=await acting({action:'authIssueDeviceCode',staffId:s.id});alert('Trusted-device code for '+s.name+': '+j.code+'\nValid for 15 minutes. Share directly with the verified employee.');}],[(s.active?'Deactivate':'Activate'),async()=>{if(!confirm('Change status for '+s.name+'?'))return;await acting({action:'authSetActive',staffId:s.id,active:!s.active});}]]){const btn=document.createElement('button');btn.className='secondary';btn.textContent=label;btn.onclick=async()=>{try{await action();message('adminMsg',label+' completed for '+s.name,true);await loadStaff();}catch(e){message('adminMsg',e.message);}};controls.append(btn);}
+  const roleEditor=document.createElement('div');roleEditor.className='hide';
+  const roleSet=document.createElement('fieldset');
+  const roleLegend=document.createElement('legend');roleLegend.textContent='Change roles';roleSet.append(roleLegend);
+  const roleChoices=[['FAC','FAC'],['EFC','EFC'],['ADMIN','Admin']];
+  const roleBoxes={};
+  const currentRoles=Array.isArray(s.roles)?s.roles:[];
+  for(const choice of roleChoices){const code=choice[0];const lab=document.createElement('label');const box=document.createElement('input');box.type='checkbox';box.checked=currentRoles.indexOf(code)!==-1;lab.append(box,document.createTextNode(' '+choice[1]));roleSet.append(lab);roleBoxes[code]=box;}
+  const roleActions=document.createElement('div');roleActions.className='buttons';
+  const saveRoles=document.createElement('button');saveRoles.type='button';saveRoles.textContent='Save';
+  const cancelRoles=document.createElement('button');cancelRoles.type='button';cancelRoles.className='secondary';cancelRoles.textContent='Cancel';
+  roleActions.append(saveRoles,cancelRoles);roleEditor.append(roleSet,roleActions);
+  const changeRoles=document.createElement('button');changeRoles.type='button';changeRoles.className='secondary';changeRoles.textContent='Change Roles';
+  changeRoles.onclick=function(){roleEditor.classList.remove('hide');};
+  cancelRoles.onclick=function(){roleBoxes.FAC.checked=currentRoles.indexOf('FAC')!==-1;roleBoxes.EFC.checked=currentRoles.indexOf('EFC')!==-1;roleBoxes.ADMIN.checked=currentRoles.indexOf('ADMIN')!==-1;roleEditor.classList.add('hide');};
+  saveRoles.onclick=async function(){const roles=[];if(roleBoxes.FAC.checked)roles.push('FAC');if(roleBoxes.EFC.checked)roles.push('EFC');if(roleBoxes.ADMIN.checked)roles.push('ADMIN');if(!roles.length){message('adminMsg','Select at least one role.');return;}const selfId=me&&me.id!=null?String(me.id):'';if(selfId&&selfId===String(s.id)&&currentRoles.indexOf('ADMIN')!==-1&&roles.indexOf('ADMIN')===-1&&!confirm('Remove your own Administrator role? You will be signed out and will need to sign in again.'))return;try{await acting({action:'authSetRoles',staffId:s.id,roles:roles});message('adminMsg',"Roles updated for "+s.name+". They'll need to sign in again.",true);await loadStaff();}catch(e){message('adminMsg',e.message);}};
+  controls.append(changeRoles);
   const emailLabel=document.createElement('label');emailLabel.textContent='Work email';
   const emailInput=document.createElement('input');emailInput.type='email';emailInput.value=s.email||'';emailInput.placeholder='name@us.af.mil';
   const saveEmail=document.createElement('button');saveEmail.className='secondary';saveEmail.textContent='Save Email';
@@ -40,7 +56,7 @@ async function loadStaff(){try{const j=await acting({action:'authListStaff'});co
     const text=prompt('Type DELETE to confirm permanent deletion of '+s.name);if(text!=='DELETE')return;
     try{await acting({action:'authDeleteStaff',staffId:s.id});message('adminMsg','Account deleted: '+s.name,true);await loadStaff();await loadRoster();}
     catch(e){message('adminMsg',e.message);}};
-  row.append(emailLabel,emailInput,saveEmail);controls.append(del);row.append(controls);root.append(row);}}catch(e){message('adminMsg',e.message);}}
+  row.append(emailLabel,emailInput,saveEmail);controls.append(del);row.append(controls,roleEditor);root.append(row);}}catch(e){message('adminMsg',e.message);}}
 $('viewAudit').onclick=async()=>{try{const j=await acting({action:'authAudit'});$('auditView').textContent=j.events.map(x=>[new Date(x.timestamp).toLocaleString(),x.staffId,x.action,x.detail].join(' | ')).join('\n');}catch(e){message('adminMsg',e.message);}};
 $('addStaff').onclick=async()=>{const roles=[...['FAC','EFC','ADMIN'].filter(r=>$(r.toLowerCase()).checked)];try{await acting({action:'authCreateStaff',name:$('newName').value,roles,temporaryPin:$('tempPin').value,email:$('newEmail').value});$('newName').value='';$('newEmail').value='';$('tempPin').value='';message('adminMsg','Account created. Provide the temporary PIN privately.',true);await loadStaff();}catch(e){message('adminMsg',e.message);}};
 
