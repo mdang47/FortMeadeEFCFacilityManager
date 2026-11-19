@@ -44,7 +44,15 @@ button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background
 .optional-tag{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
 .locked{font-size:11px;color:var(--ok);font-weight:800;margin-top:5px;min-height:14px}.small{font-size:12px;color:var(--muted);line-height:1.45}.msg{min-height:20px;margin-top:10px;font-weight:700;color:var(--bad)}
 .disabled{opacity:.45}.footer{font-size:11px;color:var(--muted);text-align:center;margin-top:14px}
+.input-max{display:flex;align-items:center}
+.input-max > input,.input-max > .pair,.input-max > .whtr-readout{flex:1 1 auto;min-width:0;width:auto}
+.whtr-readout{min-height:46px;border:1px solid #b8c4d1;border-radius:10px;padding:11px 12px;background:#f8fafc;font-size:16px;font-weight:800;line-height:1.3}
+.max-toggle{flex:0 0 auto;display:flex;align-items:center;margin:0 0 0 8px;padding:0 10px;min-height:46px;border:1px solid #b8c4d1;border-radius:10px;background:#fff;font-size:14px;font-weight:800;color:var(--navy);cursor:pointer;white-space:nowrap}
+.max-toggle input{width:18px;height:18px;min-height:0;margin:0 6px 0 0;padding:0}
+.max-toggle.max-on{background:#e7f6ec;border-color:#166534;color:#166534}
+input:disabled{background:#e8eef3;color:#64748b;opacity:1;-webkit-text-fill-color:#64748b}
 @media(max-width:650px){.grid,.grid3,.minimum-summary{grid-template-columns:1fr 1fr}.minimum-row{grid-template-columns:1fr}.minimum-row .result{text-align:left}.app{padding:0}.hero{border-radius:0}.hero-inner{grid-template-columns:1fr}.logo-card{max-width:180px;margin:0 auto;padding-top:4px}.panel{border-radius:0}.tab{font-size:14px;padding:13px 8px}}
+@media(max-width:650px){.input-max{display:block}.input-max > input,.input-max > .pair,.input-max > .whtr-readout{width:100%}.max-toggle{display:inline-flex;margin:8px 0 0}}
 </style>
 
 <style id="efc-return-home-style">
@@ -139,15 +147,18 @@ button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background
           <div><label for="target">Target Score</label><input id="target" type="number" min="75" max="100" step=".5" value="75"></div>
           <div>
             <label>Calculated WHtR</label>
-            <div style="min-height:46px;border:1px solid #b8c4d1;border-radius:10px;padding:11px 12px;background:#f8fafc;font-size:16px;font-weight:800" id="solveWhtrDisplay">—</div>
+            <div class="input-max">
+              <div class="whtr-readout" id="solveWhtrDisplay">—</div>
+              <label class="max-toggle"><input id="maxWhtr" type="checkbox"> Max</label>
+            </div>
           </div>
         </div>
-        <p class="small" style="margin:10px 0 0">Enter height and waist circumference. The calculator will calculate WHtR and its point value automatically. Any component results below are optional — enter only the results you already know.</p>
+        <p class="small" style="margin:10px 0 0">Enter height and waist circumference, or choose Max to lock WHtR at 20 points (ratio below 0.50). The calculator will calculate WHtR and its point value automatically. Any component results below are optional — enter a result you already know, or Max it.</p>
 
         <div class="optional-card">
           <div class="optional-tag">Optional known results</div>
           <h3>Already know one or more component results?</h3>
-          <p>Enter them here. Leave any component blank and the calculator will determine what you need in that category to reach your target score.</p>
+          <p>Enter them here, or choose Max to lock that event at the top of the chart. Leave any component blank and the calculator will determine what you need in that category to reach your target score.</p>
 
           <div class="grid">
             <div>
@@ -159,7 +170,10 @@ button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background
             </div>
             <div>
               <label for="knownStrengthResult">Strength Reps <span class="small">(optional)</span></label>
-              <input id="knownStrengthResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+              <div class="input-max">
+                <input id="knownStrengthResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+                <label class="max-toggle"><input id="maxStrength" type="checkbox"> Max</label>
+              </div>
               <div class="locked" id="knownStrengthPts"></div>
             </div>
 
@@ -171,15 +185,22 @@ button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background
                 <option>Forearm Plank</option>
               </select>
             </div>
-            <div id="knownCoreRepsWrap">
-              <label for="knownCoreResult">Core Reps <span class="small">(optional)</span></label>
-              <input id="knownCoreResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+            <div>
+              <div id="knownCoreRepsWrap">
+                <label for="knownCoreResult">Core Reps <span class="small">(optional)</span></label>
+                <div class="input-max">
+                  <input id="knownCoreResult" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+                  <label class="max-toggle"><input id="maxCore" type="checkbox"> Max</label>
+                </div>
+              </div>
+              <div id="knownPlankWrap" class="hidden">
+                <label>Plank Time <span class="small">(optional)</span></label>
+                <div class="input-max">
+                  <div class="pair"><input id="knownPlankMin" type="number" min="0" step="1" placeholder="Min"><input id="knownPlankSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
+                  <label class="max-toggle"><input id="maxCorePlank" type="checkbox"> Max</label>
+                </div>
+              </div>
               <div class="locked" id="knownCorePts"></div>
-            </div>
-            <div id="knownPlankWrap" class="hidden">
-              <label>Plank Time <span class="small">(optional)</span></label>
-              <div class="pair"><input id="knownPlankMin" type="number" min="0" step="1" placeholder="Min"><input id="knownPlankSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
-              <div class="locked" id="knownPlankPts"></div>
             </div>
 
             <div>
@@ -189,15 +210,22 @@ button.primary{width:100%;min-height:50px;border:0;border-radius:11px;background
                 <option>HAMR</option>
               </select>
             </div>
-            <div id="knownRunWrap">
-              <label>2-Mile Time <span class="small">(optional)</span></label>
-              <div class="pair"><input id="knownRunMin" type="number" min="0" step="1" placeholder="Min"><input id="knownRunSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
-              <div class="locked" id="knownRunPts"></div>
-            </div>
-            <div id="knownHamrWrap" class="hidden">
-              <label for="knownHamr">HAMR Shuttles <span class="small">(optional)</span></label>
-              <input id="knownHamr" type="number" min="0" step="1" placeholder="Leave blank if unknown">
-              <div class="locked" id="knownHamrPts"></div>
+            <div>
+              <div id="knownRunWrap">
+                <label>2-Mile Time <span class="small">(optional)</span></label>
+                <div class="input-max">
+                  <div class="pair"><input id="knownRunMin" type="number" min="0" step="1" placeholder="Min"><input id="knownRunSec" type="number" min="0" max="59" step="1" placeholder="Sec"></div>
+                  <label class="max-toggle"><input id="maxCardio" type="checkbox"> Max</label>
+                </div>
+              </div>
+              <div id="knownHamrWrap" class="hidden">
+                <label for="knownHamr">HAMR Shuttles <span class="small">(optional)</span></label>
+                <div class="input-max">
+                  <input id="knownHamr" type="number" min="0" step="1" placeholder="Leave blank if unknown">
+                  <label class="max-toggle"><input id="maxCardioHamr" type="checkbox"> Max</label>
+                </div>
+              </div>
+              <div class="locked" id="knownCardioPts"></div>
             </div>
           </div>
         </div>
@@ -348,6 +376,10 @@ function officialRunFloor(k){
 
 
 function updateSolveWhtr(){
+ if(boxChecked("maxWhtr")){
+   $("solveWhtrDisplay").textContent="Maxed: ratio below 0.50 = 20 pts";
+   return;
+ }
  const h=num("solveHeight"),w=num("solveWaist");
  if(h===null||w===null||h<=0||w<=0){
    $("solveWhtrDisplay").textContent="—";
@@ -372,55 +404,127 @@ function toggleKnownCardio(){
  $("knownHamrWrap").classList.toggle("hidden",ev!=="HAMR");
  updateKnownPointPreview();
 }
+function chartMax(eventName,k){
+ if(eventName==="2 Mile Run") return runForPoints(k,50);
+ if(eventName==="HAMR") return thresholdForPoints("HAMR_Lookup",k,50);
+ return thresholdForPoints(tableName(eventName),k,15);
+}
+function maxRequirementText(eventName,value){
+ if(eventName==="Forearm Plank") return mmss(value);
+ if(eventName==="2 Mile Run") return mmss(value)+" or faster";
+ if(eventName==="HAMR") return Math.round(value)+" shuttles";
+ return Math.round(value)+" reps";
+}
+function maxPreviewText(eventName,value,points){
+ return "Maxed: "+maxRequirementText(eventName,value)+" = "+fmt(points)+" pts";
+}
+function summaryPts(points,info){
+ if(info && info.maxed) return fmt(points)+" Maxed";
+ if(info) return fmt(points)+" ✓";
+ return fmt(points);
+}
+function boxChecked(id){
+ const el=$(id);
+ return !!(el && el.checked);
+}
+function paintMaxToggle(id){
+ const input=$(id);
+ if(!input || !input.parentElement) return;
+ input.parentElement.classList.toggle("max-on", input.checked);
+}
+function applyMaxInputState(){
+ const sOn=boxChecked("maxStrength");
+ $("knownStrengthResult").disabled=sOn;
+ paintMaxToggle("maxStrength");
+
+ const cOn=boxChecked("maxCore") || boxChecked("maxCorePlank");
+ $("knownCoreResult").disabled=cOn;
+ $("knownPlankMin").disabled=cOn;
+ $("knownPlankSec").disabled=cOn;
+ paintMaxToggle("maxCore");
+ paintMaxToggle("maxCorePlank");
+
+ const aOn=boxChecked("maxCardio") || boxChecked("maxCardioHamr");
+ $("knownRunMin").disabled=aOn;
+ $("knownRunSec").disabled=aOn;
+ $("knownHamr").disabled=aOn;
+ paintMaxToggle("maxCardio");
+ paintMaxToggle("maxCardioHamr");
+
+ const wOn=boxChecked("maxWhtr");
+ $("solveHeight").disabled=wOn;
+ $("solveWaist").disabled=wOn;
+ paintMaxToggle("maxWhtr");
+}
 function knownInputs(){
  const age=num("solveAge");
  if(age===null)return null;
  const k=key(age,$("solveSex").value);
-
  let strength=null, core=null, cardio=null;
 
- const sr=num("knownStrengthResult");
- if(sr!==null){
-   strength={points:strengthScore($("knownStrengthEvent").value,sr,k),event:$("knownStrengthEvent").value,value:sr};
+ const sev=$("knownStrengthEvent").value;
+ if(boxChecked("maxStrength")){
+   const req=chartMax(sev,k);
+   if(req) strength={points:req.points,event:sev,value:req.value,maxed:true};
+ } else {
+   const sr=num("knownStrengthResult");
+   if(sr!==null) strength={points:strengthScore(sev,sr,k),event:sev,value:sr,maxed:false};
  }
 
  const cev=$("knownCoreEvent").value;
- if(cev==="Forearm Plank"){
+ if(boxChecked("maxCore") || boxChecked("maxCorePlank")){
+   const req=chartMax(cev,k);
+   if(req) core={points:req.points,event:cev,value:req.value,maxed:true};
+ } else if(cev==="Forearm Plank"){
    const pm=num("knownPlankMin"), ps=num("knownPlankSec");
    if(pm!==null || ps!==null){
-     const sec=(pm??0)*60+(ps??0);
-     core={points:coreScore(cev,sec,k),event:cev,value:sec};
+     const sec=(pm===null?0:pm)*60+(ps===null?0:ps);
+     core={points:coreScore(cev,sec,k),event:cev,value:sec,maxed:false};
    }
  } else {
    const cr=num("knownCoreResult");
-   if(cr!==null) core={points:coreScore(cev,cr,k),event:cev,value:cr};
+   if(cr!==null) core={points:coreScore(cev,cr,k),event:cev,value:cr,maxed:false};
  }
 
  const aev=$("knownCardioEvent").value;
- if(aev==="HAMR"){
+ if(boxChecked("maxCardio") || boxChecked("maxCardioHamr")){
+   const req=chartMax(aev,k);
+   if(req) cardio={points:req.points,event:aev,value:req.value,maxed:true};
+ } else if(aev==="HAMR"){
    const hv=num("knownHamr");
-   if(hv!==null) cardio={points:cardioScore(aev,hv,k),event:aev,value:hv};
+   if(hv!==null) cardio={points:cardioScore(aev,hv,k),event:aev,value:hv,maxed:false};
  } else {
    const rm=num("knownRunMin"), rs=num("knownRunSec");
    if(rm!==null || rs!==null){
-     const sec=(rm??0)*60+(rs??0);
-     cardio={points:cardioScore(aev,sec,k),event:aev,value:sec};
+     const sec=(rm===null?0:rm)*60+(rs===null?0:rs);
+     cardio={points:cardioScore(aev,sec,k),event:aev,value:sec,maxed:false};
    }
  }
  return {strength,core,cardio,k};
 }
 function updateKnownPointPreview(){
+ applyMaxInputState();
  const known=knownInputs();
- ["knownStrengthPts","knownCorePts","knownPlankPts","knownRunPts","knownHamrPts"].forEach(id=>$(id).textContent="");
- if(!known)return;
- if(known.strength) $("knownStrengthPts").textContent="Locked at "+fmt(known.strength.points)+" pts";
+ const ids=["knownStrengthPts","knownCorePts","knownCardioPts"];
+ for(let i=0;i<ids.length;i++){
+   const el=$(ids[i]);
+   if(el) el.textContent="";
+ }
+ if(!known) return;
+ if(known.strength){
+   $("knownStrengthPts").textContent=known.strength.maxed
+     ? maxPreviewText(known.strength.event, known.strength.value, known.strength.points)
+     : "Locked at "+fmt(known.strength.points)+" pts";
+ }
  if(known.core){
-   const id=known.core.event==="Forearm Plank"?"knownPlankPts":"knownCorePts";
-   $(id).textContent="Locked at "+fmt(known.core.points)+" pts";
+   $("knownCorePts").textContent=known.core.maxed
+     ? maxPreviewText(known.core.event, known.core.value, known.core.points)
+     : "Locked at "+fmt(known.core.points)+" pts";
  }
  if(known.cardio){
-   const id=known.cardio.event==="HAMR"?"knownHamrPts":"knownRunPts";
-   $(id).textContent="Locked at "+fmt(known.cardio.points)+" pts";
+   $("knownCardioPts").textContent=known.cardio.maxed
+     ? maxPreviewText(known.cardio.event, known.cardio.value, known.cardio.points)
+     : "Locked at "+fmt(known.cardio.points)+" pts";
  }
 }
 ["solveAge","solveSex","knownStrengthEvent","knownStrengthResult","knownCoreEvent","knownCoreResult","knownPlankMin","knownPlankSec","knownCardioEvent","knownRunMin","knownRunSec","knownHamr"].forEach(id=>{
@@ -429,28 +533,59 @@ function updateKnownPointPreview(){
 $("knownCoreEvent").addEventListener("change",toggleKnownCore);
 $("knownCardioEvent").addEventListener("change",toggleKnownCardio);
 $("knownStrengthEvent").addEventListener("change",updateKnownPointPreview);
+$("solveAge").addEventListener("change",updateKnownPointPreview);
+$("solveSex").addEventListener("change",updateKnownPointPreview);
+function syncMaxPair(srcId,dstId){
+ $(dstId).checked=$(srcId).checked;
+ updateKnownPointPreview();
+}
+$("maxStrength").addEventListener("change",updateKnownPointPreview);
+$("maxCore").addEventListener("change",function(){syncMaxPair("maxCore","maxCorePlank");});
+$("maxCorePlank").addEventListener("change",function(){syncMaxPair("maxCorePlank","maxCore");});
+$("maxCardio").addEventListener("change",function(){syncMaxPair("maxCardio","maxCardioHamr");});
+$("maxCardioHamr").addEventListener("change",function(){syncMaxPair("maxCardioHamr","maxCardio");});
+$("maxWhtr").addEventListener("change",function(){
+ applyMaxInputState();
+ updateSolveWhtr();
+});
 toggleKnownCore(); toggleKnownCardio();
 
 $("solveBtn").addEventListener("click",()=>{
  $("solveMsg").textContent="";
  $("solveResult").classList.add("hidden");
- const age=num("solveAge"),height=num("solveHeight"),waist=num("solveWaist"),target=num("target");
- if(age===null||age<18||height===null||height<=0||waist===null||waist<=0||target===null){
-   $("solveMsg").textContent="Enter age, height, waist circumference, and target score.";
-   return;
- }
- if(target<75||target>100){
-   $("solveMsg").textContent="Target score must be between 75 and 100.";
-   return;
- }
- const ratio=waist/height;
- if(ratio<0.30||ratio>0.80){
-   $("solveMsg").textContent="The calculated WHtR looks unusual. Check the height and waist entries.";
-   return;
+ const whtrMaxed=boxChecked("maxWhtr");
+ const age=num("solveAge"), target=num("target");
+ let height=null, waist=null, ratio=null, body=0;
+ if(!whtrMaxed){
+   height=num("solveHeight");
+   waist=num("solveWaist");
+   if(age===null||age<18||height===null||height<=0||waist===null||waist<=0||target===null){
+     $("solveMsg").textContent="Enter age, height, waist circumference, and target score.";
+     return;
+   }
+   if(target<75||target>100){
+     $("solveMsg").textContent="Target score must be between 75 and 100.";
+     return;
+   }
+   ratio=waist/height;
+   if(ratio<0.30||ratio>0.80){
+     $("solveMsg").textContent="The calculated WHtR looks unusual. Check the height and waist entries.";
+     return;
+   }
+   body=whtrScore(ratio);
+ } else {
+   if(age===null||age<18||target===null){
+     $("solveMsg").textContent="Enter age and target score.";
+     return;
+   }
+   if(target<75||target>100){
+     $("solveMsg").textContent="Target score must be between 75 and 100.";
+     return;
+   }
+   body=20;
  }
 
  const k=key(age,$("solveSex").value);
- const body=whtrScore(ratio);
  const known=knownInputs()||{strength:null,core:null,cardio:null,k};
  const locked={
    strength:known.strength?known.strength.points:null,
@@ -476,7 +611,8 @@ $("solveBtn").addEventListener("click",()=>{
 
  if(unknown.length===0){
    const total=body+lockedTotal;
-   if(total<target){
+   const allMaxed=categories.every(function(c){return known[c]&&known[c].maxed;});
+   if(total<target && !allMaxed){
      $("solveMsg").textContent="With all three component results locked, the projected total is "+fmt(total)+". Increase one of the entered results to reach "+fmt(target)+".";
      return;
    }
@@ -524,12 +660,17 @@ $("solveBtn").addEventListener("click",()=>{
  const cardioPts=locked.cardio!==null?locked.cardio:run.points;
  const projected=body+strengthPts+corePts+cardioPts;
 
- $("minWhtrPts").textContent=ratio.toFixed(2)+" / "+fmt(body)+" pts";
- $("minStrengthPts").textContent=fmt(strengthPts)+(locked.strength!==null?" ✓":"");
- $("minCorePts").textContent=fmt(corePts)+(locked.core!==null?" ✓":"");
- $("minCardioPts").textContent=fmt(cardioPts)+(locked.cardio!==null?" ✓":"");
+ $("minWhtrPts").textContent=whtrMaxed?"Maxed / 20 pts":ratio.toFixed(2)+" / "+fmt(body)+" pts";
+ $("minStrengthPts").textContent=summaryPts(strengthPts, known.strength);
+ $("minCorePts").textContent=summaryPts(corePts, known.core);
+ $("minCardioPts").textContent=summaryPts(cardioPts, known.cardio);
 
- if(locked.strength!==null){
+ if(locked.strength!==null && known.strength && known.strength.maxed){
+   const ev=known.strength.event;
+   const reps=Math.round(known.strength.value)+" reps";
+   $("minPushup").textContent=ev==="Pushup"?"Maxed: "+reps:"Maxed";
+   $("minHrpu").textContent=ev==="Hand Release Pushup"?"Maxed: "+reps:"Maxed";
+ } else if(locked.strength!==null){
    const txt=known.strength.event==="Pushup"?Math.round(known.strength.value)+" reps entered":"—";
    $("minPushup").textContent=known.strength.event==="Pushup"?txt:"Locked in HRPU";
    $("minHrpu").textContent=known.strength.event==="Hand Release Pushup"?Math.round(known.strength.value)+" reps entered":"Locked in Push-Ups";
@@ -538,7 +679,13 @@ $("solveBtn").addEventListener("click",()=>{
    $("minHrpu").textContent=Math.round(hrpu.value)+" reps";
  }
 
- if(locked.core!==null){
+ if(locked.core!==null && known.core && known.core.maxed){
+   const ev=known.core.event;
+   const shown=maxRequirementText(ev, known.core.value);
+   $("minSitup").textContent=ev==="Situp"?"Maxed: "+shown:"Maxed";
+   $("minClrc").textContent=ev==="Cross-Leg Reverse Crunch"?"Maxed: "+shown:"Maxed";
+   $("minPlank").textContent=ev==="Forearm Plank"?"Maxed: "+shown:"Maxed";
+ } else if(locked.core!==null){
    $("minSitup").textContent=known.core.event==="Situp"?Math.round(known.core.value)+" reps entered":"Locked in "+known.core.event;
    $("minClrc").textContent=known.core.event==="Cross-Leg Reverse Crunch"?Math.round(known.core.value)+" reps entered":"Locked in "+known.core.event;
    $("minPlank").textContent=known.core.event==="Forearm Plank"?mmss(known.core.value)+" entered":"Locked in "+known.core.event;
@@ -548,7 +695,12 @@ $("solveBtn").addEventListener("click",()=>{
    $("minPlank").textContent=mmss(plank.value)+" or longer";
  }
 
- if(locked.cardio!==null){
+ if(locked.cardio!==null && known.cardio && known.cardio.maxed){
+   const ev=known.cardio.event;
+   const shown=maxRequirementText(ev, known.cardio.value);
+   $("minRun").textContent=ev==="2 Mile Run"?"Maxed: "+shown:"Maxed";
+   $("minHamr").textContent=ev==="HAMR"?"Maxed: "+shown:"Maxed";
+ } else if(locked.cardio!==null){
    $("minRun").textContent=known.cardio.event==="2 Mile Run"?mmss(known.cardio.value)+" entered":"Locked in HAMR";
    $("minHamr").textContent=known.cardio.event==="HAMR"?Math.round(known.cardio.value)+" shuttles entered":"Locked in 2-Mile Run";
  } else {
@@ -572,13 +724,24 @@ $("solveBtn").addEventListener("click",()=>{
  $("floorHamr").textContent="Official floor: "+Math.round(fHamr.value)+" shuttles ("+fmt(fHamr.points)+" pts)";
  $("floorRun").textContent="Official floor: "+mmss(fRun.value)+" ("+fmt(fRun.points)+" pts)";
 
- const lockedNames=categories.filter(c=>locked[c]!==null);
- $("minimumNote").textContent=
-   (lockedNames.length
-     ? "Entered results are locked and counted at their actual point values. "
-     : "No optional results were entered. ") +
-   "Blank categories are calculated from the official event minimums and the additional points needed to reach "+fmt(target)+
-   ". Because the scoring charts use fixed point steps, the projected total is "+fmt(projected)+".";
+ const anyMax=categories.some(function(c){return known[c]&&known[c].maxed;});
+ const anyEntered=categories.some(function(c){return locked[c]!==null && !(known[c]&&known[c].maxed);});
+ const allMax=categories.every(function(c){return known[c]&&known[c].maxed;});
+ let intro;
+ if(allMax){
+   intro="All three components are maxed. Projected total is "+fmt(projected)+".";
+   if(whtrMaxed) intro+=" WHtR is maxed at 20 points (ratio below 0.50).";
+   if(projected+1e-9<target) intro+=" That total is below the target of "+fmt(target)+".";
+   $("minimumNote").textContent=intro;
+ } else {
+   if(anyMax && anyEntered) intro="Maxed components are locked at maximum points. Entered results are locked at their actual point values. ";
+   else if(anyMax) intro="Maxed components are locked at maximum points. ";
+   else if(anyEntered) intro="Entered results are locked and counted at their actual point values. ";
+   else intro="No optional results were entered. ";
+   $("minimumNote").textContent=intro+
+     "Blank categories are calculated from the official event minimums and the additional points needed to reach "+fmt(target)+
+     ". Because the scoring charts use fixed point steps, the projected total is "+fmt(projected)+".";
+ }
  $("solveResult").classList.remove("hidden");
 });
 toggleCore("");toggleCardio("");
