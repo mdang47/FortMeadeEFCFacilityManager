@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1f33">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Personnel Management</title>
+</head>
+<body class="is-locked needs-access" data-page-title="Staff Status Board">
+  <div id="accessGate" class="access-gate">
+    <form class="panel" id="accessForm" action="#" onsubmit="return false;">
+      <h1 data-app-name>Personnel Management</h1>
+      <p>Enter the access PIN to continue.</p>
+      <p id="accessDemo" class="muted hide"></p>
+      <label for="accessPin">Access PIN</label>
+      <input id="accessPin" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" maxlength="64">
+      <div class="actions"><button type="button" id="accessSubmit" class="button">Continue</button></div>
+      <p id="accessMsg" class="msg" role="status"></p>
+    </form>
+  </div>
+  <div id="demoBanner" class="demo-banner" role="status"></div>
+  <div id="gate" class="gate">
+    <div class="panel">
+      <h2>Staff sign-in required</h2>
+      <p id="gateMessage">Checking your staff session…</p>
+      <p><a href="login.html?next=status.html">Open Staff Login</a> · <a href="index.html">Home</a></p>
+    </div>
+  </div>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span data-app-name>Personnel Management</span></a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="status.html">Status</a>
+        <a href="leave.html">Leave</a>
+        <a href="personnel.html">Personnel</a>
+        <a href="login.html">Staff</a>
+      </nav>
+    </header>
+    <main class="wrap">
+      <h1 class="page-title">Staff status board</h1>
+      <p class="muted" id="signedIn"></p>
+      <div id="notice" class="panel hide" role="status"></div>
+      <section class="panel">
+        <h2>My status</h2>
+        <div class="mine-line" id="mine"></div>
+        <div id="minePicker"></div>
+        <p id="mineMsg" class="msg" role="status"></p>
+      </section>
+      <section class="panel">
+        <h2>Board</h2>
+        <div class="actions"><button type="button" id="refresh" class="button secondary">Refresh</button> <span class="muted" id="refreshed"></span></div>
+        <div id="legend"></div>
+        <p class="muted" id="counts"></p>
+        <p id="boardMsg" class="msg" role="status"></p>
+        <ul class="board" id="board"></ul>
+      </section>
+      <p class="muted">Refreshes about once a minute. Everyone signed in can view. You can change your own status, and administrators can change anyone’s. Each Eastern day starts as Unknown. Earlier days stay in history and are not shown as current.</p>
+    </main>
+  </div>
+  <div id="editor" class="modal hide" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="editorTitle">Change status</h2>
+      <div id="editorPicker"></div>
+      <p id="editorMsg" class="msg" role="status"></p>
+      <button type="button" id="editorClose" class="button secondary">Close</button>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/logic/dates.js"></script>
+  <script src="js/logic/eastern.js"></script>
+  <script src="js/logic/auth.js"></script>
+  <script src="js/logic/manning.js"></script>
+  <script src="js/logic/personnel-metrics.js"></script>
+  <script src="js/logic/leave.js"></script>
+  <script src="mock/backend.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/brand.js"></script>
+  <script src="js/access.js"></script>
+  <script src="js/status.js"></script>
+</body>
+</html>

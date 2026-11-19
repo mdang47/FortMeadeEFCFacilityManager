@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1f33">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Personnel Management</title>
+</head>
+<body class="is-locked needs-access" data-page-title="Leave Tracker">
+  <div id="accessGate" class="access-gate">
+    <form class="panel" id="accessForm" action="#" onsubmit="return false;">
+      <h1 data-app-name>Personnel Management</h1>
+      <p>Enter the access PIN to continue.</p>
+      <p id="accessDemo" class="muted hide"></p>
+      <label for="accessPin">Access PIN</label>
+      <input id="accessPin" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" maxlength="64">
+      <div class="actions"><button type="button" id="accessSubmit" class="button">Continue</button></div>
+      <p id="accessMsg" class="msg" role="status"></p>
+    </form>
+  </div>
+  <div id="demoBanner" class="demo-banner" role="status"></div>
+  <div id="gate" class="gate">
+    <div class="panel">
+      <h2>Staff sign-in required</h2>
+      <p id="gateMessage">Checking your staff session…</p>
+      <p><a href="login.html?next=leave.html">Open Staff Login</a> · <a href="index.html">Home</a></p>
+    </div>
+  </div>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span data-app-name>Personnel Management</span></a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="status.html">Status</a>
+        <a href="leave.html">Leave</a>
+        <a href="personnel.html">Personnel</a>
+        <a href="login.html">Staff</a>
+      </nav>
+    </header>
+    <main class="wrap">
+      <h1 class="page-title">Leave tracker</h1>
+      <p class="muted">Same kinds of entries as the fitness-center tracker: leave, appointments, day passes, unit events, late arrivals, indoc, and other. <span id="syncLabel">Checking sync…</span></p>
+      <div class="actions"><button type="button" id="newRequest" class="button">New entry</button></div>
+      <div id="summary" class="summary"></div>
+      <div class="tabs">
+        <button type="button" id="listButton" class="tab on">List</button>
+        <button type="button" id="calendarButton" class="tab">Calendar</button>
+      </div>
+      <div id="listView">
+        <input id="search" class="search" placeholder="Search by name" aria-label="Search by name">
+        <div class="tabs">
+          <button type="button" class="tab on" data-filter="All">All</button>
+          <button type="button" class="tab" data-filter="Pending">Pending</button>
+          <button type="button" class="tab" data-filter="Approved">Approved</button>
+          <button type="button" class="tab" data-filter="Denied">Denied</button>
+          <button type="button" class="tab" data-filter="Cancelled">Cancelled</button>
+        </div>
+        <div id="requestList"></div>
+      </div>
+      <div id="calendarView" class="hide">
+        <div class="actions">
+          <button type="button" id="prevMonth" class="button secondary">Previous</button>
+          <strong id="calendarTitle"></strong>
+          <button type="button" id="nextMonth" class="button secondary">Next</button>
+        </div>
+        <div id="calendar" class="cal"></div>
+      </div>
+      <p id="pageMsg" class="msg" role="status"></p>
+    </main>
+  </div>
+  <div id="requestModal" class="modal hide" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="formTitle">New entry</h2>
+      <label for="employeeName">Name</label>
+      <input id="employeeName" maxlength="100">
+      <label for="leaveType">Type</label>
+      <select id="leaveType">
+        <option>Leave</option>
+        <option>Appointment</option>
+        <option>Day Pass</option>
+        <option>Unit Event</option>
+        <option>In Late</option>
+        <option>Indoc</option>
+        <option>Other</option>
+      </select>
+      <div class="split">
+        <div class="field">
+          <label id="startDateLabel" for="startDate">Start Date</label>
+          <input id="startDate" type="date">
+        </div>
+        <div class="field" id="endDateGroup">
+          <label id="endDateLabel" for="endDate">End Date</label>
+          <input id="endDate" type="date">
+        </div>
+      </div>
+      <div class="split" id="timeFields" style="display:none">
+        <div class="field">
+          <label id="startTimeLabel" for="startTime">Start Time</label>
+          <input id="startTime" type="time">
+        </div>
+        <div class="field" id="endTimeGroup">
+          <label for="endTime">End Time</label>
+          <input id="endTime" type="time">
+        </div>
+      </div>
+      <p id="daysDisplay" class="muted">0 days</p>
+      <label for="notes">Comments / details</label>
+      <textarea id="notes" maxlength="2000"></textarea>
+      <p id="formMsg" class="msg" role="status"></p>
+      <div class="actions">
+        <button type="button" id="closeForm" class="button secondary">Cancel</button>
+        <button type="button" id="saveRequest" class="button">Save</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/logic/dates.js"></script>
+  <script src="js/logic/eastern.js"></script>
+  <script src="js/logic/auth.js"></script>
+  <script src="js/logic/manning.js"></script>
+  <script src="js/logic/personnel-metrics.js"></script>
+  <script src="js/logic/leave.js"></script>
+  <script src="mock/backend.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/brand.js"></script>
+  <script src="js/access.js"></script>
+  <script src="js/leave.js"></script>
+</body>
+</html>

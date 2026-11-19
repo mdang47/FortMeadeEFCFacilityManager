@@ -1,4 +1,4 @@
-const CACHE_NAME = "efc-tools-v22";
+const CACHE_NAME = "efc-tools-v23";
 
 const CORE_FILES = [
   // Main EFC landing page
@@ -80,7 +80,7 @@ self.addEventListener("activate", event => {
       return Promise.all(
 
         keys
-          .filter(key => key !== CACHE_NAME)
+          .filter(key => key !== CACHE_NAME && key.indexOf("personnel-management-") !== 0)
           .map(key => caches.delete(key))
 
       );
@@ -107,6 +107,22 @@ if (url.protocol !== "http:" && url.protocol !== "https:") {
 }
   // Only handle GET requests
   if (event.request.method !== "GET") {
+    return;
+  }
+
+  // -------------------------------------------------
+  // PERSONNEL MANAGEMENT
+  //
+  // /personnel/ is a separate app with its own service worker
+  // (scope ./, cache prefix personnel-management-).
+  // Do not intercept or cache it. Activate also leaves
+  // personnel-management- caches in place.
+  // -------------------------------------------------
+
+  if (
+    url.origin === self.location.origin &&
+    /(^|\/)personnel(\/|$)/.test(url.pathname)
+  ) {
     return;
   }
 

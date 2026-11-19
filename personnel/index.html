@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1f33">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Personnel">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-180.png">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Personnel Management</title>
+</head>
+<body class="needs-access">
+  <div id="accessGate" class="access-gate">
+    <form class="panel" id="accessForm" action="#" onsubmit="return false;">
+      <h1 data-app-name>Personnel Management</h1>
+      <p>Enter the access PIN to continue.</p>
+      <p id="accessDemo" class="muted hide"></p>
+      <label for="accessPin">Access PIN</label>
+      <input id="accessPin" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" maxlength="64">
+      <div class="actions"><button type="button" id="accessSubmit" class="button">Continue</button></div>
+      <p id="accessMsg" class="msg" role="status"></p>
+    </form>
+  </div>
+  <div id="demoBanner" class="demo-banner" role="status"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Office tools</p>
+        <h1 data-app-name>Personnel Management</h1>
+        <p class="sub" id="tagline"></p>
+        <p class="location" id="locationLine"></p>
+        <a class="pill" href="login.html">Staff Login</a>
+      </div>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 160 160" width="150" height="150">
+          <rect width="160" height="160" rx="36" fill="#edf5fb"/>
+          <rect x="28" y="34" width="104" height="92" rx="12" fill="#0b1f33"/>
+          <rect x="44" y="52" width="72" height="10" rx="5" fill="#8fbee0"/>
+          <rect x="44" y="72" width="52" height="10" rx="5" fill="#2a6f9b"/>
+          <rect x="44" y="92" width="64" height="10" rx="5" fill="#8fbee0"/>
+        </svg>
+      </div>
+    </header>
+
+    <section id="signedOut" class="panel" style="margin-top:16px">
+      <h2>Sign in to continue</h2>
+      <p>News and the staff tools open after you sign in with your name and PIN.</p>
+      <a class="button" href="login.html">Staff Login</a>
+    </section>
+
+    <div id="signedIn" class="hide">
+      <div class="section-head">
+        <h2>News</h2>
+        <button type="button" id="newsNew" class="button secondary hide">Post announcement</button>
+      </div>
+      <form id="newsForm" class="panel hide" onsubmit="return false">
+        <h3 id="newsFormTitle">New announcement</h3>
+        <label for="newsTitle">Title</label>
+        <input id="newsTitle" maxlength="120">
+        <label for="newsDate">Date</label>
+        <input id="newsDate" type="date">
+        <label for="newsBody">Body</label>
+        <textarea id="newsBody" maxlength="4000"></textarea>
+        <div class="actions">
+          <button type="button" id="newsSave" class="button">Save</button>
+          <button type="button" id="newsCancel" class="button secondary">Cancel</button>
+        </div>
+      </form>
+      <div id="newsList"></div>
+      <p id="newsMsg" class="msg" role="status"></p>
+
+      <h2 class="section-title">Tools</h2>
+      <div class="tiles">
+        <a class="tile tile-status" href="status.html">
+          <h2>Staff Status Board</h2>
+          <p>See who is in, out, at lunch, on appointment, or elsewhere, and update your own status.</p>
+          <span class="tag">Open status board</span>
+        </a>
+        <a class="tile tile-leave" href="leave.html">
+          <h2>Leave Tracker</h2>
+          <p>Track leave, appointments, day passes, and other time away. List and calendar views.</p>
+          <span class="tag">Open leave tracker</span>
+        </a>
+        <a class="tile tile-people" href="personnel.html">
+          <h2>Personnel Tracker</h2>
+          <p>Inbound and outbound movement, detail manning, time in office, and upcoming departures.</p>
+          <span class="tag">Open personnel tracker</span>
+        </a>
+        <a class="tile tile-admin hide" id="adminTile" href="login.html">
+          <h2>Admin</h2>
+          <p>Change roles, reset PINs, and edit the status list. Account changes are checked on the server.</p>
+          <span class="tag">Open admin</span>
+        </a>
+      </div>
+    </div>
+    <footer class="foot"><span data-app-name>Personnel Management</span></footer>
+  </div>
+  <noscript><p class="wrap">This app needs JavaScript.</p></noscript>
+  <script src="js/config.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/logic/dates.js"></script>
+  <script src="js/logic/eastern.js"></script>
+  <script src="js/logic/auth.js"></script>
+  <script src="js/logic/manning.js"></script>
+  <script src="js/logic/personnel-metrics.js"></script>
+  <script src="js/logic/leave.js"></script>
+  <script src="mock/backend.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/brand.js"></script>
+  <script src="js/access.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

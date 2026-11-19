@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1f33">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Personnel Management</title>
+</head>
+<body class="is-locked needs-access" data-page-title="Personnel Tracker">
+  <div id="accessGate" class="access-gate">
+    <form class="panel" id="accessForm" action="#" onsubmit="return false;">
+      <h1 data-app-name>Personnel Management</h1>
+      <p>Enter the access PIN to continue.</p>
+      <p id="accessDemo" class="muted hide"></p>
+      <label for="accessPin">Access PIN</label>
+      <input id="accessPin" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" maxlength="64">
+      <div class="actions"><button type="button" id="accessSubmit" class="button">Continue</button></div>
+      <p id="accessMsg" class="msg" role="status"></p>
+    </form>
+  </div>
+  <div id="demoBanner" class="demo-banner" role="status"></div>
+  <div id="gate" class="gate">
+    <div class="panel">
+      <h2>Staff sign-in required</h2>
+      <p id="gateMessage">Checking your staff session…</p>
+      <p><a href="login.html?next=personnel.html">Open Staff Login</a> · <a href="index.html">Home</a></p>
+    </div>
+  </div>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span data-app-name>Personnel Management</span></a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="status.html">Status</a>
+        <a href="leave.html">Leave</a>
+        <a href="personnel.html">Personnel</a>
+        <a href="login.html">Staff</a>
+      </nav>
+    </header>
+    <main class="wrap">
+      <h1 class="page-title">Personnel tracker</h1>
+      <p class="muted" id="viewNote"></p>
+      <div class="tabs">
+        <button type="button" id="tabManning" class="tab on" data-tab="manning">Manning</button>
+        <button type="button" id="tabRoster" class="tab" data-tab="roster">Roster</button>
+        <button type="button" id="tabAnalytics" class="tab" data-tab="analytics">Analytics</button>
+      </div>
+      <p id="pageMsg" class="msg" role="status"></p>
+
+      <section id="manningPanel">
+        <div id="manningStats" class="summary"></div>
+        <div id="manningList" class="panel" style="margin-top:12px"></div>
+      </section>
+
+      <section id="rosterPanel" class="hide">
+        <div class="split">
+          <div class="field">
+            <label for="rosterSearch">Search</label>
+            <input id="rosterSearch" placeholder="Name or rank">
+          </div>
+          <div class="field">
+            <label for="rosterFilter">Show</label>
+            <select id="rosterFilter">
+              <option value="current">Current (hide departed)</option>
+              <option value="all">Everyone, including history</option>
+              <option>Inbound</option>
+              <option>Assigned</option>
+              <option>Outbound</option>
+              <option>Departed</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions hide" id="adminTools">
+          <button type="button" id="addPerson" class="button">Add person</button>
+        </div>
+        <div class="table-wrap panel">
+          <table class="data">
+            <thead>
+              <tr><th>Rank</th><th>Name</th><th>Status</th><th>Detail</th><th>Arrived</th><th>Projected departure</th><th></th></tr>
+            </thead>
+            <tbody id="rosterBody"></tbody>
+          </table>
+        </div>
+        <section class="panel" id="detailManager">
+          <h2>Details</h2>
+          <p class="muted">A detail is a duty with a target headcount, such as DDR or FAC.</p>
+          <div id="detailList"></div>
+          <div id="detailForm" class="hide">
+            <div class="split">
+              <div class="field">
+                <label for="detailName">Name</label>
+                <input id="detailName" maxlength="40" placeholder="DDR">
+              </div>
+              <div class="field">
+                <label for="detailRequired">Required headcount</label>
+                <input id="detailRequired" inputmode="numeric" placeholder="10">
+              </div>
+            </div>
+            <button type="button" id="saveDetail" class="button">Save detail</button>
+          </div>
+        </section>
+      </section>
+
+      <section id="analyticsPanel" class="hide">
+        <h2>Time in office</h2>
+        <p class="muted">Current personnel, from arrival date through today (Eastern), longest first. Departed people stay in history and are not listed here.</p>
+        <div class="table-wrap panel">
+          <table class="data">
+            <thead><tr><th>#</th><th>Rank</th><th>Name</th><th>Status</th><th>Detail</th><th>Time in office</th></tr></thead>
+            <tbody id="tenureBody"></tbody>
+          </table>
+        </div>
+        <h2>Inbound and outbound by month</h2>
+        <p class="muted">Inbound counts arrival dates. Outbound counts actual departure dates. The last 12 months, including this one.</p>
+        <p><span class="legend-note"><span class="swatch in"></span>Inbound</span> <span class="legend-note"><span class="swatch out"></span>Outbound</span></p>
+        <div id="trendChart" class="chart-scroll panel"></div>
+        <div class="table-wrap panel">
+          <table class="data">
+            <thead><tr><th>Month</th><th>Inbound</th><th>Outbound</th></tr></thead>
+            <tbody id="trendBody"></tbody>
+          </table>
+        </div>
+        <h2>Upcoming departures</h2>
+        <p class="muted">Projected departure dates for people who have not departed. The 60- and 90-day lists include the nearer windows.</p>
+        <div class="tiles">
+          <section class="tile"><h2>Next 30 days</h2><div id="due30"></div></section>
+          <section class="tile"><h2>Next 60 days</h2><div id="due60"></div></section>
+          <section class="tile"><h2>Next 90 days</h2><div id="due90"></div></section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="personModal" class="modal hide" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="personTitle">Add personnel</h2>
+      <div class="split">
+        <div class="field"><label for="pRank">Rank</label><input id="pRank" maxlength="30"></div>
+        <div class="field"><label for="pName">Name</label><input id="pName" maxlength="100"></div>
+      </div>
+      <label for="pStatus">Status</label>
+      <select id="pStatus">
+        <option>Inbound</option>
+        <option>Assigned</option>
+        <option>Outbound</option>
+        <option>Departed</option>
+      </select>
+      <label for="pDetail">Detail</label>
+      <select id="pDetail"></select>
+      <div class="split">
+        <div class="field"><label for="pArrival">Arrival date</label><input id="pArrival" type="date"></div>
+        <div class="field"><label for="pProjected">Projected departure</label><input id="pProjected" type="date"></div>
+        <div class="field"><label for="pActual">Actual departure</label><input id="pActual" type="date"></div>
+      </div>
+      <label for="pNotes">Notes</label>
+      <textarea id="pNotes" maxlength="2000"></textarea>
+      <div class="actions">
+        <button type="button" id="closePerson" class="button secondary">Cancel</button>
+        <button type="button" id="savePerson" class="button">Save</button>
+      </div>
+    </div>
+  </div>
+  <div id="departModal" class="modal hide" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Mark departed</h2>
+      <p id="departName"></p>
+      <label for="departDate">Actual departure date</label>
+      <input id="departDate" type="date">
+      <p class="muted">They leave the manning counts and stay in history.</p>
+      <div class="actions">
+        <button type="button" id="closeDepart" class="button secondary">Cancel</button>
+        <button type="button" id="saveDepart" class="button">Depart</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/logic/dates.js"></script>
+  <script src="js/logic/eastern.js"></script>
+  <script src="js/logic/auth.js"></script>
+  <script src="js/logic/manning.js"></script>
+  <script src="js/logic/personnel-metrics.js"></script>
+  <script src="js/logic/leave.js"></script>
+  <script src="mock/backend.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/brand.js"></script>
+  <script src="js/access.js"></script>
+  <script src="js/personnel.js"></script>
+</body>
+</html>
