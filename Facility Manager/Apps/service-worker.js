@@ -1,4 +1,4 @@
-const CACHE_NAME = "facility-manager-v5";
+const CACHE_NAME = "facility-manager-v6";
 
 const FILES_TO_CACHE = [
   // Visitor Counter
